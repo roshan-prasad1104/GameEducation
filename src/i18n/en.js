@@ -86,6 +86,7 @@ const en = {
   lesson: {
     minutes: '{n} min', completed: 'Completed', markComplete: 'Mark as complete',
     completedNext: 'Lesson complete', previous: 'Previous', next: 'Next lesson', takeQuiz: 'Take the chapter quiz',
+    notTranslated: 'This lesson is not available in your language yet, so it is shown in English.',
   },
   quiz: {
     questions: '{count} questions', questionOf: 'Question {n} of {total}', answered: '{n}/{total} answered',

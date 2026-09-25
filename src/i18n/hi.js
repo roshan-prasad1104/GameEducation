@@ -86,6 +86,7 @@ const hi = {
   lesson: {
     minutes: '{n} मिनट', completed: 'पूरा हुआ', markComplete: 'पूरा चिह्नित करें',
     completedNext: 'पाठ पूरा हुआ', previous: 'पिछला', next: 'अगला पाठ', takeQuiz: 'अध्याय क्विज़ दें',
+    notTranslated: 'यह पाठ अभी आपकी भाषा में उपलब्ध नहीं है, इसलिए इसे अंग्रेज़ी में दिखाया गया है।',
   },
   quiz: {
     questions: '{count} प्रश्न', questionOf: 'प्रश्न {n} / {total}', answered: '{n}/{total} उत्तर दिए',

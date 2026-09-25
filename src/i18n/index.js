@@ -1,12 +1,14 @@
 import en from './en';
 import hi from './hi';
+import or from './or';
+import te from './te';
 import legacy from './legacy';
 import { LANGUAGES as ALL_LANGUAGES } from '../data/constants';
 
-/** Interface languages: English and Hindi are complete; Odia and Telugu cover the original screens' labels. */
+/** Interface languages: English, Hindi, Odia and Telugu (all dictionaries have the same keys; see scripts/check-i18n.mjs). */
 export const LANGUAGES = ALL_LANGUAGES.map((l) => ({ ...l, label: l.native, short: l.id.toUpperCase() }));
 
-const DICTS = { en, hi };
+const DICTS = { en, hi, or, te };
 
 const lookup = (dict, key) => key.split('.').reduce((acc, part) => (acc == null ? acc : acc[part]), dict);
 
