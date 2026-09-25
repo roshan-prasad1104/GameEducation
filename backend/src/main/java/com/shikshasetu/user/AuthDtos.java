@@ -20,7 +20,8 @@ public final class AuthDtos {
             @NotNull(message = "Grade is required") @Min(6) @Max(12) Integer gradeLevel,
             @NotBlank @Pattern(regexp = "en|hi|or|te", message = "Unsupported language") String preferredLanguage,
             @Size(max = 160) String school,
-            @Size(max = 120) String district) {}
+            @Size(max = 120) String district,
+            @Size(max = 12) String classCode) {}
 
     public record UpdateMeRequest(
             @NotBlank(message = "Name is required") @Size(max = 120) String name,
@@ -31,7 +32,8 @@ public final class AuthDtos {
 
     public record UserView(Long id, String name, String email, Role role, String preferredLanguage,
                            Boolean onboarded, Integer gradeLevel, String school, String district,
-                           Integer xp, Integer level, Integer streak) {
+                           Integer xp, Integer level, Integer streak,
+                           Long classId, String className, String teacherName) {
 
         /** {@code streak} is the live streak (0 if broken); ignored for staff accounts. */
         public static UserView of(User u, StudentProfile p, int streak) {
@@ -42,7 +44,10 @@ public final class AuthDtos {
                     p == null ? null : p.getDistrict(),
                     p == null ? null : p.getXp(),
                     p == null ? null : Levels.levelFor(p.getXp()),
-                    p == null ? null : streak);
+                    p == null ? null : streak,
+                    p == null || p.getClassroom() == null ? null : p.getClassroom().getId(),
+                    p == null || p.getClassroom() == null ? null : p.getClassroom().getName(),
+                    p == null || p.teacherOrNull() == null ? null : p.teacherOrNull().getName());
         }
     }
 

@@ -2,6 +2,7 @@ package com.shikshasetu.user;
 
 import com.shikshasetu.common.ApiException;
 import com.shikshasetu.gamification.GamificationService;
+import com.shikshasetu.school.SchoolService;
 import com.shikshasetu.security.JwtService;
 import com.shikshasetu.user.AuthDtos.*;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwt;
     private final GamificationService gamification;
+    private final SchoolService schools;
 
     @Transactional
     public AuthResponse login(LoginRequest req) {
@@ -43,9 +45,7 @@ public class AuthService {
         User user = users.save(new User(req.name().trim(), email, encoder.encode(req.password()), Role.STUDENT));
         StudentProfile profile = new StudentProfile(user);
         profile.setGradeLevel(req.gradeLevel());
-        // Until a school/class model exists, new students join the first teacher's roster.
-        users.findByRoleOrderByNameAsc(Role.TEACHER).stream().filter(User::isActive).findFirst()
-                .ifPresent(profile::setTeacher);
+        // No class yet: the student joins one with the class code (onboarding/profile) or an admin places them.
         profiles.save(profile);
         return respond(user);
     }
@@ -63,6 +63,7 @@ public class AuthService {
         p.setGradeLevel(req.gradeLevel());
         p.setSchool(blankToNull(req.school()));
         p.setDistrict(blankToNull(req.district()));
+        if (req.classCode() != null && !req.classCode().isBlank()) schools.join(userId, req.classCode());
         p.setOnboarded(true);
         user.setPreferredLanguage(req.preferredLanguage());
         return view(user, p);

@@ -217,7 +217,7 @@ public class GamificationService {
     }
 
     /**
-     * scope: "all" (total XP), "week" (XP earned since Monday) or "class" (classmates with the same teacher).
+     * scope: "all" (total XP), "week" (XP earned since Monday) or "class" (students in the same class).
      */
     public Leaderboard leaderboard(Long currentStudentId, String scope, int limit) {
         List<StudentProfile> all = new ArrayList<>(profileRepo.findLeaderboard());
@@ -229,10 +229,10 @@ public class GamificationService {
             all.forEach(p -> score.put(p.getUser().getId(), p.getXp()));
         }
         if ("class".equals(scope)) {
-            Long teacherId = all.stream().filter(p -> Objects.equals(p.getUser().getId(), currentStudentId)).findFirst()
-                    .map(p -> p.getTeacher() == null ? null : p.getTeacher().getId()).orElse(null);
+            Long classId = all.stream().filter(p -> Objects.equals(p.getUser().getId(), currentStudentId)).findFirst()
+                    .map(p -> p.getClassroom() == null ? null : p.getClassroom().getId()).orElse(null);
             all.removeIf(p -> !Objects.equals(p.getUser().getId(), currentStudentId)
-                    && (teacherId == null || p.getTeacher() == null || !teacherId.equals(p.getTeacher().getId())));
+                    && (classId == null || p.getClassroom() == null || !classId.equals(p.getClassroom().getId())));
         }
         all.sort(Comparator.comparing((StudentProfile p) -> score.get(p.getUser().getId())).reversed()
                 .thenComparing(p -> p.getUser().getName()));

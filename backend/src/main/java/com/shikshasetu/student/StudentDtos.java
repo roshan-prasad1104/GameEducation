@@ -18,7 +18,13 @@ public final class StudentDtos {
     public record LessonPointer(Long lessonId, String lessonTitle, Long chapterId, String chapterTitle,
                                 Long subjectId, String subjectName, String subjectColor) {}
 
-    public record ActivityItem(String type, String title, String detail, Instant at) {}
+    /**
+     * One feed entry. {@code title}/{@code detail} are ready-made English text; {@code name} (lesson,
+     * quiz or badge name in the request language), {@code score}, {@code xp} and {@code code} (badge)
+     * let the app phrase the entry in the student's language.
+     */
+    public record ActivityItem(String type, String title, String detail, Instant at,
+                               String name, Integer score, Integer xp, String code) {}
 
     public record Dashboard(String name, Integer gradeLevel, String school, LevelInfo level, int streak,
                             int longestStreak, long xpThisWeek, long lessonsCompleted, long totalLessons,

@@ -17,8 +17,8 @@ public final class AdminDtos {
                         long completionsLast7Days, boolean aiServiceUp) {}
 
     public record AdminUser(Long id, String name, String email, Role role, boolean active, Instant createdAt,
-                            Instant lastLoginAt, Integer gradeLevel, Long teacherId, String teacherName, Integer xp,
-                            LocalDate lastActive) {}
+                            Instant lastLoginAt, Integer gradeLevel, Long classId, String className,
+                            String teacherName, Integer xp, LocalDate lastActive) {}
 
     public record CreateUserRequest(
             @NotBlank(message = "Name is required") @Size(max = 120) String name,
@@ -26,13 +26,13 @@ public final class AdminDtos {
             @NotBlank @Size(min = 8, max = 72, message = "Password must be 8–72 characters") String password,
             @NotNull(message = "Role is required") Role role,
             @Min(6) @Max(12) Integer gradeLevel,
-            Long teacherId) {}
+            Long classId) {}
 
     public record UpdateUserRequest(
             @NotBlank(message = "Name is required") @Size(max = 120) String name,
             @NotNull Boolean active,
             @Min(6) @Max(12) Integer gradeLevel,
-            Long teacherId,
+            Long classId,
             @Size(min = 8, max = 72, message = "Password must be 8–72 characters") String newPassword) {}
 
     public record SubjectInput(

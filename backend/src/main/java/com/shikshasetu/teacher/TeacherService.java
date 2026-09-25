@@ -17,6 +17,8 @@ import com.shikshasetu.teacher.TeacherDtos.*;
 import com.shikshasetu.user.Role;
 import com.shikshasetu.user.StudentProfile;
 import com.shikshasetu.user.StudentProfileRepository;
+import com.shikshasetu.school.Classroom;
+import com.shikshasetu.school.SchoolService;
 import com.shikshasetu.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,13 +49,17 @@ public class TeacherService {
     private final CatalogService catalog;
     private final LearningService learning;
     private final TimeService time;
+    private final SchoolService schools;
 
     /** All raw data for one teacher's class, loaded once per request. */
     private record ClassData(List<StudentProfile> roster, Map<Long, List<LessonProgress>> progress,
                              Map<Long, List<QuizAttempt>> attempts, List<AnswerFact> facts) {}
 
-    private ClassData load(Long teacherId) {
-        List<StudentProfile> roster = profiles.findActiveByTeacherId(teacherId);
+    /** All of the teacher's classes, or one of them (404 when {@code classId} is not the teacher's class). */
+    private ClassData load(Long teacherId, Long classId) {
+        List<StudentProfile> roster = classId == null
+                ? profiles.findActiveByTeacherId(teacherId)
+                : profiles.findActiveByClassroomId(schools.ownClass(teacherId, classId).getId());
         List<Long> ids = roster.stream().map(p -> p.getUser().getId()).toList();
         if (ids.isEmpty()) return new ClassData(roster, Map.of(), Map.of(), List.of());
         Map<Long, List<LessonProgress>> progress = progressRepo.findByStudentIdIn(ids).stream()
@@ -66,8 +72,8 @@ public class TeacherService {
     /** Student rows plus the name of the model that segmented them. */
     private record Rows(List<StudentRow> list, String model) {}
 
-    public List<StudentRow> students(Long teacherId) {
-        return rows(load(teacherId)).list();
+    public List<StudentRow> students(Long teacherId, Long classId) {
+        return rows(load(teacherId, classId)).list();
     }
 
     private Rows rows(ClassData d) {
@@ -109,8 +115,8 @@ public class TeacherService {
         return new Rows(rows, seg == null ? "none" : seg.model());
     }
 
-    public Overview overview(Long teacherId) {
-        ClassData d = load(teacherId);
+    public Overview overview(Long teacherId, Long classId) {
+        ClassData d = load(teacherId, classId);
         Rows classRows = rows(d);
         List<StudentRow> rows = classRows.list();
         LocalDate today = time.today();
@@ -162,9 +168,11 @@ public class TeacherService {
         List<TeacherActivity> recent = new ArrayList<>();
         allProgress.forEach(lp -> recent.add(new TeacherActivity(names.get(lp.getStudent().getId()),
                 new ActivityItem("LESSON", "Completed " + ContentText.title(lp.getLesson()),
-                        ContentText.name(lp.getLesson().getChapter().getSubject()), lp.getCompletedAt()))));
+                        ContentText.name(lp.getLesson().getChapter().getSubject()), lp.getCompletedAt(),
+                        ContentText.title(lp.getLesson()), null, null, null))));
         allAttempts.forEach(a -> recent.add(new TeacherActivity(names.get(a.getStudent().getId()),
-                new ActivityItem("QUIZ", ContentText.title(a.getQuiz()), "Scored " + a.getPercentage() + "%", a.getSubmittedAt()))));
+                new ActivityItem("QUIZ", ContentText.title(a.getQuiz()), "Scored " + a.getPercentage() + "%", a.getSubmittedAt(),
+                        ContentText.title(a.getQuiz()), a.getPercentage(), null, null))));
         recent.sort(Comparator.comparing((TeacherActivity t) -> t.item().at()).reversed());
 
         return new Overview(rows.size(), active, avg, allProgress.size(), allAttempts.size(),
@@ -172,8 +180,8 @@ public class TeacherService {
                 perf, activity, weakTopics(d).stream().limit(6).toList(), recent.stream().limit(10).toList());
     }
 
-    public List<TopicStat> weakTopics(Long teacherId) {
-        return weakTopics(load(teacherId));
+    public List<TopicStat> weakTopics(Long teacherId, Long classId) {
+        return weakTopics(load(teacherId, classId));
     }
 
     private List<TopicStat> weakTopics(ClassData d) {
@@ -204,7 +212,7 @@ public class TeacherService {
 
     public StudentDetail student(Long teacherId, Long studentId) {
         StudentProfile p = ownStudent(teacherId, studentId);
-        ClassData d = load(teacherId);
+        ClassData d = load(teacherId, p.getClassroom().getId());
         StudentRow row = rows(d).list().stream().filter(r -> r.id().equals(studentId)).findFirst()
                 .orElseThrow(() -> ApiException.notFound("Student"));
         AuthUser asStudent = new AuthUser(studentId, p.getUser().getEmail(), p.getUser().getName(), Role.STUDENT);
@@ -222,15 +230,21 @@ public class TeacherService {
 
     // ------------------------------------------------------------------ assignments
 
-    public List<AssignmentView> assignments(Long teacherId) {
-        ClassData d = load(teacherId);
-        int classSize = d.roster().size();
-        return assignments.findByTeacherIdOrderByCreatedAtDesc(teacherId).stream().map(a -> {
-            List<Long> targets = a.getStudent() != null ? List.of(a.getStudent().getId())
-                    : d.roster().stream().map(p -> p.getUser().getId()).toList();
-            int done = (int) targets.stream().filter(sid -> isDone(a, d, sid)).count();
-            return view(a, done, a.getStudent() != null ? 1 : classSize);
-        }).toList();
+    public List<AssignmentView> assignments(Long teacherId, Long classId) {
+        ClassData d = load(teacherId, classId);
+        Set<Long> inScope = d.roster().stream().map(p -> p.getUser().getId()).collect(Collectors.toSet());
+        return assignments.findByTeacherIdOrderByCreatedAtDesc(teacherId).stream()
+                .filter(a -> classId == null
+                        || (a.getClassroom() != null && a.getClassroom().getId().equals(classId))
+                        || (a.getStudent() != null && inScope.contains(a.getStudent().getId())))
+                .map(a -> {
+                    List<Long> targets = a.getStudent() != null ? List.of(a.getStudent().getId())
+                            : d.roster().stream().filter(p -> p.getClassroom() != null
+                                    && p.getClassroom().getId().equals(a.getClassroom().getId()))
+                            .map(p -> p.getUser().getId()).toList();
+                    int done = (int) targets.stream().filter(sid -> isDone(a, d, sid)).count();
+                    return view(a, done, targets.size());
+                }).toList();
     }
 
     @Transactional
@@ -249,10 +263,27 @@ public class TeacherService {
         a.setCreatedAt(Instant.now());
         if (req.lessonId() != null) a.setLesson(lessons.findById(req.lessonId()).orElseThrow(() -> ApiException.notFound("Lesson")));
         if (req.quizId() != null) a.setQuiz(quizzes.findById(req.quizId()).orElseThrow(() -> ApiException.notFound("Quiz")));
-        if (req.studentId() != null) a.setStudent(ownStudent(teacher.id(), req.studentId()).getUser());
+        int target;
+        if (req.studentId() != null) {
+            a.setStudent(ownStudent(teacher.id(), req.studentId()).getUser());
+            target = 1;
+        } else {
+            Classroom c = targetClass(teacher.id(), req.classId());
+            a.setClassroom(c);
+            target = profiles.findActiveByClassroomId(c.getId()).size();
+        }
         assignments.save(a);
-        int target = a.getStudent() != null ? 1 : profiles.findActiveByTeacherId(teacher.id()).size();
         return view(a, 0, target);
+    }
+
+    /** The class a whole-class assignment goes to: the given one (must be the teacher's) or their only class. */
+    private Classroom targetClass(Long teacherId, Long classId) {
+        if (classId != null) return schools.ownClass(teacherId, classId);
+        List<Long> own = schools.classesOf(teacherId).stream().map(c -> c.id()).toList();
+        if (own.size() == 1) return schools.ownClass(teacherId, own.getFirst());
+        throw ApiException.badRequest(own.isEmpty()
+                ? "You are not assigned to a class yet. Ask your school admin."
+                : "Choose which class to assign this to.");
     }
 
     @Transactional
@@ -277,12 +308,14 @@ public class TeacherService {
                 a.getLesson() == null ? null : a.getLesson().getId(), a.getLesson() == null ? null : ContentText.title(a.getLesson()),
                 a.getQuiz() == null ? null : a.getQuiz().getId(), a.getQuiz() == null ? null : ContentText.title(a.getQuiz()),
                 chapterId, null, a.getStudent() == null ? null : a.getStudent().getId(),
-                a.getStudent() == null ? null : a.getStudent().getName(), a.getCreatedAt(), null, done, target);
+                a.getStudent() == null ? null : a.getStudent().getName(), a.getCreatedAt(), null, done, target,
+                a.getClassroom() == null ? null : a.getClassroom().getId(),
+                a.getClassroom() == null ? null : a.getClassroom().getName());
     }
 
     private StudentProfile ownStudent(Long teacherId, Long studentId) {
         return profiles.findByUserId(studentId)
-                .filter(p -> p.getTeacher() != null && p.getTeacher().getId().equals(teacherId))
+                .filter(p -> p.teacherOrNull() != null && p.teacherOrNull().getId().equals(teacherId))
                 .orElseThrow(() -> ApiException.notFound("Student"));
     }
 

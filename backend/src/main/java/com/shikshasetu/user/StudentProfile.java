@@ -1,5 +1,6 @@
 package com.shikshasetu.user;
 
+import com.shikshasetu.school.Classroom;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,10 +27,10 @@ public class StudentProfile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    /** Teacher responsible for this student (teacher ↔ student relationship). */
+    /** The student's class; its teacher is the student's teacher. Null until the student joins a class. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id")
-    private User teacher;
+    @JoinColumn(name = "classroom_id")
+    private Classroom classroom;
 
     private Integer gradeLevel;
 
@@ -55,5 +56,10 @@ public class StudentProfile {
 
     public StudentProfile(User user) {
         this.user = user;
+    }
+
+    /** The teacher of the student's class, or null. */
+    public User teacherOrNull() {
+        return classroom == null ? null : classroom.getTeacher();
     }
 }

@@ -7,6 +7,8 @@ import com.shikshasetu.gamification.StudentBadgeRepository;
 import com.shikshasetu.gamification.XpTransactionRepository;
 import com.shikshasetu.learning.LessonProgressRepository;
 import com.shikshasetu.learning.QuizAttemptRepository;
+import com.shikshasetu.learning.QuizSessionRepository;
+import com.shikshasetu.school.SchoolService;
 import com.shikshasetu.teacher.AssignmentRepository;
 import com.shikshasetu.user.*;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class AdminUserService {
     private final StudentBadgeRepository badges;
     private final RecommendationRepository recommendations;
     private final AssignmentRepository assignments;
+    private final QuizSessionRepository quizSessions;
+    private final SchoolService schools;
 
     @Transactional(readOnly = true)
     public List<AdminUser> list() {
@@ -49,7 +53,7 @@ public class AdminUserService {
         if (req.role() == Role.STUDENT) {
             p = new StudentProfile(u);
             p.setGradeLevel(req.gradeLevel());
-            p.setTeacher(req.teacherId() == null ? null : teacher(req.teacherId()));
+            schools.placeStudent(p, req.classId());
             profiles.save(p);
         }
         return view(u, p);
@@ -67,7 +71,7 @@ public class AdminUserService {
         StudentProfile p = profiles.findByUserId(id).orElse(null);
         if (p != null) {
             p.setGradeLevel(req.gradeLevel());
-            p.setTeacher(req.teacherId() == null ? null : teacher(req.teacherId()));
+            schools.placeStudent(p, req.classId());
         }
         return view(u, p);
     }
@@ -79,6 +83,8 @@ public class AdminUserService {
         if (u.getId().equals(actingAdminId)) throw ApiException.badRequest("You cannot delete your own account.");
         switch (u.getRole()) {
             case STUDENT -> {
+                quizSessions.deleteAnswersByStudentId(id);
+                quizSessions.deleteSessionsByStudentId(id);
                 attempts.deleteAll(attempts.findByStudentIdOrderBySubmittedAtDesc(id));
                 progress.deleteByStudentId(id);
                 xp.deleteByStudentId(id);
@@ -88,8 +94,7 @@ public class AdminUserService {
                 profiles.deleteByUserId(id);
             }
             case TEACHER -> {
-                profiles.findAll().stream().filter(p -> p.getTeacher() != null && p.getTeacher().getId().equals(id))
-                        .forEach(p -> p.setTeacher(null));
+                schools.releaseTeacher(id);
                 assignments.deleteByTeacherId(id);
             }
             case ADMIN -> { }
@@ -97,16 +102,12 @@ public class AdminUserService {
         users.delete(u);
     }
 
-    private User teacher(Long teacherId) {
-        return users.findById(teacherId).filter(t -> t.getRole() == Role.TEACHER)
-                .orElseThrow(() -> ApiException.badRequest("Selected teacher does not exist."));
-    }
-
     private static AdminUser view(User u, StudentProfile p) {
         return new AdminUser(u.getId(), u.getName(), u.getEmail(), u.getRole(), u.isActive(), u.getCreatedAt(),
                 u.getLastLoginAt(), p == null ? null : p.getGradeLevel(),
-                p == null || p.getTeacher() == null ? null : p.getTeacher().getId(),
-                p == null || p.getTeacher() == null ? null : p.getTeacher().getName(),
+                p == null || p.getClassroom() == null ? null : p.getClassroom().getId(),
+                p == null || p.getClassroom() == null ? null : p.getClassroom().getName(),
+                p == null || p.teacherOrNull() == null ? null : p.teacherOrNull().getName(),
                 p == null ? null : p.getXp(), p == null ? null : p.getLastActiveDate());
     }
 }

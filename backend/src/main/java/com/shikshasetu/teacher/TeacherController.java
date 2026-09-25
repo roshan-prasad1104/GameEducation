@@ -18,14 +18,16 @@ import java.util.List;
 public class TeacherController {
     private final TeacherService teacher;
 
+    // classId (optional) narrows a view to one of the teacher's classes; without it all their classes count.
+
     @GetMapping("/overview")
-    public Overview overview() {
-        return teacher.overview(CurrentUser.id());
+    public Overview overview(@RequestParam(required = false) Long classId) {
+        return teacher.overview(CurrentUser.id(), classId);
     }
 
     @GetMapping("/students")
-    public List<StudentRow> students() {
-        return teacher.students(CurrentUser.id());
+    public List<StudentRow> students(@RequestParam(required = false) Long classId) {
+        return teacher.students(CurrentUser.id(), classId);
     }
 
     @GetMapping("/students/{id}")
@@ -34,14 +36,14 @@ public class TeacherController {
     }
 
     @GetMapping("/weak-topics")
-    public List<TopicStat> weakTopics() {
-        return teacher.weakTopics(CurrentUser.id());
+    public List<TopicStat> weakTopics(@RequestParam(required = false) Long classId) {
+        return teacher.weakTopics(CurrentUser.id(), classId);
     }
 
     /** One row per student: the roster with performance and support segment. */
     @GetMapping("/reports/students.csv")
-    public ResponseEntity<byte[]> studentsCsv() {
-        List<List<?>> rows = teacher.students(CurrentUser.id()).stream().<List<?>>map(s -> Arrays.asList(
+    public ResponseEntity<byte[]> studentsCsv(@RequestParam(required = false) Long classId) {
+        List<List<?>> rows = teacher.students(CurrentUser.id(), classId).stream().<List<?>>map(s -> Arrays.asList(
                 s.id(), s.name(), s.email(), s.gradeLevel(), s.xp(), s.level(), s.streak(), s.lessonsCompleted(),
                 s.quizAttempts(), s.averageScore(), s.lastActive(), s.activeDays(), s.segment(), s.weakestTopic())).toList();
         return CsvReport.of("class-students.csv", List.of("student_id", "name", "email", "grade", "xp", "level",
@@ -51,8 +53,8 @@ public class TeacherController {
 
     /** One row per topic: answer accuracy across the class. */
     @GetMapping("/reports/topics.csv")
-    public ResponseEntity<byte[]> topicsCsv() {
-        List<List<?>> rows = teacher.weakTopics(CurrentUser.id()).stream().<List<?>>map(t -> Arrays.asList(
+    public ResponseEntity<byte[]> topicsCsv(@RequestParam(required = false) Long classId) {
+        List<List<?>> rows = teacher.weakTopics(CurrentUser.id(), classId).stream().<List<?>>map(t -> Arrays.asList(
                 t.subjectName(), t.topic(), t.topicName(), t.answered(), t.correct(), t.accuracy(),
                 t.studentsStruggling(), t.lessonTitle())).toList();
         return CsvReport.of("class-topics.csv", List.of("subject", "topic_code", "topic", "answers", "correct",
@@ -60,8 +62,8 @@ public class TeacherController {
     }
 
     @GetMapping("/assignments")
-    public List<AssignmentView> assignments() {
-        return teacher.assignments(CurrentUser.id());
+    public List<AssignmentView> assignments(@RequestParam(required = false) Long classId) {
+        return teacher.assignments(CurrentUser.id(), classId);
     }
 
     @PostMapping("/assignments")

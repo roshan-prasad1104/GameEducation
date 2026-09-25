@@ -162,6 +162,12 @@ class ApiIntegrationTest {
 
         // Leaderboard scopes
         assertThat(getJson("/api/students/me/leaderboard?scope=week", token).get("me").get("xp").asInt()).isGreaterThan(0);
+        assertThat(getJson("/api/students/me/leaderboard?scope=class", token).get("entries").size()).isEqualTo(1);
+        // Joining the demo class with the teacher's class code brings in the classmates
+        String code = getJson("/api/teacher/classes", login("teacher@shiksha.org", "Teacher@123")).at("/0/joinCode").asText();
+        mvc.perform(put("/api/students/me/class").header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"joinCode\":\"" + code.toLowerCase() + "\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.className").value("Class 8 – Section A"));
         assertThat(getJson("/api/students/me/leaderboard?scope=class", token).get("entries").size()).isGreaterThan(1);
         assertThat(getJson("/api/catalog/outline", token).size()).isEqualTo(5);
 

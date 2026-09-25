@@ -133,22 +133,24 @@ public class StudentService {
                                               List<BadgeView> earned) {
         List<ActivityItem> items = new ArrayList<>();
         done.stream().limit(6).forEach(d -> items.add(new ActivityItem("LESSON", "Completed " + ContentText.title(d.getLesson()),
-                ContentText.name(d.getLesson().getChapter().getSubject()), d.getCompletedAt())));
+                ContentText.name(d.getLesson().getChapter().getSubject()), d.getCompletedAt(),
+                ContentText.title(d.getLesson()), null, null, null)));
         quizAttempts.stream().limit(6).forEach(a -> items.add(new ActivityItem("QUIZ", ContentText.title(a.getQuiz()),
-                "Scored " + a.getPercentage() + "% · +" + a.getXpEarned() + " XP", a.getSubmittedAt())));
+                "Scored " + a.getPercentage() + "% · +" + a.getXpEarned() + " XP", a.getSubmittedAt(),
+                ContentText.title(a.getQuiz()), a.getPercentage(), a.getXpEarned(), null)));
         earned.stream().limit(6).forEach(b -> items.add(new ActivityItem("BADGE", "Unlocked " + b.name(),
-                b.description(), b.earnedAt())));
+                b.description(), b.earnedAt(), b.name(), null, null, b.code())));
         items.sort(Comparator.comparing(ActivityItem::at).reversed());
         return items.stream().limit(8).toList();
     }
 
     private List<AssignmentView> assignmentsFor(StudentProfile p) {
-        if (p.getTeacher() == null) return List.of();
         Long sid = p.getUser().getId();
         Set<Long> doneLessons = progress.findCompletedLessonIds(sid);
         List<QuizAttempt> quizAttempts = attempts.findByStudentIdOrderBySubmittedAtDesc(sid);
         List<AssignmentView> out = new ArrayList<>();
-        for (Assignment a : assignments.findForStudent(p.getTeacher().getId(), sid)) {
+        Long classroomId = p.getClassroom() == null ? null : p.getClassroom().getId();
+        for (Assignment a : assignments.findForStudent(classroomId, sid)) {
             boolean completed = a.getLesson() != null
                     ? doneLessons.contains(a.getLesson().getId())
                     : quizAttempts.stream().anyMatch(q -> q.getQuiz().getId().equals(a.getQuiz().getId())
@@ -159,7 +161,9 @@ public class StudentService {
                     a.getLesson() == null ? null : ContentText.title(a.getLesson()),
                     a.getQuiz() == null ? null : a.getQuiz().getId(),
                     a.getQuiz() == null ? null : ContentText.title(a.getQuiz()), chapterId,
-                    a.getTeacher().getName(), null, null, a.getCreatedAt(), completed, null, null));
+                    a.getTeacher().getName(), null, null, a.getCreatedAt(), completed, null, null,
+                    a.getClassroom() == null ? null : a.getClassroom().getId(),
+                    a.getClassroom() == null ? null : a.getClassroom().getName()));
         }
         return out;
     }

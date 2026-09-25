@@ -91,6 +91,33 @@ class ContentLocalizationTest {
         assertThat(again.at("/questions/0/prompt").asText()).isEqualTo(en.at("/questions/0/prompt").asText());
     }
 
+    @Test
+    void recommendationsAndActivityCarryLocalizedNamesAndFacts() throws Exception {
+        String token = student();
+        mvc.perform(post("/api/lessons/1/complete").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        JsonNode quiz = get("/api/quizzes/1", token, "en");
+        List<Map<String, Object>> answers = new ArrayList<>();
+        quiz.get("questions").forEach(q -> answers.add(Map.of("questionId", q.get("id").asLong(), "selectedIndex", 1)));
+        mvc.perform(post("/api/quizzes/1/submit").header("Authorization", "Bearer " + token).contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("answers", answers, "clientAttemptId", UUID.randomUUID().toString()))))
+                .andExpect(status().isOk());
+
+        JsonNode recs = get("/api/students/me/recommendations", token, "hi");
+        JsonNode first = recs.at("/recommendations/0");
+        assertThat(inScript(first.get("title").asText(), "hi")).isTrue();
+        assertThat(inScript(first.get("subjectName").asText(), "hi")).isTrue();
+        assertThat(first.at("/reasonParams/subject").asText()).isEqualTo(first.get("subjectName").asText());
+        assertThat(first.get("reason").asText()).isNotBlank(); // the model's own (English) explanation is kept
+        if (first.get("kind").asText().equals("REVISE")) assertThat(first.at("/reasonParams/answered").asInt()).isPositive();
+
+        JsonNode activity = get("/api/students/me/dashboard", token, "te").get("recentActivity");
+        JsonNode quizItem = null;
+        for (JsonNode a : activity) if (a.get("type").asText().equals("QUIZ")) quizItem = a;
+        assertThat(quizItem).isNotNull();
+        assertThat(inScript(quizItem.get("name").asText(), "te")).isTrue();
+        assertThat(quizItem.get("score").isInt()).isTrue();
+    }
+
     // ------------------------------------------------------------------ helpers
 
     private static boolean inScript(String text, String lang) {

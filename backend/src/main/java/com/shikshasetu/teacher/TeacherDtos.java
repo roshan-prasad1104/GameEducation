@@ -42,5 +42,6 @@ public final class TeacherDtos {
             LocalDate dueDate,
             Long lessonId,
             Long quizId,
-            Long studentId) {}
+            Long studentId,
+            Long classId) {}
 }

@@ -2,6 +2,7 @@ package com.shikshasetu.ai;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 /** Wire format shared with the Python FastAPI service (see ai-service/README.md). */
 public final class AiDtos {
@@ -24,9 +25,18 @@ public final class AiDtos {
     public record RecommendResponse(Long studentId, List<SubjectMastery> subjectMastery, List<WeakTopic> weakTopics,
                                     List<RecommendationItem> recommendations, String model, Instant generatedAt) {}
 
+    /**
+     * A recommendation as the app shows it: names in the request language, the model's own English
+     * explanation ({@code reason}) and the facts behind it ({@code reasonParams}) so the app can
+     * phrase the explanation in the student's language.
+     */
+    public record RecommendationView(Long lessonId, String title, Long subjectId, String subjectName, Long chapterId,
+                                     String chapterTitle, String topic, String kind, double priority, String reason,
+                                     Map<String, Object> reasonParams) {}
+
     /** What the backend returns to the frontend: the AI response plus where it came from. */
     public record RecommendationsView(List<SubjectMastery> subjectMastery, List<WeakTopic> weakTopics,
-                                      List<RecommendationItem> recommendations, String model, String source,
+                                      List<RecommendationView> recommendations, String model, String source,
                                       Instant generatedAt) {}
 
     public record SegmentStudent(Long studentId, String name, double avgScore, int lessonsCompleted,

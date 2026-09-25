@@ -3,6 +3,7 @@ package com.shikshasetu.teacher;
 import com.shikshasetu.content.Lesson;
 import com.shikshasetu.content.Quiz;
 import com.shikshasetu.user.User;
+import com.shikshasetu.school.Classroom;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /**
- * A learning activity a teacher assigns: one lesson or one quiz, either to a
- * single student or (when {@code student} is null) to all of the teacher's students.
+ * A learning activity a teacher assigns: one lesson or one quiz, either to a single
+ * student or to a whole class (exactly one of {@code student} and {@code classroom} is set).
  */
 @Entity
 @Table(name = "assignments")
@@ -33,6 +34,10 @@ public class Assignment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private User student;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classroom_id")
+    private Classroom classroom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")

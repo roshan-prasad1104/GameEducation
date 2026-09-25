@@ -9,6 +9,10 @@ import com.shikshasetu.gamification.GamificationService;
 import com.shikshasetu.learning.LearningDtos.AnswerInput;
 import com.shikshasetu.learning.LearningDtos.SubmitQuizRequest;
 import com.shikshasetu.learning.LearningService;
+import com.shikshasetu.school.Classroom;
+import com.shikshasetu.school.ClassroomRepository;
+import com.shikshasetu.school.School;
+import com.shikshasetu.school.SchoolRepository;
 import com.shikshasetu.seed.ContentSeed.*;
 import com.shikshasetu.teacher.Assignment;
 import com.shikshasetu.teacher.AssignmentRepository;
@@ -51,6 +55,8 @@ public class DataSeeder implements ApplicationRunner {
     private final LessonRepository lessons;
     private final QuizRepository quizzes;
     private final AssignmentRepository assignments;
+    private final SchoolRepository schools;
+    private final ClassroomRepository classes;
     private final LearningService learning;
     private final GamificationService gamification;
     private final PasswordEncoder encoder;
@@ -74,7 +80,7 @@ public class DataSeeder implements ApplicationRunner {
                 throw new IllegalStateException("Could not read seed/content.json", e);
             }
         });
-        Long teacherId = tx.execute(s -> seedStaff());
+        Long classId = tx.execute(s -> seedStaffAndClass());
 
         List<Persona> personas = List.of(
                 // The demo student: strong in science, weak in linear equations → AI recommends revising algebra.
@@ -98,10 +104,10 @@ public class DataSeeder implements ApplicationRunner {
 
         Random rng = new Random(42);
         for (Persona p : personas) {
-            Long studentId = tx.execute(s -> createStudent(p, teacherId));
+            Long studentId = tx.execute(s -> createStudent(p, classId));
             replayHistory(p, studentId, rng);
         }
-        tx.executeWithoutResult(s -> seedAssignments(teacherId));
+        tx.executeWithoutResult(s -> seedAssignments(classId));
         log.info("Seeding complete: {} users, {} lessons, {} quizzes.", users.count(), lessons.count(), quizzes.count());
     }
 
@@ -165,14 +171,23 @@ public class DataSeeder implements ApplicationRunner {
         }
     }
 
-    private Long seedStaff() {
+    /** Admin, teacher, and the teacher's class at the demo school; returns the class id. */
+    private Long seedStaffAndClass() {
         User admin = new User("Ravi Mahapatra", "admin@shiksha.org", encoder.encode("Admin@123"), Role.ADMIN);
         users.save(admin);
-        User teacher = new User("Sunita Kullu", "teacher@shiksha.org", encoder.encode("Teacher@123"), Role.TEACHER);
-        return users.save(teacher).getId();
+        User teacher = users.save(new User("Sunita Kullu", "teacher@shiksha.org", encoder.encode("Teacher@123"), Role.TEACHER));
+        School school = schools.save(new School("Govt. High School, Sundargarh", "Sundargarh, Odisha"));
+        Classroom c = new Classroom();
+        c.setSchool(school);
+        c.setName("Class 8 – Section A");
+        c.setGradeLevel(8);
+        c.setTeacher(teacher);
+        c.setJoinCode(Classroom.newJoinCode());
+        c.setCreatedAt(Instant.now());
+        return classes.save(c).getId();
     }
 
-    private Long createStudent(Persona p, Long teacherId) {
+    private Long createStudent(Persona p, Long classId) {
         User u = new User(p.name(), p.email(), encoder.encode("Student@123"), Role.STUDENT);
         users.save(u);
         StudentProfile profile = new StudentProfile(u);
@@ -180,7 +195,7 @@ public class DataSeeder implements ApplicationRunner {
         profile.setSchool("Govt. High School, Sundargarh");
         profile.setDistrict("Sundargarh, Odisha");
         profile.setOnboarded(true);
-        profile.setTeacher(users.getReferenceById(teacherId));
+        profile.setClassroom(classes.getReferenceById(classId));
         profiles.save(profile);
         return u.getId();
     }
@@ -242,13 +257,15 @@ public class DataSeeder implements ApplicationRunner {
         return answers;
     }
 
-    private void seedAssignments(Long teacherId) {
-        User teacher = users.getReferenceById(teacherId);
+    private void seedAssignments(Long classId) {
+        Classroom classroom = classes.findById(classId).orElseThrow();
+        User teacher = classroom.getTeacher();
         Lesson algebra = lessons.findAllInCurriculumOrder().stream()
                 .filter(l -> l.getTopic().equals("linear-equations")).findFirst().orElse(null);
         if (algebra != null) {
             Assignment a = new Assignment();
             a.setTeacher(teacher);
+            a.setClassroom(classroom);
             a.setLesson(algebra);
             a.setTitle("Revise: " + algebra.getTitle());
             a.setNote("Many of you found linear equations tricky. Re-read this before Friday.");
@@ -261,6 +278,7 @@ public class DataSeeder implements ApplicationRunner {
         if (physicsQuiz != null) {
             Assignment a = new Assignment();
             a.setTeacher(teacher);
+            a.setClassroom(classroom);
             a.setQuiz(physicsQuiz);
             a.setTitle("Practice: " + physicsQuiz.getTitle());
             a.setDueDate(time.today().plusDays(5));

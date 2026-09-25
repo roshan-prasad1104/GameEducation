@@ -8,12 +8,15 @@ import java.util.List;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
-    @EntityGraph(attributePaths = {"student", "lesson", "quiz"})
+    @EntityGraph(attributePaths = {"student", "classroom", "lesson", "quiz"})
     List<Assignment> findByTeacherIdOrderByCreatedAtDesc(Long teacherId);
 
+    /** Work assigned to the student personally or to their class (classroomId may be null). */
     @EntityGraph(attributePaths = {"lesson", "quiz", "teacher"})
-    @Query("select a from Assignment a where a.teacher.id = :teacherId and (a.student is null or a.student.id = :studentId) order by a.createdAt desc")
-    List<Assignment> findForStudent(Long teacherId, Long studentId);
+    @Query("select a from Assignment a where a.student.id = :studentId or a.classroom.id = :classroomId order by a.createdAt desc")
+    List<Assignment> findForStudent(Long classroomId, Long studentId);
+
+    void deleteByClassroomId(Long classroomId);
 
     void deleteByStudentId(Long studentId);
 
