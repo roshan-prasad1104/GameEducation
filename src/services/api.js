@@ -143,6 +143,8 @@ export const learningApi = {
     }
   },
 
+  /** Instant per-question feedback (online only; nothing is stored until the quiz is submitted). */
+  checkAnswer: (quizId, questionId, selectedIndex) => http.post(`/quizzes/${quizId}/check`, { questionId, selectedIndex }),
   attempt: (id) => http.get(`/students/me/attempts/${id}`),
   attempts: () => listWithSnapshot('attempts', () => http.get('/students/me/attempts')),
   syncedResult: (clientAttemptId) => offlineStore.getResult(clientAttemptId),
@@ -154,7 +156,7 @@ export const studentApi = {
   badges: () => listWithSnapshot('badges', () => http.get('/students/me/badges')),
   xp: () => withSnapshot('xp', () => http.get('/students/me/xp')),
   recommendations: (limit = 4) => withSnapshot(`recs:${limit}`, () => http.get(`/students/me/recommendations?limit=${limit}`)),
-  leaderboard: () => withSnapshot('leaderboard', () => http.get('/students/me/leaderboard?limit=20')),
+  leaderboard: (scope = 'all') => withSnapshot(`leaderboard:${scope}`, () => http.get(`/students/me/leaderboard?scope=${scope}&limit=20`)),
   assignments: () => listWithSnapshot('assignments', () => http.get('/students/me/assignments')),
 };
 
@@ -169,6 +171,7 @@ export const teacherApi = {
   subjects: () => http.get('/subjects'),
   subject: (id) => http.get(`/subjects/${id}`),
   chapter: (id) => http.get(`/chapters/${id}`),
+  outline: () => http.get('/catalog/outline'),
 };
 
 export const adminApi = {

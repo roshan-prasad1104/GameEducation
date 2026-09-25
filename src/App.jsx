@@ -4,106 +4,115 @@ import { AppProvider } from './context/AppContext';
 import { NotificationBanner } from './components/common/NotificationBanner';
 import { AppLayout } from './components/layout/AppLayout';
 import { GuestRoute, ProtectedRoute } from './components/routing/ProtectedRoute';
+import { LoadingState } from './components/ui';
 
-import { LandingPage } from './pages/public/LandingPage';
-import { LoginPage } from './pages/public/LoginPage';
-import { RegisterPage } from './pages/public/RegisterPage';
-import { OnboardingPage } from './pages/public/OnboardingPage';
-import { NotFoundPage } from './pages/public/NotFoundPage';
-import { ProfilePage } from './pages/shared/ProfilePage';
+// Original screens (now backed by the real API)
+import { LandingPage } from './components/landing/LandingPage';
+import { AuthModal } from './components/auth/AuthModal';
+import { OnboardingModal } from './components/auth/OnboardingModal';
+import { StudentDashboard } from './components/dashboard/StudentDashboard';
+import { CourseCatalog } from './components/courses/CourseCatalog';
+import { LessonView } from './components/lesson/LessonView';
+import { QuizScreen } from './components/quiz/QuizScreen';
+import { PendingResultScreen, ResultScreen } from './components/quiz/ResultScreen';
+import { AchievementsView } from './components/achievements/AchievementsView';
+import { LeaderboardView } from './components/leaderboard/LeaderboardView';
+import { ProfileView } from './components/profile/ProfileView';
+import { MissionsView } from './components/missions/MissionsView';
 
-import { DashboardPage } from './pages/student/DashboardPage';
-import { SubjectsPage } from './pages/student/SubjectsPage';
+// Screens that did not exist before, built with the same design system
 import { SubjectPage } from './pages/student/SubjectPage';
 import { ChapterPage } from './pages/student/ChapterPage';
-import { LessonPage } from './pages/student/LessonPage';
-import { QuizPage } from './pages/student/QuizPage';
-import { PendingResultPage, ResultPage } from './pages/student/ResultPage';
 import { ForYouPage } from './pages/student/ForYouPage';
 import { ProgressPage } from './pages/student/ProgressPage';
-import { BadgesPage } from './pages/student/BadgesPage';
-import { LeaderboardPage } from './pages/student/LeaderboardPage';
 import { DownloadsPage } from './pages/student/DownloadsPage';
-
-import { LoadingState } from './components/ui';
+import { NotFoundPage } from './pages/public/NotFoundPage';
 
 // Teacher and admin screens are online-only, so they are split out of the student bundle.
 const named = (loader, name) => lazy(() => loader().then((m) => ({ default: m[name] })));
-const TeacherDashboardPage = named(() => import('./pages/teacher/TeacherDashboardPage'), 'TeacherDashboardPage');
-const StudentsPage = named(() => import('./pages/teacher/StudentsPage'), 'StudentsPage');
+const TeacherDashboard = named(() => import('./components/teacher/TeacherDashboard'), 'TeacherDashboard');
 const StudentDetailPage = named(() => import('./pages/teacher/StudentDetailPage'), 'StudentDetailPage');
-const WeakTopicsPage = named(() => import('./pages/teacher/WeakTopicsPage'), 'WeakTopicsPage');
-const AssignmentsPage = named(() => import('./pages/teacher/AssignmentsPage'), 'AssignmentsPage');
 const AdminDashboardPage = named(() => import('./pages/admin/AdminDashboardPage'), 'AdminDashboardPage');
 const UsersPage = named(() => import('./pages/admin/UsersPage'), 'UsersPage');
 const ContentPage = named(() => import('./pages/admin/ContentPage'), 'ContentPage');
 const QuizEditorPage = named(() => import('./pages/admin/QuizEditorPage'), 'QuizEditorPage');
+
+const Landing = () => (
+  <div className="min-h-screen app-canvas">
+    <LandingPage />
+  </div>
+);
 
 export default function App() {
   return (
     <AppProvider>
       <BrowserRouter>
         <Suspense fallback={<div className="p-8"><LoadingState rows={2} /></div>}>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route element={<GuestRoute />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-
-          <Route element={<ProtectedRoute role="STUDENT" allowUnonboarded />}>
-            <Route path="/onboarding" element={<OnboardingPage />} />
-          </Route>
-
-          <Route path="/student" element={<ProtectedRoute role="STUDENT" />}>
-            <Route element={<AppLayout />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="subjects" element={<SubjectsPage />} />
-              <Route path="subjects/:subjectId" element={<SubjectPage />} />
-              <Route path="chapters/:chapterId" element={<ChapterPage />} />
-              <Route path="lessons/:lessonId" element={<LessonPage />} />
-              <Route path="quiz/:quizId" element={<QuizPage />} />
-              <Route path="results" element={<Navigate to="/student/progress" replace />} />
-              <Route path="results/:attemptId" element={<ResultPage />} />
-              <Route path="results/pending/:clientAttemptId" element={<PendingResultPage />} />
-              <Route path="for-you" element={<ForYouPage />} />
-              <Route path="progress" element={<ProgressPage />} />
-              <Route path="badges" element={<BadgesPage />} />
-              <Route path="leaderboard" element={<LeaderboardPage />} />
-              <Route path="downloads" element={<DownloadsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="*" element={<NotFoundPage />} />
+          <Routes>
+            {/* Public landing; sign-in / sign-up open the original dialog over it */}
+            <Route path="/" element={<Landing />} />
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<><Landing /><AuthModal mode="login" /></>} />
+              <Route path="/register" element={<><Landing /><AuthModal mode="register" /></>} />
             </Route>
-          </Route>
-
-          <Route path="/teacher" element={<ProtectedRoute role="TEACHER" />}>
-            <Route element={<AppLayout />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<TeacherDashboardPage />} />
-              <Route path="students" element={<StudentsPage />} />
-              <Route path="students/:studentId" element={<StudentDetailPage />} />
-              <Route path="weak-topics" element={<WeakTopicsPage />} />
-              <Route path="assignments" element={<AssignmentsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="*" element={<NotFoundPage />} />
+            <Route element={<ProtectedRoute role="STUDENT" allowUnonboarded />}>
+              <Route path="/onboarding" element={<><Landing /><OnboardingModal /></>} />
             </Route>
-          </Route>
 
-          <Route path="/admin" element={<ProtectedRoute role="ADMIN" />}>
-            <Route element={<AppLayout />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="users" element={<UsersPage />} />
-              <Route path="content" element={<ContentPage />} />
-              <Route path="quizzes/:quizId" element={<QuizEditorPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="*" element={<NotFoundPage />} />
+            {/* Student area */}
+            <Route path="/student" element={<ProtectedRoute role="STUDENT" />}>
+              <Route element={<AppLayout />}>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<StudentDashboard />} />
+                <Route path="subjects" element={<CourseCatalog />} />
+                <Route path="subjects/:subjectId" element={<SubjectPage />} />
+                <Route path="chapters/:chapterId" element={<ChapterPage />} />
+                <Route path="lessons/:lessonId" element={<LessonView />} />
+                <Route path="quiz/:quizId" element={<QuizScreen />} />
+                <Route path="results" element={<Navigate to="/student/progress" replace />} />
+                <Route path="results/:attemptId" element={<ResultScreen />} />
+                <Route path="results/pending/:clientAttemptId" element={<PendingResultScreen />} />
+                <Route path="missions" element={<MissionsView />} />
+                <Route path="badges" element={<AchievementsView />} />
+                <Route path="leaderboard" element={<LeaderboardView />} />
+                <Route path="recommendations" element={<ForYouPage />} />
+                <Route path="for-you" element={<Navigate to="/student/recommendations" replace />} />
+                <Route path="progress" element={<ProgressPage />} />
+                <Route path="downloads" element={<DownloadsPage />} />
+                <Route path="profile" element={<ProfileView />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            {/* Teacher area: sidebar routes map to the original dashboard's tabs */}
+            <Route path="/teacher" element={<ProtectedRoute role="TEACHER" />}>
+              <Route element={<AppLayout />}>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                {['dashboard', 'classes', 'weak-topics', 'assignments', 'reports'].map((p) => (
+                  <Route key={p} path={p} element={<TeacherDashboard />} />
+                ))}
+                <Route path="students" element={<Navigate to="/teacher/classes" replace />} />
+                <Route path="students/:studentId" element={<StudentDetailPage />} />
+                <Route path="profile" element={<ProfileView />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Route>
+
+            {/* Admin area */}
+            <Route path="/admin" element={<ProtectedRoute role="ADMIN" />}>
+              <Route element={<AppLayout />}>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboardPage />} />
+                <Route path="users" element={<UsersPage />} />
+                <Route path="content" element={<ContentPage />} />
+                <Route path="quizzes/:quizId" element={<QuizEditorPage />} />
+                <Route path="profile" element={<ProfileView />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
         </Suspense>
         <NotificationBanner />
       </BrowserRouter>

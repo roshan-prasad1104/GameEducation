@@ -56,7 +56,7 @@ const en = {
   onboarding: {
     title: 'Welcome, {name}!', subtitle: 'Tell us a little about yourself so we can set things up.',
     grade: 'Your grade', language: 'Preferred language', school: 'School (optional)', district: 'District (optional)',
-    start: 'Start learning', pickGrade: 'Please choose your grade.',
+    start: 'Start learning', pickGrade: 'Please choose your grade.', done: 'All set — happy learning!',
   },
   dashboard: {
     welcome: 'Welcome back, {name}!', continue: 'Continue learning', level: 'Level', toNextLevel: '{xp} XP to next level',
@@ -194,6 +194,14 @@ const en = {
     correctRequired: 'The correct option cannot be empty.', explanation: 'Explanation',
   },
   profile: { title: 'Profile', saved: 'Profile updated.' },
+  sidebar: { dailyStreak: 'Daily Streak', streakDays: '{count} days', streakHint: 'Keep learning every day to grow it!' },
+  notifications: { none: 'No new notifications.' },
+  // Flat labels used by the original navigation / top bar
+  ruralStemTagline: 'Rural STEM',
+  myClasses: 'My Classes',
+  reports: 'Reports',
+  users: 'Users',
+  content: 'Content',
 };
 
 export default en;

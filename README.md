@@ -57,7 +57,7 @@ The Vite dev server proxies `/api` to the backend.
 | Teacher | `teacher@shiksha.org` | `Teacher@123` |
 | Admin | `admin@shiksha.org` | `Admin@123` |
 
-Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. The login page shows one-click demo buttons in `npm run dev` only. Set `SEED_ENABLED=false` for any real deployment. To reset the demo data, stop the backend and delete `backend/data/`.
+Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. The sign-in dialog shows one-click demo buttons in `npm run dev` only. Set `SEED_ENABLED=false` for any real deployment. To reset the demo data, stop the backend and delete `backend/data/`.
 
 ### Trying the offline mode
 
@@ -82,13 +82,25 @@ See `.env.example` for all variables.
 
 ---
 
+## UI
+
+The approved Indigo/Violet frontend (landing page, sign-in dialog, student dashboard, course catalog, lesson view, quiz, results, achievements, leaderboard, profile, teacher dashboard, sidebar and top bar) is kept as designed. Each screen's hardcoded mock data was replaced with live API data, and the functionality it only pretended to have was made real. Screens that did not exist before (subject/chapter pages, missions, For You, progress, offline downloads, onboarding, admin) use the same components and styling.
+
+Functional changes to existing screens:
+- The top-bar offline toggle is now a real connectivity and sync indicator.
+- The bell now lists real assignments and pending syncs.
+- "Regional Voice" reads the lesson aloud through the browser's speech synthesis.
+- The fictional coin rewards store tab became an XP-history tab.
+- Leaderboard tabs are now weekly, all-time and classmates.
+- Public sign-up is student-only.
+
 ## Features
 
 **Student**
 - Onboarding (grade, language, school) after registration.
 - Dashboard: level and XP, streak, lessons completed, average quiz score, badges, next lesson, progress by subject, daily missions, teacher assignments, recommendations and recent activity.
 - Subjects → chapters → lessons (Markdown content). Mark a lesson complete → quiz.
-- Chapter quizzes: multiple choice with a question navigator and timer (auto-submits at 0). Answers are graded on the server, and the result page shows the score, accuracy, XP, per-question explanations and recommended next lessons.
+- Chapter quizzes: the original one-question-at-a-time flow with a timer. **Submit Answer** checks each answer on the server (`POST /api/quizzes/{id}/check`) for instant feedback and an explanation. The whole attempt is then graded on the server and scored for XP. Offline, answers are saved without feedback and scored after sync.
 - Gamification:
   - XP: 20 per lesson; 10 per correct answer + 20 for completing a quiz (first attempt); later attempts only earn XP for improving your best score; +25 perfect-score bonus.
   - Levels: `threshold(L) = 25·(L−1)·(L+2)`, i.e. 0 / 100 / 250 / 450 …
@@ -123,8 +135,8 @@ See `.env.example` for all variables.
 ```
 POST /api/auth/login · POST /api/auth/register · GET /api/auth/me · PUT /api/users/me
 GET  /api/subjects · /api/subjects/{id} · /api/chapters/{id} · /api/chapters/{id}/offline-bundle
-GET  /api/lessons/{id} · POST /api/lessons/{id}/complete
-GET  /api/quizzes/{id} · POST /api/quizzes/{id}/submit
+GET  /api/lessons/{id} · POST /api/lessons/{id}/complete · GET /api/catalog/outline
+GET  /api/quizzes/{id} · POST /api/quizzes/{id}/check · POST /api/quizzes/{id}/submit
 GET  /api/students/me/{dashboard|progress|badges|xp|missions|recommendations|assignments|leaderboard|attempts}
 PUT  /api/students/me/onboarding
 GET  /api/teacher/{overview|students|students/{id}|weak-topics|assignments} · POST/DELETE /api/teacher/assignments
@@ -147,4 +159,6 @@ End-to-end browser checks (student journey including offline and sync, teacher a
 - The schema is managed by Hibernate `ddl-auto=update` rather than versioned migrations (Flyway would be the next step before production).
 - The `postgres` profile and `docker-compose.yml` have not been exercised in the development environment used here, which had no PostgreSQL or Docker. Everything else was run with H2.
 - A new student is attached to the first teacher; there is no school/class model yet (admins can reassign students).
+- The per-question check endpoint lets a determined student probe answers through the API before submitting. This is an accepted trade-off to keep the original instant-feedback quiz design, since the final score is still computed on the server.
+- Odia and Telugu cover the original screens' labels only; English and Hindi are complete.
 - The student bundle is about 570 kB (180 kB gzipped), mostly React and Chart.js. Teacher and admin screens are code-split.

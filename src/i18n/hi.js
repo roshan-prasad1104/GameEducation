@@ -56,7 +56,7 @@ const hi = {
   onboarding: {
     title: 'स्वागत है, {name}!', subtitle: 'अपने बारे में थोड़ा बताएँ ताकि हम सब कुछ तैयार कर सकें।',
     grade: 'आपकी कक्षा', language: 'पसंदीदा भाषा', school: 'स्कूल (वैकल्पिक)', district: 'ज़िला (वैकल्पिक)',
-    start: 'पढ़ाई शुरू करें', pickGrade: 'कृपया अपनी कक्षा चुनें।',
+    start: 'पढ़ाई शुरू करें', pickGrade: 'कृपया अपनी कक्षा चुनें।', done: 'सब तैयार — पढ़ाई का आनंद लें!',
   },
   dashboard: {
     welcome: 'फिर से स्वागत है, {name}!', continue: 'पढ़ाई जारी रखें', level: 'स्तर', toNextLevel: 'अगले स्तर तक {xp} XP',
@@ -194,6 +194,13 @@ const hi = {
     correctRequired: 'सही विकल्प खाली नहीं हो सकता।', explanation: 'व्याख्या',
   },
   profile: { title: 'प्रोफ़ाइल', saved: 'प्रोफ़ाइल अपडेट हुई।' },
+  sidebar: { dailyStreak: 'दैनिक स्ट्रीक', streakDays: '{count} दिन', streakHint: 'इसे बढ़ाने के लिए रोज़ पढ़ते रहें!' },
+  notifications: { none: 'कोई नई सूचना नहीं।' },
+  ruralStemTagline: 'ग्रामीण STEM',
+  myClasses: 'मेरी कक्षाएँ',
+  reports: 'रिपोर्ट',
+  users: 'उपयोगकर्ता',
+  content: 'सामग्री',
 };
 
 export default hi;

@@ -28,6 +28,7 @@ export const AppProvider = ({ children }) => {
   const [status, setStatus] = useState(tokenStore.get() ? 'loading' : 'anon');
   const [language, setLanguageState] = useState(prefs.language ?? 'en');
   const [darkMode, setDarkMode] = useState(prefs.darkMode ?? false);
+  const [audioNarrator, setAudioNarrator] = useState(prefs.audioNarrator ?? false);
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
   const [pending, setPending] = useState(0);
   const [syncing, setSyncing] = useState(false);
@@ -95,12 +96,23 @@ export const AppProvider = ({ children }) => {
 
   const setLanguage = useCallback((lang) => setLanguageState(lang), []);
 
+  /** Reflect a server RewardSummary (XP, level, streak) in the signed-in user without refetching. */
+  const applyReward = useCallback((reward) => {
+    if (!reward) return;
+    setUserState((u) => {
+      if (!u) return u;
+      const next = { ...u, xp: reward.totalXp, level: reward.level?.level ?? u.level, streak: reward.streak ?? u.streak };
+      writeJson(USER_KEY, next);
+      return next;
+    });
+  }, []);
+
   // ---- persist preferences & apply theme
   useEffect(() => {
-    writeJson(PREFS_KEY, { language, darkMode });
+    writeJson(PREFS_KEY, { language, darkMode, audioNarrator });
     document.documentElement.classList.toggle('dark', darkMode);
     document.documentElement.lang = language;
-  }, [language, darkMode]);
+  }, [language, darkMode, audioNarrator]);
 
   // ---- connectivity + offline sync
   const syncNow = useCallback(async ({ silent = false } = {}) => {
@@ -141,10 +153,10 @@ export const AppProvider = ({ children }) => {
   const value = useMemo(() => ({
     user, status, setUser, login, register, logout,
     language, setLanguage, t,
-    darkMode, setDarkMode,
+    darkMode, setDarkMode, audioNarrator, setAudioNarrator, applyReward,
     online, pending, syncing, syncNow, refreshPending,
     toast, showToast,
-  }), [user, status, setUser, login, register, logout, language, setLanguage, t, darkMode, online, pending,
+  }), [user, status, setUser, login, register, logout, language, setLanguage, t, darkMode, audioNarrator, applyReward, online, pending,
     syncing, syncNow, refreshPending, toast, showToast]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
