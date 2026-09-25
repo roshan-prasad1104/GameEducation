@@ -1,175 +1,154 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_USER, TRANSLATIONS, SUBJECT_COURSES, SAMPLE_QUIZ } from '../data/mockData';
-import { useSession } from '../hooks/useSession';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { authApi, setOfflineOwner } from '../services/api';
+import { SESSION_EXPIRED_EVENT, tokenStore } from '../lib/api';
+import { flushOutbox, pendingCount } from '../lib/sync';
+import { translate } from '../i18n';
 
-const AppContext = createContext();
+const AppContext = createContext(null);
 
-export const AppProvider = ({ children }) => {
-  const session = useSession();
-  const [activeTab, setActiveTab] = useState('landing'); // 'landing', 'dashboard', 'courses', 'lesson', 'quiz', 'achievements', 'leaderboard', 'profile', 'teacher'
-  const [authModalMode, setAuthModalMode] = useState(null); // 'login', 'signup', or null
-  // While session is loading, keep the demo user so existing screens render. Once authed,
-  // session.user becomes the canonical source. Logged-out users see the landing page.
-  // NOTE: `user` is the legacy UI user (may be INITIAL_USER during load).
-  // Use `session.user` / `session.status` for real RBAC checks.
-  const [user, setUser] = useState(INITIAL_USER);
-  const [language, setLanguage] = useState('en');
-  const [darkMode, setDarkMode] = useState(false);
-  const [isOffline, setIsOffline] = useState(false);
-  const [audioNarrator, setAudioNarrator] = useState(false);
-  const [selectedGrade, setSelectedGrade] = useState('Grade 8');
+const USER_KEY = 'shikshasetu.user';
+const PREFS_KEY = 'shikshasetu.prefs';
 
-  const [courses, setCourses] = useState(SUBJECT_COURSES);
-  const [selectedCourse, setSelectedCourse] = useState(SUBJECT_COURSES[0]);
-  const [selectedLesson, setSelectedLesson] = useState(SUBJECT_COURSES[0].lessons[0]);
-  const [activeQuiz, setActiveQuiz] = useState(SAMPLE_QUIZ);
-
-  const [toastNotification, setToastNotification] = useState(null);
-
-  // Mirror session.user into the legacy `user` slot once session resolves.
-  useEffect(() => {
-    if (session.status === 'authed' && session.user) setUser(session.user);
-    if (session.status === 'anon') setUser(null);
-  }, [session.status, session.user]);
-
-  // Sync Dark Mode with HTML class
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const showToast = (message, type = 'success') => {
-    setToastNotification({ message, type, id: Date.now() });
-    setTimeout(() => setToastNotification(null), 4000);
-  };
-
-  const t = (key) => {
-    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || key;
-  };
-
-  const addXP = (points) => {
-    setUser(prev => {
-      if (!prev) return prev;
-      const newXP = (prev.xp ?? 0) + points;
-      const newLevel = Math.floor(newXP / 300) + 1;
-      const levelUp = newLevel > (prev.level ?? 1);
-      if (levelUp) {
-        showToast(`🎉 Level Up! You reached Level ${newLevel}!`, 'level');
-      } else {
-        showToast(`⚡ +${points} XP Earned! Keep going!`, 'xp');
-      }
-      return {
-        ...prev,
-        xp: newXP,
-        level: newLevel,
-        coins: (prev.coins ?? 0) + Math.floor(points / 2)
-      };
-    });
-  };
-
-  const toggleOffline = () => {
-    setIsOffline(prev => {
-      const nextState = !prev;
-      showToast(
-        nextState
-          ? "📲 Offline Mode Activated. Showing downloaded lessons!"
-          : "🌐 Back Online! Synced latest progress.",
-        nextState ? 'offline' : 'online'
-      );
-      return nextState;
-    });
-  };
-
-  const toggleLessonDownload = (courseId, lessonId) => {
-    setCourses(prevCourses =>
-      prevCourses.map(c => {
-        if (c.id === courseId) {
-          return {
-            ...c,
-            lessons: c.lessons.map(l => {
-              if (l.id === lessonId) {
-                const nextDl = !l.isDownloaded;
-                showToast(nextDl ? "📥 Lesson downloaded for offline access!" : "🗑️ Removed from offline cache.", 'info');
-                return { ...l, isDownloaded: nextDl };
-              }
-              return l;
-            })
-          };
-        }
-        return c;
-      })
-    );
-  };
-
-  const openCourse = (course) => {
-    if (!course) return;
-    setSelectedCourse(course);
-    if (course.lessons && course.lessons.length > 0) {
-      setSelectedLesson(course.lessons[0]);
-    }
-    setActiveTab('lesson');
-  };
-
-  const openLesson = (course, lesson) => {
-    const targetCourse = course || selectedCourse || courses[0];
-    const targetLesson = lesson || (targetCourse?.lessons && targetCourse.lessons[0]);
-    if (targetCourse) setSelectedCourse(targetCourse);
-    if (targetLesson) setSelectedLesson(targetLesson);
-    setActiveTab('lesson');
-  };
-
-  const startQuiz = (quiz = SAMPLE_QUIZ) => {
-    setActiveQuiz(quiz);
-    setActiveTab('quiz');
-  };
-
-  return (
-    <AppContext.Provider value={{
-      // Session (canonical, DB-backed) — use for RBAC
-      sessionUser: session.user,
-      sessionStatus: session.status,
-      login: session.login,
-      logout: session.logout,
-      register: session.register,
-      // Legacy UI user (may be INITIAL_USER until session resolves)
-      activeTab,
-      setActiveTab,
-      authModalMode,
-      setAuthModalMode,
-      user,
-      setUser,
-      language,
-      setLanguage,
-      darkMode,
-      setDarkMode,
-      isOffline,
-      toggleOffline,
-      audioNarrator,
-      setAudioNarrator,
-      selectedGrade,
-      setSelectedGrade,
-      courses,
-      selectedCourse,
-      setSelectedCourse,
-      selectedLesson,
-      setSelectedLesson,
-      activeQuiz,
-      setActiveQuiz,
-      toastNotification,
-      showToast,
-      t,
-      addXP,
-      toggleLessonDownload,
-      openCourse,
-      openLesson,
-      startQuiz
-    }}>
-      {children}
-    </AppContext.Provider>
-  );
+const readJson = (key) => {
+  try { return JSON.parse(localStorage.getItem(key) ?? 'null'); } catch { return null; }
+};
+const writeJson = (key, value) => {
+  try {
+    if (value == null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch { /* storage unavailable */ }
 };
 
+/**
+ * Global client state: session, language, theme, connectivity, offline sync and toasts.
+ */
+export const AppProvider = ({ children }) => {
+  const prefs = readJson(PREFS_KEY) ?? {};
+  const [user, setUserState] = useState(null);
+  const [status, setStatus] = useState(tokenStore.get() ? 'loading' : 'anon');
+  const [language, setLanguageState] = useState(prefs.language ?? 'en');
+  const [darkMode, setDarkMode] = useState(prefs.darkMode ?? false);
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  const [pending, setPending] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+
+  const showToast = useCallback((message, tone = 'success') => {
+    clearTimeout(toastTimer.current);
+    setToast({ message, tone, id: Date.now() });
+    toastTimer.current = setTimeout(() => setToast(null), 4500);
+  }, []);
+
+  const setUser = useCallback((u) => {
+    setUserState(u);
+    writeJson(USER_KEY, u);
+    setOfflineOwner(u?.id ?? null);
+  }, []);
+
+  const t = useCallback((key, vars) => translate(language, key, vars), [language]);
+
+  // ---- session bootstrap: validate the stored token; stay signed in offline using the cached user
+  useEffect(() => {
+    if (!tokenStore.get()) return;
+    let cancelled = false;
+    authApi.me()
+      .then((u) => { if (!cancelled) { setUser(u); setStatus('authed'); } })
+      .catch((e) => {
+        if (cancelled) return;
+        const cached = readJson(USER_KEY);
+        if (e?.isNetwork && cached) { setUser(cached); setStatus('authed'); return; }
+        tokenStore.clear(); setUser(null); setStatus('anon');
+      });
+    return () => { cancelled = true; };
+  }, [setUser]);
+
+  const logout = useCallback(() => {
+    authApi.logout();
+    setUser(null);
+    setStatus('anon');
+  }, [setUser]);
+
+  useEffect(() => {
+    const onExpired = () => {
+      logout();
+      showToast(translate(language, 'auth.sessionExpired'), 'warn');
+    };
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+  }, [logout, showToast, language]);
+
+  const login = useCallback(async (email, password) => {
+    const u = await authApi.login(email, password);
+    setUser(u);
+    setStatus('authed');
+    if (u.preferredLanguage) setLanguageState(u.preferredLanguage);
+    return u;
+  }, [setUser]);
+
+  const register = useCallback(async (data) => {
+    const u = await authApi.register(data);
+    setUser(u);
+    setStatus('authed');
+    return u;
+  }, [setUser]);
+
+  const setLanguage = useCallback((lang) => setLanguageState(lang), []);
+
+  // ---- persist preferences & apply theme
+  useEffect(() => {
+    writeJson(PREFS_KEY, { language, darkMode });
+    document.documentElement.classList.toggle('dark', darkMode);
+    document.documentElement.lang = language;
+  }, [language, darkMode]);
+
+  // ---- connectivity + offline sync
+  const syncNow = useCallback(async ({ silent = false } = {}) => {
+    if (!user || user.role !== 'STUDENT') return;
+    setSyncing(true);
+    try {
+      const res = await flushOutbox(user.id);
+      if (!silent && res.synced > 0) {
+        showToast(translate(language, 'sync.done', { count: res.synced }), 'success');
+      }
+      if (res.failed > 0) showToast(translate(language, 'sync.someFailed', { count: res.failed }), 'warn');
+      return res;
+    } finally {
+      setPending(await pendingCount(user.id));
+      setSyncing(false);
+    }
+  }, [user, language, showToast]);
+
+  useEffect(() => {
+    const up = () => setOnline(true);
+    const down = () => setOnline(false);
+    window.addEventListener('online', up);
+    window.addEventListener('offline', down);
+    return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
+  }, []);
+
+  // Sync shortly after we are (back) online with a signed-in student (debounced for flaky networks).
+  useEffect(() => {
+    if (!online || status !== 'authed') return;
+    const id = setTimeout(() => syncNow(), 1500);
+    return () => clearTimeout(id);
+  }, [online, status, syncNow]);
+
+  const refreshPending = useCallback(async () => {
+    setPending(user ? await pendingCount(user.id) : 0);
+  }, [user]);
+
+  const value = useMemo(() => ({
+    user, status, setUser, login, register, logout,
+    language, setLanguage, t,
+    darkMode, setDarkMode,
+    online, pending, syncing, syncNow, refreshPending,
+    toast, showToast,
+  }), [user, status, setUser, login, register, logout, language, setLanguage, t, darkMode, online, pending,
+    syncing, syncNow, refreshPending, toast, showToast]);
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
 export const useApp = () => useContext(AppContext);
