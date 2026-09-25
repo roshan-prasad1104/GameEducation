@@ -1,0 +1,9 @@
+node_modules
+dist
+backend
+ai-service
+.git
+.github
+.claude
+.env
+*.local

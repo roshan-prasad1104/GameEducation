@@ -1,17 +1,59 @@
-# Optional: PostgreSQL for running the backend with the "postgres" profile.
-#   docker compose up -d
-#   (in backend/)  SPRING_PROFILES_ACTIVE=postgres DATABASE_PASSWORD=shikshasetu ./mvnw spring-boot:run
-# Not needed for local development — the default "dev" profile uses an embedded H2 database.
+# Docker setup (optional — local development needs no Docker; the default "dev" profile uses H2).
+#
+#   PostgreSQL only, for running the backend locally with the "postgres" profile:
+#     docker compose up -d postgres
+#
+#   Whole stack (PostgreSQL + AI service + backend + nginx-served PWA on http://localhost:8081):
+#     JWT_SECRET=<32+ random characters> docker compose --profile full up --build
+#
+# The passwords below are local-development defaults; override them for anything shared.
 services:
   postgres:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: shikshasetu
       POSTGRES_USER: shikshasetu
-      POSTGRES_PASSWORD: shikshasetu   # local development only
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shikshasetu}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shikshasetu -d shikshasetu"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  ai:
+    profiles: ["full"]
+    build: ./ai-service
+
+  backend:
+    profiles: ["full"]
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://postgres:5432/shikshasetu
+      DATABASE_USERNAME: shikshasetu
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-shikshasetu}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to at least 32 random characters}
+      AI_SERVICE_URL: http://ai:8000
+      SEED_ENABLED: ${SEED_ENABLED:-true}
+    ports:
+      - "8080:8080"
+
+  web:
+    profiles: ["full"]
+    build: .
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
 volumes:
   pgdata:
