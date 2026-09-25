@@ -13,7 +13,7 @@ React PWA (Vite)  ──/api──▶  Spring Boot API  ──HTTP──▶  Fas
 |---|---|---|
 | Frontend | React 19, Vite, Tailwind CSS 4, React Router 7, Chart.js, IndexedDB (`idb`), service worker | `/` (`src/`, `public/`) |
 | Backend | Java 21 (runs on JDK 21+), Spring Boot 3.5, Spring Security, JWT (jjwt), BCrypt, Spring Data JPA | `backend/` |
-| Database | H2 in PostgreSQL mode (default, zero-install) or PostgreSQL (`postgres` profile) | — |
+| Database | H2 in PostgreSQL mode (default, zero-install) or PostgreSQL (`postgres` profile); schema managed by Flyway | `backend/src/main/resources/db/migration` |
 | AI service | Python 3.10+, FastAPI, pandas, NumPy, scikit-learn | `ai-service/` |
 
 ---
@@ -73,12 +73,31 @@ Sign in as the student, open a chapter and press **Download for offline**. Then 
 ### Using PostgreSQL
 
 ```bash
-docker compose up -d                     # or use any PostgreSQL 14+ instance
+docker compose up -d postgres            # or use any PostgreSQL 14+ instance
 cd backend
 SPRING_PROFILES_ACTIVE=postgres DATABASE_PASSWORD=shikshasetu ./mvnw spring-boot:run
 ```
 
-See `.env.example` for all variables.
+Flyway creates the schema on first start (`V1__baseline_schema.sql`). See `.env.example` for all variables.
+
+### Docker (whole stack)
+
+```bash
+JWT_SECRET=<32+ random characters> docker compose --profile full up --build
+# PWA on http://localhost:8081 (nginx, proxies /api) · API on :8080 · PostgreSQL on :5432
+```
+
+Dockerfiles: `backend/Dockerfile`, `ai-service/Dockerfile`, `Dockerfile` (frontend + `docker/nginx.conf`). See the limitations below: these were not run in the development environment.
+
+### Postman
+
+Import `docs/postman/ShikshaSetu.postman_collection.json`, or run it from the command line against a running backend:
+
+```bash
+npx newman run docs/postman/ShikshaSetu.postman_collection.json
+```
+
+The collection has 28 requests and 47 assertions. It covers auth, the full student loop including an idempotent replay, RBAC denials, the teacher analytics and CSV export, and the admin endpoints. Each run registers a new student, so the demo accounts are left unchanged.
 
 ---
 
@@ -109,7 +128,7 @@ Functional changes to existing screens:
 - **For You**: recommendations with the evidence behind them (mastery per subject, weak topics).
 - Offline library, sync status, English / हिन्दी UI, and dark mode.
 
-**Teacher**: class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking).
+**Teacher**: class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking). The Class Reports tab exports the roster and the topic accuracy as CSV (UTF-8, one header row) that opens directly in Excel and loads into Power BI.
 
 **Admin**: platform statistics (users, content, engagement, AI-service health), user management (create, edit, deactivate, delete, assign a teacher), and content management (subjects, chapters, lessons, quizzes, questions). Content that students have already completed or answered cannot be deleted.
 
@@ -128,7 +147,7 @@ Functional changes to existing screens:
   - IndexedDB stores downloaded chapters (lessons + quiz without answers), "last seen" snapshots of read-only screens, and an outbox of offline actions.
   - The outbox is flushed in order when the browser comes back online.
   - Offline quizzes are scored after sync, because answers are never sent to the client.
-- **Database**: `ddl-auto=update` builds the schema from the JPA entities. Tables: `users`, `student_profiles` (with the teacher relation), `subjects`, `chapters`, `lessons`, `quizzes`, `questions`, `question_options`, `quiz_attempts`, `attempt_answers`, `lesson_progress`, `xp_transactions`, `badges`, `student_badges`, `recommendations`, `assignments`.
+- **Database**: Flyway owns the schema (`db/migration/V1__baseline_schema.sql`, named constraints and foreign-key indexes). Hibernate runs with `ddl-auto=validate`, so a mismatch between the entities and the schema stops startup. Any schema change needs a new `V<n>__*.sql` file. Databases created by earlier builds are adopted as version 1 (`baseline-on-migrate`). Tables: `users`, `student_profiles` (with the teacher relation), `subjects`, `chapters`, `lessons`, `quizzes`, `questions`, `question_options`, `quiz_attempts`, `attempt_answers`, `lesson_progress`, `xp_transactions`, `badges`, `student_badges`, `recommendations`, `assignments`.
 
 ### Main endpoints
 
@@ -140,24 +159,31 @@ GET  /api/quizzes/{id} · POST /api/quizzes/{id}/check · POST /api/quizzes/{id}
 GET  /api/students/me/{dashboard|progress|badges|xp|missions|recommendations|assignments|leaderboard|attempts}
 PUT  /api/students/me/onboarding
 GET  /api/teacher/{overview|students|students/{id}|weak-topics|assignments} · POST/DELETE /api/teacher/assignments
+GET  /api/teacher/reports/{students|topics}.csv
 GET  /api/admin/{stats|users|content|lessons/{id}|quizzes/{id}} · POST/PUT/DELETE users, subjects, chapters, lessons, quizzes, questions
 ```
 
 ## Tests
 
 ```bash
-cd backend && ./mvnw test                                  # 6 tests: auth, RBAC, learning loop, idempotent sync, analytics
+cd backend && ./mvnw test                                  # 7 tests: auth, RBAC, learning loop, idempotent sync, analytics, CSV,
+                                                           #   and PostgresMigrationTest on a real embedded PostgreSQL
 cd ai-service && .venv/Scripts/python -m pytest -q         # 18 tests: mastery, recommendations, segmentation, validation
 npm run lint && npm run build                              # frontend
 ```
 
-End-to-end browser checks (student journey including offline and sync, teacher and admin flows) were run with Playwright against `npm run preview`.
+`PostgresMigrationTest` starts real PostgreSQL binaries through the `io.zonky.test:embedded-postgres` test dependency, so no Docker or local install is needed. Its first run downloads them from Maven Central. The test then applies the Flyway migrations, validates the entities, loads the seed and runs the learning loop on the `postgres` profile.
+
+End-to-end browser checks (student journey including offline and sync, teacher and admin flows, CSV downloads) were run with Playwright against `npm run preview`. The API was also checked with the Postman collection via newman.
 
 ## Known limitations
 
 - Lesson **content** is English only; the UI is translated into English and Hindi. Content translations would need a translation table.
-- The schema is managed by Hibernate `ddl-auto=update` rather than versioned migrations (Flyway would be the next step before production).
-- The `postgres` profile and `docker-compose.yml` have not been exercised in the development environment used here, which had no PostgreSQL or Docker. Everything else was run with H2.
+- **Docker**: the development environment had no Docker, so the Dockerfiles and `docker-compose.yml` have not been built or run. Their individual steps were checked separately:
+  - the frontend build, and `mvn -DskipTests package` followed by `java -jar` on a fresh database (migrations and seed load from the jar);
+  - the `postgres` profile, via the embedded-PostgreSQL test above;
+  - the compose file parses as valid YAML.
+- **PostgreSQL**: the day-to-day demo database is H2 (PostgreSQL mode). PostgreSQL itself is exercised by the automated test, not by a long-running server.
 - A new student is attached to the first teacher; there is no school/class model yet (admins can reassign students).
 - The per-question check endpoint lets a determined student probe answers through the API before submitting. This is an accepted trade-off to keep the original instant-feedback quiz design, since the final score is still computed on the server.
 - Odia and Telugu cover the original screens' labels only; English and Hindi are complete.
