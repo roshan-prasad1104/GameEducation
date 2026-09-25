@@ -8,7 +8,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(Jwt jwt, Cors cors, Ai ai, String timezone, Seed seed) {
 
-    public record Jwt(String secret, long expirationMinutes) {}
+    /** requireSecret: refuse to start without JWT_SECRET (set by the postgres profile). */
+    public record Jwt(String secret, long expirationMinutes, boolean requireSecret) {}
 
     public record Cors(List<String> allowedOrigins) {}
 

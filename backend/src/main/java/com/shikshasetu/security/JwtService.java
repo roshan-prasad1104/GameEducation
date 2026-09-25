@@ -27,6 +27,10 @@ public class JwtService {
 
     public JwtService(AppProperties props) {
         String secret = props.jwt().secret();
+        if ((secret == null || secret.isBlank()) && props.jwt().requireSecret()) {
+            throw new IllegalStateException("JWT_SECRET must be set (at least " + MIN_SECRET_LENGTH
+                    + " random characters) for this profile, so sessions survive restarts and work across instances.");
+        }
         if (secret == null || secret.isBlank()) {
             byte[] random = new byte[48];
             new SecureRandom().nextBytes(random);
