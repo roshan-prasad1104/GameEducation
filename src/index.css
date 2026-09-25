@@ -1,0 +1,250 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   ShikshaSetu Design System
+   Premium EdTech — Indigo / Violet primary, slate neutrals, amber accents
+   ===================================================================== */
+
+@theme {
+  /* Brand */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+
+  --color-violet-450: #8b5cf6;
+  --color-violet-550: #7c3aed;
+
+  /* Accents (semantic, used sparingly for gamified moments) */
+  --color-xp-50: #fffbeb;
+  --color-xp-100: #fef3c7;
+  --color-xp-300: #fcd34d;
+  --color-xp-500: #f59e0b;
+  --color-xp-600: #d97706;
+
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-warn-500: #f97316;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+
+  /* Surfaces (premium, slightly cool) */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-surface-sunken: #f1f5f9;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+
+  /* Type scale (premium, restrained) */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Oriya', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  /* Shadows (soft, layered, never harsh) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 12px 24px -8px rgba(15, 23, 42, 0.12), 0 4px 8px -4px rgba(15, 23, 42, 0.06);
+  --shadow-glow: 0 0 0 1px rgba(99, 102, 241, 0.18), 0 8px 24px -8px rgba(99, 102, 241, 0.35);
+}
+
+/* ---------- Reset & base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-surface-muted);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
+/* Odia script legibility (Noto Sans Oriya if available) */
+[lang="or"] {
+  font-family: 'Noto Sans Oriya', var(--font-sans);
+}
+
+[lang="hi"] {
+  font-family: 'Noto Sans Devanagari', var(--font-sans);
+}
+
+/* ---------- Premium background canvas ---------- */
+.app-canvas {
+  background:
+    radial-gradient(1200px 600px at 100% -100px, rgba(99, 102, 241, 0.06), transparent 60%),
+    radial-gradient(800px 500px at -100px 100%, rgba(139, 92, 246, 0.05), transparent 60%),
+    var(--color-surface-muted);
+}
+
+/* ---------- Card primitives ---------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.card-hover:hover {
+  border-color: var(--color-line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.card-premium {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Gradient brand surface (used for hero blocks, never full-page) ---------- */
+.brand-gradient {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(99, 102, 241, 0.18), transparent 50%),
+    radial-gradient(120% 80% at 100% 100%, rgba(139, 92, 246, 0.20), transparent 50%),
+    linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* ---------- Subtle progress shimmer ---------- */
+.progress-shimmer {
+  background: linear-gradient(90deg,
+      rgba(99, 102, 241, 0.85) 0%,
+      rgba(139, 92, 246, 0.95) 50%,
+      rgba(99, 102, 241, 0.85) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 0%;
+  }
+
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* ---------- Focus ring (accessibility) ---------- */
+:where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ---------- Scrollbar polish ---------- */
+.scroll-soft::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-soft::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.scroll-soft::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* ---------- Dark mode ---------- */
+.dark body {
+  background: #0b1020;
+  color: #e2e8f0;
+}
+
+.dark .card,
+.dark .card-premium {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+.dark .app-canvas {
+  background:
+    radial-gradient(1200px 600px at 100% -100px, rgba(99, 102, 241, 0.10), transparent 60%),
+    radial-gradient(800px 500px at -100px 100%, rgba(139, 92, 246, 0.08), transparent 60%),
+    #0b1020;
+}
+
+.dark .card-premium {
+  background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+}
+
+/* Global readability guard: keep secondary text visible on dark surfaces */
+.dark .text-slate-300,
+.dark .text-slate-400,
+.dark .text-slate-500,
+.dark .text-slate-600,
+.dark .text-slate-700,
+.dark .text-slate-800,
+.dark .text-slate-900,
+.dark .text-slate-950 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-300 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+/* ---------- Reduced motion respect ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
