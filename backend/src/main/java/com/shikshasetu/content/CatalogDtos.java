@@ -45,6 +45,12 @@ public final class CatalogDtos {
     public record QuizView(Long id, String title, String description, int timeLimitSeconds, ChapterRef chapter,
                            SubjectRef subject, List<QuestionView> questions) {}
 
+    public record OutlineItem(Long id, String title) {}
+
+    public record OutlineChapter(Long id, String title, List<OutlineItem> lessons, OutlineItem quiz) {}
+
+    public record OutlineSubject(Long id, String name, List<OutlineChapter> chapters) {}
+
     /** Everything needed to study a chapter offline. */
     public record OfflineBundle(ChapterDetail chapter, List<LessonDetail> lessons, QuizView quiz) {}
 }

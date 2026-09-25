@@ -53,6 +53,16 @@ public class CatalogService {
         return quizView(q);
     }
 
+    /** Compact subject → chapter → lesson/quiz tree (used by teacher assignment pickers). */
+    public List<OutlineSubject> outline() {
+        return subjects.findAllByOrderByIdAsc().stream().map(s -> new OutlineSubject(s.getId(), s.getName(),
+                s.getChapters().stream().map(c -> new OutlineChapter(c.getId(), c.getTitle(),
+                        c.getLessons().stream().map(l -> new OutlineItem(l.getId(), l.getTitle())).toList(),
+                        c.getQuizzes().isEmpty() ? null
+                                : new OutlineItem(c.getQuizzes().getFirst().getId(), c.getQuizzes().getFirst().getTitle())))
+                        .toList())).toList();
+    }
+
     public OfflineBundle offlineBundle(Long chapterId, AuthUser user) {
         Chapter c = chapters.findById(chapterId).orElseThrow(() -> ApiException.notFound("Chapter"));
         Set<Long> done = completedIds(user);

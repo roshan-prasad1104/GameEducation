@@ -25,6 +25,11 @@ public class LearningController {
         return learning.submitQuiz(CurrentUser.id(), id, req);
     }
 
+    @PostMapping("/quizzes/{id}/check")
+    public CheckAnswerResult check(@PathVariable Long id, @Valid @RequestBody CheckAnswerRequest req) {
+        return learning.checkAnswer(id, req);
+    }
+
     @GetMapping("/students/me/attempts")
     public List<AttemptSummary> attempts() {
         return learning.attempts(CurrentUser.id());

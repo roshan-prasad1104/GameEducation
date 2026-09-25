@@ -1,5 +1,6 @@
 package com.shikshasetu.user;
 
+import com.shikshasetu.gamification.Levels;
 import jakarta.validation.constraints.*;
 
 public final class AuthDtos {
@@ -17,26 +18,31 @@ public final class AuthDtos {
 
     public record OnboardingRequest(
             @NotNull(message = "Grade is required") @Min(6) @Max(12) Integer gradeLevel,
-            @NotBlank @Pattern(regexp = "en|hi", message = "Language must be en or hi") String preferredLanguage,
+            @NotBlank @Pattern(regexp = "en|hi|or|te", message = "Unsupported language") String preferredLanguage,
             @Size(max = 160) String school,
             @Size(max = 120) String district) {}
 
     public record UpdateMeRequest(
             @NotBlank(message = "Name is required") @Size(max = 120) String name,
-            @Pattern(regexp = "en|hi", message = "Language must be en or hi") String preferredLanguage,
+            @Pattern(regexp = "en|hi|or|te", message = "Unsupported language") String preferredLanguage,
             @Min(6) @Max(12) Integer gradeLevel,
             @Size(max = 160) String school,
             @Size(max = 120) String district) {}
 
     public record UserView(Long id, String name, String email, Role role, String preferredLanguage,
-                           Boolean onboarded, Integer gradeLevel, String school, String district) {
+                           Boolean onboarded, Integer gradeLevel, String school, String district,
+                           Integer xp, Integer level, Integer streak) {
 
-        public static UserView of(User u, StudentProfile p) {
+        /** {@code streak} is the live streak (0 if broken); ignored for staff accounts. */
+        public static UserView of(User u, StudentProfile p, int streak) {
             return new UserView(u.getId(), u.getName(), u.getEmail(), u.getRole(), u.getPreferredLanguage(),
                     p == null ? null : p.isOnboarded(),
                     p == null ? null : p.getGradeLevel(),
                     p == null ? null : p.getSchool(),
-                    p == null ? null : p.getDistrict());
+                    p == null ? null : p.getDistrict(),
+                    p == null ? null : p.getXp(),
+                    p == null ? null : Levels.levelFor(p.getXp()),
+                    p == null ? null : streak);
         }
     }
 

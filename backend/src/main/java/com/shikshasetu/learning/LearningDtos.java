@@ -27,6 +27,11 @@ public final class LearningDtos {
             Instant submittedAt,
             Boolean offline) {}
 
+    public record CheckAnswerRequest(@NotNull Long questionId, @NotNull Integer selectedIndex) {}
+
+    /** Instant feedback for one question. Nothing is stored; the attempt is graded on submit. */
+    public record CheckAnswerResult(Long questionId, boolean correct, int correctIndex, String explanation) {}
+
     public record QuestionResult(Long questionId, String prompt, List<String> options, Integer selectedIndex,
                                  int correctIndex, boolean correct, String explanation, String topic) {}
 

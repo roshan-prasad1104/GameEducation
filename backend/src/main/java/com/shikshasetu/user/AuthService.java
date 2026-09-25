@@ -1,6 +1,7 @@
 package com.shikshasetu.user;
 
 import com.shikshasetu.common.ApiException;
+import com.shikshasetu.gamification.GamificationService;
 import com.shikshasetu.security.JwtService;
 import com.shikshasetu.user.AuthDtos.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class AuthService {
     private final StudentProfileRepository profiles;
     private final PasswordEncoder encoder;
     private final JwtService jwt;
+    private final GamificationService gamification;
 
     @Transactional
     public AuthResponse login(LoginRequest req) {
@@ -51,7 +53,7 @@ public class AuthService {
     @Transactional(readOnly = true)
     public UserView me(Long userId) {
         User user = users.findById(userId).orElseThrow(() -> ApiException.notFound("User"));
-        return UserView.of(user, profiles.findByUserId(userId).orElse(null));
+        return view(user, profiles.findByUserId(userId).orElse(null));
     }
 
     @Transactional
@@ -63,7 +65,7 @@ public class AuthService {
         p.setDistrict(blankToNull(req.district()));
         p.setOnboarded(true);
         user.setPreferredLanguage(req.preferredLanguage());
-        return UserView.of(user, p);
+        return view(user, p);
     }
 
     @Transactional
@@ -77,12 +79,16 @@ public class AuthService {
             p.setSchool(blankToNull(req.school()));
             p.setDistrict(blankToNull(req.district()));
         }
-        return UserView.of(user, p);
+        return view(user, p);
     }
 
     private AuthResponse respond(User user) {
         StudentProfile p = profiles.findByUserId(user.getId()).orElse(null);
-        return new AuthResponse(jwt.issue(user), jwt.ttlSeconds(), UserView.of(user, p));
+        return new AuthResponse(jwt.issue(user), jwt.ttlSeconds(), view(user, p));
+    }
+
+    private UserView view(User user, StudentProfile p) {
+        return UserView.of(user, p, p == null ? 0 : gamification.effectiveStreak(p));
     }
 
     private static String blankToNull(String s) {

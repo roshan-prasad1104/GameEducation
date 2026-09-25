@@ -138,6 +138,15 @@ public class LearningService {
     }
 
     @Transactional(readOnly = true)
+    public CheckAnswerResult checkAnswer(Long quizId, CheckAnswerRequest req) {
+        Quiz quiz = quizzes.findById(quizId).orElseThrow(() -> ApiException.notFound("Quiz"));
+        Question q = quiz.getQuestions().stream().filter(x -> x.getId().equals(req.questionId())).findFirst()
+                .orElseThrow(() -> ApiException.notFound("Question"));
+        return new CheckAnswerResult(q.getId(), req.selectedIndex() == q.getCorrectIndex(), q.getCorrectIndex(),
+                q.getExplanation());
+    }
+
+    @Transactional(readOnly = true)
     public QuizResult attempt(Long studentId, Long attemptId) {
         QuizAttempt a = attemptRepo.findWithQuizById(attemptId)
                 .filter(x -> x.getStudent().getId().equals(studentId))

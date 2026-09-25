@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/students/**").hasRole("STUDENT")
-                        .requestMatchers(HttpMethod.POST, "/api/lessons/*/complete", "/api/quizzes/*/submit").hasRole("STUDENT")
+                        .requestMatchers(HttpMethod.POST, "/api/lessons/*/complete", "/api/quizzes/*/submit", "/api/quizzes/*/check").hasRole("STUDENT")
                         .requestMatchers("/api/teacher/**").hasRole("TEACHER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()

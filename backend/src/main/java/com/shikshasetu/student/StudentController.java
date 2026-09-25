@@ -63,7 +63,8 @@ public class StudentController {
     }
 
     @GetMapping("/leaderboard")
-    public Leaderboard leaderboard(@RequestParam(defaultValue = "20") int limit) {
-        return gamification.leaderboard(CurrentUser.id(), Math.max(1, Math.min(limit, 100)));
+    public Leaderboard leaderboard(@RequestParam(defaultValue = "all") String scope,
+                                   @RequestParam(defaultValue = "20") int limit) {
+        return gamification.leaderboard(CurrentUser.id(), scope, Math.max(1, Math.min(limit, 100)));
     }
 }

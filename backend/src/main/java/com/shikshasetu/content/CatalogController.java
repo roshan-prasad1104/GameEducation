@@ -22,6 +22,11 @@ public class CatalogController {
         return catalog.listSubjects(CurrentUser.get());
     }
 
+    @GetMapping("/catalog/outline")
+    public List<OutlineSubject> outline() {
+        return catalog.outline();
+    }
+
     @GetMapping("/subjects/{id}")
     public SubjectDetail subject(@PathVariable Long id) {
         return catalog.subject(id, CurrentUser.get());

@@ -216,15 +216,34 @@ public class GamificationService {
                 xpRepo.sumSince(id, time.startOf(monday)), recent);
     }
 
-    public Leaderboard leaderboard(Long currentStudentId, int limit) {
-        List<StudentProfile> all = profileRepo.findLeaderboard();
+    /**
+     * scope: "all" (total XP), "week" (XP earned since Monday) or "class" (classmates with the same teacher).
+     */
+    public Leaderboard leaderboard(Long currentStudentId, String scope, int limit) {
+        List<StudentProfile> all = new ArrayList<>(profileRepo.findLeaderboard());
+        Map<Long, Integer> score = new HashMap<>();
+        if ("week".equals(scope)) {
+            Instant monday = time.startOf(time.today().with(DayOfWeek.MONDAY));
+            all.forEach(p -> score.put(p.getUser().getId(), (int) xpRepo.sumSince(p.getUser().getId(), monday)));
+        } else {
+            all.forEach(p -> score.put(p.getUser().getId(), p.getXp()));
+        }
+        if ("class".equals(scope)) {
+            Long teacherId = all.stream().filter(p -> Objects.equals(p.getUser().getId(), currentStudentId)).findFirst()
+                    .map(p -> p.getTeacher() == null ? null : p.getTeacher().getId()).orElse(null);
+            all.removeIf(p -> !Objects.equals(p.getUser().getId(), currentStudentId)
+                    && (teacherId == null || p.getTeacher() == null || !teacherId.equals(p.getTeacher().getId())));
+        }
+        all.sort(Comparator.comparing((StudentProfile p) -> score.get(p.getUser().getId())).reversed()
+                .thenComparing(p -> p.getUser().getName()));
         List<LeaderboardEntry> entries = new ArrayList<>();
         LeaderboardEntry me = null;
         for (int i = 0; i < all.size(); i++) {
             StudentProfile p = all.get(i);
             boolean isMe = Objects.equals(p.getUser().getId(), currentStudentId);
             LeaderboardEntry e = new LeaderboardEntry(i + 1, p.getUser().getId(), p.getUser().getName(),
-                    p.getGradeLevel(), p.getSchool(), p.getXp(), Levels.levelFor(p.getXp()), effectiveStreak(p), isMe);
+                    p.getGradeLevel(), p.getSchool(), score.get(p.getUser().getId()), Levels.levelFor(p.getXp()),
+                    effectiveStreak(p), isMe);
             if (i < limit) entries.add(e);
             if (isMe) me = e;
         }

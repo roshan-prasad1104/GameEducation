@@ -122,9 +122,22 @@ class ApiIntegrationTest {
                 .andReturn().getResponse().getContentAsString());
         assertThat(again.get("alreadyCompleted").asBoolean()).isTrue();
 
-        // Quiz questions never expose the answer
+        // Quiz questions never expose the answer up front
         JsonNode quiz = getJson("/api/quizzes/" + quizId, token);
         assertThat(quiz.at("/questions/0/correctIndex").isMissingNode()).isTrue();
+
+        // Per-question check gives instant feedback without storing anything
+        long firstQuestion = quiz.at("/questions/0/id").asLong();
+        JsonNode check = json.readTree(postJson("/api/quizzes/" + quizId + "/check", token,
+                Map.of("questionId", firstQuestion, "selectedIndex", 0)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString());
+        assertThat(check.has("correct")).isTrue();
+        assertThat(check.get("correctIndex").isInt()).isTrue();
+
+        // /auth/me carries live gamification state for the sidebar
+        JsonNode me = getJson("/api/auth/me", token);
+        assertThat(me.get("xp").asInt()).isEqualTo(35);
+        assertThat(me.get("streak").asInt()).isEqualTo(1);
 
         // Submit answering option 0 everywhere; grading happens server side
         List<Map<String, Object>> answers = new ArrayList<>();
@@ -153,6 +166,11 @@ class ApiIntegrationTest {
         assertThat(dash.get("quizzesTaken").asInt()).isEqualTo(1);
         assertThat(dash.at("/level/xp").asInt()).isEqualTo(xpAfterFirst);
         assertThat(getJson("/api/students/me/progress", token).get("attempts").size()).isEqualTo(1);
+
+        // Leaderboard scopes
+        assertThat(getJson("/api/students/me/leaderboard?scope=week", token).get("me").get("xp").asInt()).isGreaterThan(0);
+        assertThat(getJson("/api/students/me/leaderboard?scope=class", token).get("entries").size()).isGreaterThan(1);
+        assertThat(getJson("/api/catalog/outline", token).size()).isEqualTo(5);
 
         // Recommendations work even with the AI service down (Java fallback)
         JsonNode recs = getJson("/api/students/me/recommendations", token);
