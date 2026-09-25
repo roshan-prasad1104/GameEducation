@@ -19,6 +19,7 @@ import {
   CloudOff,
   Loader2
 } from 'lucide-react';
+import { badgeName } from '../../i18n/serverText';
 
 const SPEECH_LANG = { en: 'en-IN', hi: 'hi-IN', or: 'or-IN', te: 'te-IN' };
 
@@ -91,7 +92,7 @@ export const LessonView = () => {
 
   const toggleNarration = () => {
     const synth = window.speechSynthesis;
-    if (!synth) { showToast('Read-aloud is not supported on this device.', 'warn'); return; }
+    if (!synth) { showToast(t('lesson.readAloudUnsupported'), 'warn'); return; }
     if (speaking) { synth.cancel(); setSpeaking(false); return; }
     const utterance = new SpeechSynthesisUtterance(`${lesson.title}. ${lesson.summary ?? ''}. ${plainText(body)}`);
     utterance.lang = SPEECH_LANG[language] ?? 'en-IN';
@@ -115,7 +116,7 @@ export const LessonView = () => {
         showToast(t('offline.savedForSync'), 'offline');
       } else if (res.reward) {
         applyReward(res.reward);
-        showToast(res.reward.leveledUp ? `🎉 Level Up! You reached Level ${res.reward.level.level}!` : `⚡ +${res.reward.xpEarned} XP Earned! Keep going!`,
+        showToast(res.reward.leveledUp ? t('lesson.levelUpToast', { level: res.reward.level.level }) : t('lesson.xpToast', { xp: res.reward.xpEarned }),
           res.reward.leveledUp ? 'level' : 'xp');
       }
     } catch (e) {
@@ -135,7 +136,7 @@ export const LessonView = () => {
           className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to {lesson.chapter.title}</span>
+          <span>{t('lesson.backTo', { title: lesson.chapter.title })}</span>
         </button>
 
         {/* Offline Download Button (whole chapter: lessons + quiz) */}
@@ -147,7 +148,7 @@ export const LessonView = () => {
               ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 text-emerald-700 dark:text-emerald-300'
               : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50'
           }`}
-          title={downloaded ? 'Click to remove the offline copy' : 'Save this chapter for offline study'}
+          title={downloaded ? t('lesson.removeOfflineHint') : t('lesson.saveOfflineHint')}
         >
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4 text-emerald-500" />}
           <span>{downloaded ? t('downloaded') : t('downloadOffline')}</span>
@@ -167,7 +168,7 @@ export const LessonView = () => {
                 {lesson.subject.name}
               </span>
               <span className="text-sm font-bold text-slate-200">{lesson.title}</span>
-              {lesson.__offline && <CloudOff className="w-4 h-4 text-amber-300 shrink-0" aria-label="Offline copy" />}
+              {lesson.__offline && <CloudOff className="w-4 h-4 text-amber-300 shrink-0" aria-label={t('offline.readingOffline')} />}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -177,10 +178,10 @@ export const LessonView = () => {
                     ? 'bg-amber-500/20 border-amber-400 text-amber-300'
                     : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                 }`}
-                title="Read this lesson aloud"
+                title={t('lesson.readAloud')}
               >
                 {speaking || audioNarrator ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                <span>{speaking ? 'Stop Voice' : 'Regional Voice'}</span>
+                <span>{speaking ? t('lesson.stopVoice') : t('lesson.regionalVoice')}</span>
               </button>
             </div>
           </div>
@@ -223,7 +224,7 @@ export const LessonView = () => {
                 }`}
               >
                 <BookMarked className="w-4 h-4" />
-                <span>Detailed Notes</span>
+                <span>{t('lesson.detailedNotes')}</span>
               </button>
 
               <button
@@ -235,7 +236,7 @@ export const LessonView = () => {
                 }`}
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Key Concepts & Formulas</span>
+                <span>{t('lesson.keyConcepts')}</span>
               </button>
             </div>
 
@@ -255,10 +256,10 @@ export const LessonView = () => {
                 <div className="bg-blue-50 dark:bg-blue-950/40 p-4 rounded-2xl border border-blue-200 dark:border-blue-800 space-y-2">
                   <h4 className="font-bold text-blue-900 dark:text-blue-200 text-xs tracking-wider uppercase flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    <span>In this lesson ({lesson.durationMinutes} min):</span>
+                    <span>{t('lesson.inThisLesson', { min: lesson.durationMinutes })}</span>
                   </h4>
                   <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
-                    Read the Detailed Notes, review the Key Concepts, then mark the lesson complete to earn XP.
+                    {t('lesson.howTo')}
                   </p>
                 </div>
               </div>
@@ -268,7 +269,7 @@ export const LessonView = () => {
             {activeTab === 'detailedNotes' && (
               <div className="space-y-4">
                 <h4 className="text-xs font-extrabold uppercase text-slate-500 tracking-wider">
-                  Step-by-Step Concept Breakdown:
+                  {t('lesson.stepByStep')}
                 </h4>
                 <Markdown source={body} />
               </div>
@@ -278,7 +279,7 @@ export const LessonView = () => {
             {activeTab === 'formulas' && (
               <div className="space-y-4">
                 <h4 className="text-xs font-extrabold uppercase text-slate-500 tracking-wider pt-2">
-                  Key Takeaway Principles:
+                  {t('lesson.keyTakeaways')}
                 </h4>
                 {keyPoints.length === 0 ? (
                   <p className="text-xs text-slate-500">{lesson.summary}</p>
@@ -302,10 +303,10 @@ export const LessonView = () => {
             {lesson.completed ? (
               <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-300">
                 <CheckCircle2 className="w-5 h-5" />
-                <span>Lesson completed{result?.queued ? ' — saved offline, will sync when you reconnect' : ''}</span>
+                <span>{result?.queued ? t('lesson.lessonCompletedOffline') : t('lesson.lessonCompleted')}</span>
               </div>
             ) : (
-              <p className="text-xs text-slate-600 dark:text-slate-400">Finished reading? Mark this lesson complete to earn XP and advance your streak.</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{t('lesson.finishedReading')}</p>
             )}
             {!lesson.completed && (
               <button
@@ -314,7 +315,7 @@ export const LessonView = () => {
                 className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-60"
               >
                 {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                <span>Mark Lesson Complete (+20 XP)</span>
+                <span>{t('lesson.markCompleteXp')}</span>
               </button>
             )}
           </div>
@@ -322,13 +323,13 @@ export const LessonView = () => {
           {result?.reward && (
             <div className="bg-amber-50 dark:bg-amber-950/30 rounded-3xl p-5 border border-amber-200 dark:border-amber-800/50 space-y-2 text-sm animate-pop">
               <p className="font-black text-amber-700 dark:text-amber-300 flex items-center gap-2">
-                <Zap className="w-4 h-4 fill-amber-400" /> +{result.reward.xpEarned} XP · Level {result.reward.level.level} · 🔥 {result.reward.streak} day streak
+                <Zap className="w-4 h-4 fill-amber-400" /> {t('lesson.rewardLine', { xp: result.reward.xpEarned, level: result.reward.level.level, streak: result.reward.streak })}
               </p>
               {result.reward.newBadges.map((b) => (
-                <p key={b.code} className="text-xs font-semibold text-slate-700 dark:text-slate-200">🏆 New badge unlocked: {b.name}</p>
+                <p key={b.code} className="text-xs font-semibold text-slate-700 dark:text-slate-200">🏆 {t('result.newBadge', { name: badgeName(t, b) })}</p>
               ))}
               {result.reward.completedMissions.map((m) => (
-                <p key={m.code} className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">✅ Mission complete: {t(`missions.${m.code}.title`)} (+{m.xpReward} XP)</p>
+                <p key={m.code} className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{t('result.missionComplete', { title: t(`missions.${m.code}.title`), xp: m.xpReward })}</p>
               ))}
             </div>
           )}
@@ -346,15 +347,15 @@ export const LessonView = () => {
               </div>
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded">
-                  Interactive Practice
+                  {t('lesson.interactivePractice')}
                 </span>
                 <h3 className="text-xl font-black text-white mt-1">
-                  Test Your Knowledge
+                  {t('lesson.testKnowledge')}
                 </h3>
                 <p className="text-xs text-amber-100 mt-1">
                   {quiz.bestPercentage != null
-                    ? `Your best score is ${quiz.bestPercentage}%. Beat it to earn more XP!`
-                    : `Solve ${quiz.questionCount} multiple-choice questions to earn up to ${quiz.questionCount * 10 + 20} XP and advance your daily streak!`}
+                    ? t('lesson.bestScore', { pct: quiz.bestPercentage })
+                    : t('lesson.solveQuestions', { count: quiz.questionCount, xp: quiz.questionCount * 10 + 20 })}
                 </p>
               </div>
 
@@ -372,7 +373,7 @@ export const LessonView = () => {
           <div className="glass-card rounded-3xl p-5 space-y-4">
             <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-blue-600" />
-              <span>Chapter Contents</span>
+              <span>{t('lesson.chapterContents')}</span>
             </h4>
 
             <div className="space-y-2">
@@ -410,7 +411,7 @@ export const LessonView = () => {
                   className="text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Prev</span>
+                  <span>{t('lesson.prev')}</span>
                 </button>
               ) : <div />}
 

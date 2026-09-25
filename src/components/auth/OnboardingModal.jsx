@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Globe, GraduationCap, MapPin, School, Sparkles } from 'lucide-react';
+import { ArrowRight, Globe, GraduationCap, KeyRound, MapPin, School, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { authApi } from '../../services/api';
 import { GRADES, LANGUAGES } from '../../data/constants';
@@ -15,6 +15,7 @@ export const OnboardingModal = () => {
   const [grade, setGrade] = useState(user?.gradeLevel ?? 8);
   const [school, setSchool] = useState('');
   const [district, setDistrict] = useState('');
+  const [classCode, setClassCode] = useState('');
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -23,7 +24,9 @@ export const OnboardingModal = () => {
     setSaving(true);
     setError(null);
     try {
-      const updated = await authApi.onboard({ gradeLevel: Number(grade), preferredLanguage: language, school, district });
+      const updated = await authApi.onboard({
+        gradeLevel: Number(grade), preferredLanguage: language, school, district, classCode: classCode.trim() || null,
+      });
       setUser(updated);
       showToast(t('onboarding.done'), 'success');
       navigate('/student/dashboard', { replace: true });
@@ -52,7 +55,7 @@ export const OnboardingModal = () => {
           <form onSubmit={submit} className="space-y-3">
             <Field label={t('onboarding.grade')} icon={GraduationCap}>
               <select value={grade} onChange={(e) => setGrade(e.target.value)} className="input">
-                {GRADES.map((g) => <option key={g.id} value={g.id.slice(1)}>{g.label} ({g.age})</option>)}
+                {GRADES.map((g) => <option key={g.id} value={g.id.slice(1)}>{t('common.grade', { grade: g.id.slice(1) })} ({t('authModal.ageYears', { age: g.age.replace(' yrs', '') })})</option>)}
               </select>
             </Field>
             <Field label={t('onboarding.language')} icon={Globe}>
@@ -61,10 +64,14 @@ export const OnboardingModal = () => {
               </select>
             </Field>
             <Field label={t('onboarding.school')} icon={School}>
-              <input value={school} onChange={(e) => setSchool(e.target.value)} maxLength={160} className="input" placeholder="Govt. High School…" />
+              <input value={school} onChange={(e) => setSchool(e.target.value)} maxLength={160} className="input" placeholder={t('onboarding.schoolPlaceholder')} />
             </Field>
             <Field label={t('onboarding.district')} icon={MapPin}>
               <input value={district} onChange={(e) => setDistrict(e.target.value)} maxLength={120} className="input" placeholder="Sundargarh, Odisha" />
+            </Field>
+            <Field label={t('classes.codeOptional')} icon={KeyRound}>
+              <input value={classCode} onChange={(e) => setClassCode(e.target.value.toUpperCase())} maxLength={12}
+                className="input font-mono tracking-widest" placeholder="ABC234" autoComplete="off" />
             </Field>
 
             {error && (

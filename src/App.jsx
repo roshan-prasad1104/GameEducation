@@ -35,6 +35,7 @@ const StudentDetailPage = named(() => import('./pages/teacher/StudentDetailPage'
 const AdminDashboardPage = named(() => import('./pages/admin/AdminDashboardPage'), 'AdminDashboardPage');
 const UsersPage = named(() => import('./pages/admin/UsersPage'), 'UsersPage');
 const ContentPage = named(() => import('./pages/admin/ContentPage'), 'ContentPage');
+const ClassesPage = named(() => import('./pages/admin/ClassesPage'), 'ClassesPage');
 const QuizEditorPage = named(() => import('./pages/admin/QuizEditorPage'), 'QuizEditorPage');
 
 const Landing = () => (
@@ -105,6 +106,7 @@ export default function App() {
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<AdminDashboardPage />} />
                 <Route path="users" element={<UsersPage />} />
+                <Route path="classes" element={<ClassesPage />} />
                 <Route path="content" element={<ContentPage />} />
                 {['subjects', 'chapters', 'lessons', 'quizzes'].map((p) => (
                   <Route key={p} path={p} element={<Navigate to="/admin/content" replace />} />

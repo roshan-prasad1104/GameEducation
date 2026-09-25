@@ -10,6 +10,7 @@ import {
   Zap,
   ArrowRight
 } from 'lucide-react';
+import { missionDescription } from '../../i18n/serverText';
 
 const MISSION_LINK = {
   DAILY_LESSON: '/student/dashboard',
@@ -39,22 +40,22 @@ export const MissionsView = () => {
       <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-blue-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center sm:text-left">
           <span className="text-[10px] font-extrabold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">
-            Daily Quests
+            {t('missionsView.eyebrow')}
           </span>
-          <h1 className="text-3xl font-black">Today's Missions</h1>
+          <h1 className="text-3xl font-black">{t('missionsView.title')}</h1>
           <p className="text-xs sm:text-sm text-indigo-100 max-w-xl">
-            Missions reset every day. Complete them to earn bonus XP and keep your streak alive!
+            {t('missionsView.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-4 bg-white/20 backdrop-blur-md border border-white/30 p-4 rounded-2xl">
           <div className="text-center">
             <div className="text-2xl font-black text-amber-200">{done}/{data.missions.length}</div>
-            <div className="text-[11px] font-semibold text-white">Completed</div>
+            <div className="text-[11px] font-semibold text-white">{t('lesson.completed')}</div>
           </div>
           <div className="h-8 w-[1px] bg-white/30" />
           <div className="text-center">
             <div className="text-2xl font-black text-white">+{earned}/{possible}</div>
-            <div className="text-[11px] font-semibold text-white">Bonus XP</div>
+            <div className="text-[11px] font-semibold text-white">{t('missionsView.bonusXp')}</div>
           </div>
         </div>
       </div>
@@ -71,16 +72,16 @@ export const MissionsView = () => {
                   {m.completed ? <CheckCircle2 className="w-6 h-6" /> : <Target className="w-6 h-6" />}
                 </div>
                 <span className="text-xs text-amber-600 dark:text-amber-400 font-black flex items-center gap-1">
-                  <Zap className="w-4 h-4 fill-amber-400" /> +{m.xpReward} XP
+                  <Zap className="w-4 h-4 fill-amber-400" /> {t('dashboard.plusXp', { xp: m.xpReward })}
                 </span>
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{t(`missions.${m.code}.title`)}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400">{m.description}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">{missionDescription(t, m)}</p>
               </div>
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <span>Progress</span>
+                  <span>{t('nav.progress')}</span>
                   <span className="text-blue-600 dark:text-blue-400 font-bold">{m.progress}/{m.target}</span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -91,7 +92,7 @@ export const MissionsView = () => {
               {!m.completed && (
                 <Link to={m.code === 'DAILY_LESSON' ? lessonLink : MISSION_LINK[m.code]}
                   className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:translate-x-1 transition-transform">
-                  Start now <ArrowRight className="w-4 h-4" />
+                  {t('missionsView.startNow')} <ArrowRight className="w-4 h-4" />
                 </Link>
               )}
             </div>
@@ -102,10 +103,10 @@ export const MissionsView = () => {
       {/* Teacher assignments */}
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <ClipboardList className="w-5 h-5 text-blue-600" /> Teacher Assignments
+          <ClipboardList className="w-5 h-5 text-blue-600" /> {t('dashboard.teacherAssignments')}
         </h2>
         {data.assignments.length === 0 ? (
-          <p className="text-sm text-slate-500">No assignments from your teacher right now.</p>
+          <p className="text-sm text-slate-500">{t('missionsView.noAssignments')}</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {data.assignments.map((a) => (
@@ -114,7 +115,7 @@ export const MissionsView = () => {
                 {a.completed ? <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> : <ClipboardList className="w-5 h-5 text-blue-600 shrink-0" />}
                 <div className="min-w-0">
                   <p className={`text-sm font-bold ${a.completed ? 'line-through text-slate-500' : 'text-slate-900 dark:text-white'}`}>{a.title}</p>
-                  <p className="text-xs text-slate-500">{a.teacherName}{a.dueDate ? ` • Due ${new Date(a.dueDate).toLocaleDateString()}` : ''}</p>
+                  <p className="text-xs text-slate-500">{a.teacherName}{a.dueDate ? ` • ${t('assignments.due', { date: new Date(a.dueDate).toLocaleDateString() })}` : ''}</p>
                   {a.note && <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{a.note}</p>}
                 </div>
               </Link>

@@ -13,7 +13,8 @@ import {
   Flame,
   Edit2,
   Save,
-  Mail
+  Mail,
+  Users
 } from 'lucide-react';
 
 export const ProfileView = () => {
@@ -38,6 +39,7 @@ export const ProfileView = () => {
   const [school, setSchool] = useState(user.school ?? '');
   const [district, setDistrict] = useState(user.district ?? '');
   const [grade, setGrade] = useState(user.gradeLevel ?? 8);
+  const [classCode, setClassCode] = useState('');
   const [saving, setSaving] = useState(false);
 
   const save = async (patch) => {
@@ -54,12 +56,17 @@ export const ProfileView = () => {
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
-    if (!name.trim()) { showToast('Please enter your name.', 'warn'); return; }
+    if (!name.trim()) { showToast(t('profileView.nameRequired'), 'warn'); return; }
     setSaving(true);
     try {
       await save({ name: name.trim(), school, district, gradeLevel: grade });
+      if (isStudent && classCode.trim()) {
+        const joined = await authApi.joinClass(classCode.trim());
+        setUser(joined);
+        setClassCode('');
+      }
       setIsEditing(false);
-      showToast('✨ Profile details updated successfully!', 'success');
+      showToast(t('profileView.updated'), 'success');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -121,10 +128,18 @@ export const ProfileView = () => {
                       {user.district}
                     </span>
                   )}
+                  {isStudent && (
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4 text-emerald-500" />
+                      {user.className
+                        ? `${user.className}${user.teacherName ? ` · ${user.teacherName}` : ''}`
+                        : t('classes.noClassStudent')}
+                    </span>
+                  )}
                 </div>
                 <div className="pt-2 flex flex-wrap justify-center sm:justify-start gap-2">
                   <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 text-xs font-extrabold px-3 py-1 rounded-xl">
-                    {isStudent ? `Grade ${user.gradeLevel ?? '—'}` : t(`roles.${user.role}`)}
+                    {isStudent ? t('common.grade', { grade: user.gradeLevel ?? '—' }) : t(`roles.${user.role}`)}
                   </span>
                   {isStudent && (
                     <span className="bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 text-xs font-extrabold px-3 py-1 rounded-xl flex items-center gap-1">
@@ -137,7 +152,7 @@ export const ProfileView = () => {
             ) : (
               <form onSubmit={handleSaveProfile} className="space-y-3 text-left">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Full Name:</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t('profileView.fullName')}</label>
                   <input
                     type="text"
                     value={name}
@@ -149,7 +164,7 @@ export const ProfileView = () => {
                 {isStudent && (
                   <>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">School Name:</label>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t('profileView.schoolName')}</label>
                       <input
                         type="text"
                         value={school}
@@ -160,7 +175,7 @@ export const ProfileView = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">District:</label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{t('profileView.district')}</label>
                         <input
                           type="text"
                           value={district}
@@ -170,15 +185,29 @@ export const ProfileView = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">Grade:</label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{t('profileView.grade')}</label>
                         <select
                           value={grade}
                           onChange={(e) => setGrade(e.target.value)}
                           className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border rounded-xl text-sm font-semibold"
                         >
-                          {GRADES.map((g) => <option key={g.id} value={g.id.slice(1)}>{g.label}</option>)}
+                          {GRADES.map((g) => <option key={g.id} value={g.id.slice(1)}>{t('common.grade', { grade: g.id.slice(1) })}</option>)}
                         </select>
                       </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">
+                        {user.className ? t('classes.changeClassCode') : t('classes.codeOptional')}
+                      </label>
+                      <input
+                        type="text"
+                        value={classCode}
+                        onChange={(e) => setClassCode(e.target.value.toUpperCase())}
+                        maxLength={12}
+                        placeholder="ABC234"
+                        aria-label={t('classes.joinCode')}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border rounded-xl text-sm font-semibold font-mono tracking-widest"
+                      />
                     </div>
                   </>
                 )}
@@ -187,7 +216,7 @@ export const ProfileView = () => {
                   disabled={saving}
                   className="px-5 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow disabled:opacity-60"
                 >
-                  {saving ? 'Saving…' : 'Save Changes'}
+                  {saving ? t('profileView.saving') : t('profileView.saveChanges')}
                 </button>
               </form>
             )}

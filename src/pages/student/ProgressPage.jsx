@@ -5,15 +5,16 @@ import { useApi } from '../../hooks/useApi';
 import { studentApi } from '../../services/api';
 import { BarChart, Badge, Card, EmptyState, ErrorState, LoadingState, PageHeader, Progress, StaleBanner } from '../../components/ui';
 import { SectionTitle } from './widgets';
+import { weekdayShort } from '../../i18n/serverText';
 
 export const ProgressPage = () => {
-  const { t, language } = useApp();
+  const { t } = useApp();
   const { data, error, loading, reload } = useApi(() => studentApi.progress(), []);
 
   if (loading && !data) return <LoadingState rows={3} />;
   if (error && !data) return <ErrorState error={error} onRetry={reload} />;
 
-  const dayLabels = data.last7Days.map((d) => new Date(d.date).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'short' }));
+  const dayLabels = data.last7Days.map((d) => weekdayShort(t, d.date));
 
   return (
     <div className="space-y-5">

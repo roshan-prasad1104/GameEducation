@@ -8,12 +8,12 @@ import { EMAIL_RE } from '../public/validation';
 
 const ROLE_TONE = { STUDENT: 'brand', TEACHER: 'success', ADMIN: 'neutral' };
 
-const UserForm = ({ user, teachers, onDone, onCancel }) => {
+const UserForm = ({ user, classes, onDone, onCancel }) => {
   const { t } = useApp();
   const editing = Boolean(user);
   const [form, setForm] = useState({
     name: user?.name ?? '', email: user?.email ?? '', password: '', role: user?.role ?? 'STUDENT',
-    gradeLevel: user?.gradeLevel ?? 8, teacherId: user?.teacherId ?? '', active: user?.active ?? true,
+    gradeLevel: user?.gradeLevel ?? 8, classId: user?.classId ?? '', active: user?.active ?? true,
   });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState(null);
@@ -35,12 +35,12 @@ const UserForm = ({ user, teachers, onDone, onCancel }) => {
       if (editing) {
         await adminApi.updateUser(user.id, {
           name: form.name.trim(), active: form.active, newPassword: form.password || null,
-          gradeLevel: isStudent ? Number(form.gradeLevel) : null, teacherId: isStudent && form.teacherId ? Number(form.teacherId) : null,
+          gradeLevel: isStudent ? Number(form.gradeLevel) : null, classId: isStudent && form.classId ? Number(form.classId) : null,
         });
       } else {
         await adminApi.createUser({
           name: form.name.trim(), email: form.email.trim(), password: form.password, role: form.role,
-          gradeLevel: isStudent ? Number(form.gradeLevel) : null, teacherId: isStudent && form.teacherId ? Number(form.teacherId) : null,
+          gradeLevel: isStudent ? Number(form.gradeLevel) : null, classId: isStudent && form.classId ? Number(form.classId) : null,
         });
       }
       onDone();
@@ -70,9 +70,11 @@ const UserForm = ({ user, teachers, onDone, onCancel }) => {
           <Field as="select" label={t('onboarding.grade')} value={form.gradeLevel} onChange={set('gradeLevel')}>
             {[6, 7, 8, 9, 10, 11, 12].map((g) => <option key={g} value={g}>{t('common.grade', { grade: g })}</option>)}
           </Field>
-          <Field as="select" label={t('roles.TEACHER')} value={form.teacherId} onChange={set('teacherId')}>
-            <option value="">{t('admin.noTeacher')}</option>
-            {teachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.name}</option>)}
+          <Field as="select" label={t('classes.class')} value={form.classId} onChange={set('classId')}>
+            <option value="">{t('classes.noClass')}</option>
+            {classes.map((c) => (
+              <option key={c.id} value={c.id}>{c.name} · {c.schoolName}{c.teacherName ? ` (${c.teacherName})` : ''}</option>
+            ))}
           </Field>
         </div>
       )}
@@ -96,7 +98,8 @@ export const UsersPage = () => {
   const [role, setRole] = useState('ALL');
   const [editing, setEditing] = useState(null); // null | 'new' | user
 
-  const teachers = useMemo(() => (data ?? []).filter((u) => u.role === 'TEACHER'), [data]);
+  const schools = useApi(() => adminApi.schools(), []);
+  const classes = useMemo(() => (schools.data ?? []).flatMap((s) => s.classes), [schools.data]);
   const rows = useMemo(() => (data ?? [])
     .filter((u) => role === 'ALL' || u.role === role)
     .filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(query.trim().toLowerCase())), [data, role, query]);
@@ -152,7 +155,7 @@ export const UsersPage = () => {
                   <td className="px-3 py-3"><Badge tone={ROLE_TONE[u.role]}>{t(`roles.${u.role}`)}</Badge></td>
                   <td className="px-3 py-3 text-slate-600 dark:text-slate-300">
                     {u.role === 'STUDENT'
-                      ? `${u.gradeLevel ? t('common.grade', { grade: u.gradeLevel }) : '—'} · ${u.teacherName ?? t('admin.noTeacher')} · ${u.xp ?? 0} XP`
+                      ? `${u.gradeLevel ? t('common.grade', { grade: u.gradeLevel }) : '—'} · ${u.className ? `${u.className}${u.teacherName ? ` (${u.teacherName})` : ''}` : t('classes.noClass')} · ${u.xp ?? 0} XP`
                       : u.lastLoginAt ? t('admin.lastLogin', { date: new Date(u.lastLoginAt).toLocaleDateString() }) : '—'}
                   </td>
                   <td className="px-3 py-3">{u.active ? <Badge tone="success">{t('admin.active')}</Badge> : <Badge tone="danger">{t('admin.inactive')}</Badge>}</td>
@@ -169,7 +172,7 @@ export const UsersPage = () => {
 
       <Modal open={editing !== null} title={editing === 'new' ? t('admin.addUser') : t('admin.editUser')} onClose={() => setEditing(null)}>
         {editing !== null && (
-          <UserForm user={editing === 'new' ? null : editing} teachers={teachers} onCancel={() => setEditing(null)}
+          <UserForm user={editing === 'new' ? null : editing} classes={classes} onCancel={() => setEditing(null)}
             onDone={() => { setEditing(null); showToast(t('admin.userSaved'), 'success'); reload(); }} />
         )}
       </Modal>

@@ -18,7 +18,7 @@ const THEME = {
  *   series: [{ label, data: number[] }] — 1 series = no legend, 2 = legend shown.
  */
 export const BarChart = ({ labels, series, horizontal = false, height = 240, valueSuffix = '', max, ariaLabel }) => {
-  const { darkMode } = useApp();
+  const { darkMode, t } = useApp();
   const theme = darkMode ? THEME.dark : THEME.light;
   const multi = series.length > 1;
 
@@ -75,7 +75,7 @@ export const BarChart = ({ labels, series, horizontal = false, height = 240, val
       </div>
       <table className="sr-only">
         <caption>{ariaLabel}</caption>
-        <thead><tr><th>Label</th>{series.map((s) => <th key={s.label}>{s.label}</th>)}</tr></thead>
+        <thead><tr><th>{t('charts.label')}</th>{series.map((s) => <th key={s.label}>{s.label}</th>)}</tr></thead>
         <tbody>
           {labels.map((l, i) => (
             <tr key={l}><td>{l}</td>{series.map((s) => <td key={s.label}>{s.data[i] ?? '—'}{valueSuffix}</td>)}</tr>

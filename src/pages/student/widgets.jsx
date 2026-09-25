@@ -5,6 +5,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { Badge, Card, Progress, NamedIcon } from '../../components/ui';
 import { cn } from '../../lib/cn';
+import { badgeName, recommendationReason } from '../../i18n/serverText';
 
 /** XP, level progress and streak — the core gamification readout. */
 export const LevelCard = ({ level, streak }) => {
@@ -87,7 +88,7 @@ const KIND = {
 };
 
 export const RecommendationList = ({ items, compact = false }) => {
-  const { t } = useApp();
+  const { t, language } = useApp();
   return (
     <ul className="space-y-2.5">
       {items.map((r) => {
@@ -100,7 +101,7 @@ export const RecommendationList = ({ items, compact = false }) => {
                 <span className="text-xs text-slate-500 dark:text-slate-400">{r.subjectName} · {r.chapterTitle}</span>
               </div>
               <p className="mt-2 text-sm font-semibold">{r.title}</p>
-              {!compact && <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{r.reason}</p>}
+              {!compact && <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{recommendationReason(t, language, r)}</p>}
             </Link>
           </li>
         );
@@ -157,7 +158,7 @@ export const RewardPanel = ({ reward }) => {
         return (
           <p key={b.code} className="flex items-center gap-2 text-sm font-medium text-slate-800 dark:text-slate-100">
             <span className="h-7 w-7 rounded-lg bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 flex items-center justify-center"><NamedIcon name={b.icon} className="h-4 w-4" /></span>
-            {t('rewards.badge', { name: b.name })}
+            {t('rewards.badge', { name: badgeName(t, b) })}
           </p>
         );
       })}

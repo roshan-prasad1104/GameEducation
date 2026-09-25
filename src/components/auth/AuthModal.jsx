@@ -8,9 +8,9 @@ import { homeFor } from '../routing/roles';
 
 /** Seeded development accounts (documented in README). Shown only in `npm run dev`. */
 const DEMO_ACCOUNTS = [
-  { email: 'aarav@shiksha.org', password: 'Student@123', label: 'Student demo' },
-  { email: 'teacher@shiksha.org', password: 'Teacher@123', label: 'Teacher demo' },
-  { email: 'admin@shiksha.org', password: 'Admin@123', label: 'Admin demo' },
+  { email: 'aarav@shiksha.org', password: 'Student@123', labelKey: 'authModal.studentDemo' },
+  { email: 'teacher@shiksha.org', password: 'Teacher@123', labelKey: 'authModal.teacherDemo' },
+  { email: 'admin@shiksha.org', password: 'Admin@123', labelKey: 'authModal.adminDemo' },
 ];
 
 /**
@@ -42,7 +42,7 @@ export const AuthModal = ({ mode }) => {
     setSubmitting(true); setError(null);
     try {
       const u = await login(acct.email, acct.password);
-      showToast(`Welcome back, ${u.name.split(' ')[0]}!`, 'success');
+      showToast(t('dashboard.welcome', { name: u.name.split(' ')[0] }), 'success');
       goHome(u);
     } catch (e) {
       setError(e.message);
@@ -59,7 +59,7 @@ export const AuthModal = ({ mode }) => {
       const u = mode === 'login'
         ? await login(email.trim(), password)
         : await register({ name: name.trim(), email: email.trim(), password, gradeLevel: Number(grade) });
-      showToast(mode === 'login' ? `Welcome back, ${u.name.split(' ')[0]}!` : `Account created — welcome, ${u.name.split(' ')[0]}!`, 'success');
+      showToast(mode === 'login' ? t('dashboard.welcome', { name: u.name.split(' ')[0] }) : t('authModal.accountCreated', { name: u.name.split(' ')[0] }), 'success');
       goHome(u);
     } catch (e) {
       setError(e.status === 401 ? t('auth.invalidCredentials') : e.message);
@@ -74,7 +74,7 @@ export const AuthModal = ({ mode }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
       <div className="relative w-full max-w-md bg-slate-900/95 text-slate-100 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden">
         <div className="h-1.5 brand-gradient" />
-        <button onClick={close} aria-label="Close" className="absolute top-4 right-4 p-2 text-slate-300 hover:text-white rounded-full hover:bg-slate-800">
+        <button onClick={close} aria-label={t('authModal.close')} className="absolute top-4 right-4 p-2 text-slate-300 hover:text-white rounded-full hover:bg-slate-800">
           <X className="w-5 h-5" />
         </button>
 
@@ -86,10 +86,10 @@ export const AuthModal = ({ mode }) => {
             </div>
             <div>
               <h2 className="text-lg font-semibold tracking-tight">
-                {mode === 'login' ? 'Welcome back' : 'Create your account'}
+                {mode === 'login' ? t('auth.loginTitle') : t('authModal.createYourAccount')}
               </h2>
               <p className="text-sm text-slate-300">
-                {mode === 'login' ? 'Sign in to continue your learning journey' : 'Start learning in minutes — free for rural students'}
+                {mode === 'login' ? t('authModal.loginSubtitle') : t('authModal.registerSubtitle')}
               </p>
             </div>
           </div>
@@ -98,7 +98,7 @@ export const AuthModal = ({ mode }) => {
           {mode === 'login' && demos.length > 0 && (
             <div className="mb-5 p-3 rounded-xl bg-slate-800/80 border border-slate-700">
               <p className="text-xs font-semibold text-brand-200 mb-2 flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5" /> Demo accounts (one click)
+                <ShieldCheck className="h-3.5 w-3.5" /> {t('authModal.demoOneClick')}
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {demos.map(d => (
@@ -109,7 +109,7 @@ export const AuthModal = ({ mode }) => {
                     disabled={submitting}
                     className="text-xs font-medium px-2 py-1.5 rounded-lg bg-slate-900 border border-brand-500/60 text-slate-100 hover:border-brand-400 transition-colors disabled:opacity-50"
                   >
-                    {d.label}
+                    {t(d.labelKey)}
                   </button>
                 ))}
               </div>
@@ -119,22 +119,22 @@ export const AuthModal = ({ mode }) => {
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === 'register' && (
               <>
-                <Field label="Full name" icon={User}>
-                  <input type="text" required value={name} onChange={e => setName(e.target.value)} className="input" placeholder="Your name" />
+                <Field label={t('auth.name')} icon={User}>
+                  <input type="text" required value={name} onChange={e => setName(e.target.value)} className="input" placeholder={t('authModal.yourName')} />
                 </Field>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Grade</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">{t('authModal.grade')}</label>
                   <select value={grade} onChange={e => setGrade(e.target.value)} className="input">
-                    {GRADES.map(g => <option key={g.id} value={g.id.slice(1)}>{g.label} ({g.age})</option>)}
+                    {GRADES.map(g => <option key={g.id} value={g.id.slice(1)}>{t('common.grade', { grade: g.id.slice(1) })} ({t('authModal.ageYears', { age: g.age.replace(' yrs', '') })})</option>)}
                   </select>
                 </div>
               </>
             )}
-            <Field label="Email" icon={Mail}>
+            <Field label={t('auth.email')} icon={Mail}>
               <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="input" placeholder="you@example.com" />
             </Field>
-            <Field label="Password" icon={KeyRound}>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="input" placeholder={mode === 'register' ? 'At least 8 characters' : 'Your password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
+            <Field label={t('auth.password')} icon={KeyRound}>
+              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="input" placeholder={mode === 'register' ? t('authModal.atLeast8') : t('authModal.yourPassword')} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
             </Field>
 
             {error && (
@@ -142,21 +142,21 @@ export const AuthModal = ({ mode }) => {
             )}
 
             <Button type="submit" size="lg" className="w-full" loading={submitting} rightIcon={ArrowRight}>
-              {mode === 'login' ? 'Sign in' : 'Create account'}
+              {mode === 'login' ? t('auth.signIn') : t('auth.createAccount')}
             </Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
-            {mode === 'login' ? "Don't have an account?" : 'Already have one?'}{' '}
+            {mode === 'login' ? t('authModal.noAccount') : t('authModal.haveOne')}{' '}
             <button type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
               className="text-brand-300 font-medium hover:underline">
-              {mode === 'login' ? 'Create one' : 'Sign in'}
+              {mode === 'login' ? t('authModal.createOne') : t('auth.signIn')}
             </button>
           </p>
 
           {/* Language */}
           <div className="mt-5 pt-5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-            <span className="inline-flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Language</span>
+            <span className="inline-flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> {t('common.language')}</span>
             <select value={language} onChange={e => setLanguage(e.target.value)} className="text-xs bg-slate-800 border border-slate-600 rounded-lg px-2 py-1 text-slate-100">
               {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.native}</option>)}
             </select>

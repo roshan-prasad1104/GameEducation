@@ -1,4 +1,5 @@
 import { cn } from '../../lib/cn';
+import { useApp } from '../../context/AppContext';
 
 /**
  * Progress — accessible progressbar with optional shimmer.
@@ -14,6 +15,7 @@ export const Progress = ({
   showLabel = false,
   className,
 }) => {
+  const { t } = useApp();
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const heights = { sm: 'h-1.5', md: 'h-2', lg: 'h-3' };
   const fills = {
@@ -27,7 +29,7 @@ export const Progress = ({
     <div className={cn('w-full', className)}>
       {showLabel && (
         <div className="flex justify-between mb-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-          <span>Progress</span>
+          <span>{t('nav.progress')}</span>
           <span>{Math.round(pct)}%</span>
         </div>
       )}

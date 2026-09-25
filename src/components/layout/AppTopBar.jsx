@@ -38,7 +38,7 @@ export const AppTopBar = ({ onMenuClick }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={onMenuClick}
-            aria-label="Open navigation"
+            aria-label={t('nav.openMenu')}
             className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <Menu className="h-5 w-5" />
@@ -104,7 +104,7 @@ export const AppTopBar = ({ onMenuClick }) => {
           {/* Theme */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            aria-label="Toggle theme"
+            aria-label={t('layout.toggleTheme')}
             className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -113,7 +113,7 @@ export const AppTopBar = ({ onMenuClick }) => {
           {/* Notifications */}
           <div className="relative">
             <button
-              aria-label="Notifications"
+              aria-label={t('layout.notifications')}
               onClick={() => { setBellOpen(o => !o); setMenuOpen(false); setLangOpen(false); }}
               className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 relative"
             >

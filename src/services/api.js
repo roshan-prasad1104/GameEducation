@@ -53,6 +53,8 @@ export const authApi = {
   me: () => http.get('/auth/me'),
   updateMe: (data) => http.put('/users/me', data),
   onboard: (data) => http.put('/students/me/onboarding', data),
+  /** Join a class with the code from the teacher; returns the updated user. */
+  joinClass: (joinCode) => http.put('/students/me/class', { joinCode }),
   logout: () => tokenStore.clear(),
 };
 
@@ -152,6 +154,8 @@ export const learningApi = {
   syncedResult: (clientAttemptId) => offlineStore.getResult(clientAttemptId),
 };
 
+const classQuery = (classId) => (classId ? `?classId=${classId}` : '');
+
 export const studentApi = {
   dashboard: () => withSnapshot('dashboard', () => http.get('/students/me/dashboard')),
   progress: () => withSnapshot('progress', () => http.get('/students/me/progress')),
@@ -163,15 +167,17 @@ export const studentApi = {
 };
 
 export const teacherApi = {
-  overview: () => http.get('/teacher/overview'),
-  students: () => http.get('/teacher/students'),
+  // classId narrows a view to one of the teacher's classes; omitted = all of them.
+  classes: () => http.get('/teacher/classes'),
+  overview: (classId) => http.get(`/teacher/overview${classQuery(classId)}`),
+  students: (classId) => http.get(`/teacher/students${classQuery(classId)}`),
   student: (id) => http.get(`/teacher/students/${id}`),
-  weakTopics: () => http.get('/teacher/weak-topics'),
-  assignments: () => http.get('/teacher/assignments'),
+  weakTopics: (classId) => http.get(`/teacher/weak-topics${classQuery(classId)}`),
+  assignments: (classId) => http.get(`/teacher/assignments${classQuery(classId)}`),
   createAssignment: (data) => http.post('/teacher/assignments', data),
   deleteAssignment: (id) => http.del(`/teacher/assignments/${id}`),
   /** report: 'students' | 'topics' — CSV for Excel / Power BI. */
-  exportCsv: (report) => http.download(`/teacher/reports/${report}.csv`, `class-${report}.csv`),
+  exportCsv: (report, classId) => http.download(`/teacher/reports/${report}.csv${classQuery(classId)}`, `class-${report}.csv`),
   subjects: () => http.get('/subjects'),
   subject: (id) => http.get(`/subjects/${id}`),
   chapter: (id) => http.get(`/chapters/${id}`),
@@ -181,6 +187,14 @@ export const teacherApi = {
 export const adminApi = {
   stats: () => http.get('/admin/stats'),
   users: () => http.get('/admin/users'),
+  schools: () => http.get('/admin/schools'),
+  createSchool: (data) => http.post('/admin/schools', data),
+  updateSchool: (id, data) => http.put(`/admin/schools/${id}`, data),
+  deleteSchool: (id) => http.del(`/admin/schools/${id}`),
+  createClass: (data) => http.post('/admin/classes', data),
+  updateClass: (id, data) => http.put(`/admin/classes/${id}`, data),
+  deleteClass: (id) => http.del(`/admin/classes/${id}`),
+  newJoinCode: (id) => http.post(`/admin/classes/${id}/join-code`),
   createUser: (data) => http.post('/admin/users', data),
   updateUser: (id, data) => http.put(`/admin/users/${id}`, data),
   deleteUser: (id) => http.del(`/admin/users/${id}`),

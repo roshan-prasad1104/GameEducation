@@ -20,20 +20,21 @@ import {
   Calendar,
   ClipboardList
 } from 'lucide-react';
+import { activityText, badgeName, weekdayShort } from '../../i18n/serverText';
 
 const ACTIVITY_DOT = { LESSON: 'bg-blue-600', QUIZ: 'bg-amber-500', BADGE: 'bg-emerald-500' };
 
-const timeAgo = (iso) => {
+const timeAgo = (iso, t) => {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 60) return `${Math.max(1, mins)}m ago`;
+  if (mins < 60) return t('dashboard.minutesAgo', { n: Math.max(1, mins) });
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t('dashboard.hoursAgo', { n: hours });
   const days = Math.round(hours / 24);
-  return days === 1 ? 'Yesterday' : `${days} days ago`;
+  return days === 1 ? t('dashboard.yesterday') : t('dashboard.daysAgo', { n: days });
 };
 
 export const StudentDashboard = () => {
-  const { t, language } = useApp();
+  const { t } = useApp();
   const navigate = useNavigate();
   const { data: dash, error, loading, reload } = useApi(() => studentApi.dashboard(), []);
   const { data: progress } = useApi(() => studentApi.progress(), []);
@@ -56,7 +57,7 @@ export const StudentDashboard = () => {
   const upcomingQuiz = quizCard ? {
     title: quizCard.title,
     to: `/student/quiz/${quizCard.id}`,
-    label: assignedQuiz ? 'Assigned Quiz' : 'Upcoming Quiz',
+    label: assignedQuiz ? t('dashboard.assignedQuiz') : t('dashboard.upcomingQuiz'),
     minutes: Math.round(quizCard.timeLimitSeconds / 60),
     questions: quizCard.questionCount,
     maxXp: quizCard.questionCount * 10 + 20,
@@ -65,7 +66,7 @@ export const StudentDashboard = () => {
 
   // Weekly activity (lessons + quizzes per day) from real progress data.
   const weeklyData = (progress?.last7Days ?? []).map((d) => ({
-    day: new Date(d.date).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'short' }),
+    day: weekdayShort(t, d.date),
     count: d.lessons + d.quizzes,
     lessons: d.lessons,
     quizzes: d.quizzes,
@@ -81,17 +82,17 @@ export const StudentDashboard = () => {
       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Welcome back, {dash.name.split(' ')[0]}! 👋
+            {t('dashboard.welcome', { name: dash.name.split(' ')[0] })} 👋
           </h1>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {[dash.gradeLevel && `Grade ${dash.gradeLevel}`, dash.school].filter(Boolean).join(' • ')}
+            {[dash.gradeLevel && t('common.grade', { grade: dash.gradeLevel }), dash.school].filter(Boolean).join(' • ')}
           </p>
         </div>
 
         {/* Today's Goal Pill */}
         <div className="flex items-center gap-2.5 bg-blue-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold text-blue-800 dark:text-blue-300">
           <Target className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-          <span>Today's Goal: {missionsDone}/{dash.missions.length} daily missions complete</span>
+          <span>{t('dashboard.todaysGoal', { done: missionsDone, total: dash.missions.length })}</span>
         </div>
       </div>
 
@@ -105,10 +106,10 @@ export const StudentDashboard = () => {
           </div>
           <div>
             <span className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              XP Points
+              {t('xpPoints')}
             </span>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
-              {dash.level.xp} XP
+              {t('dashboard.xpValue', { xp: dash.level.xp })}
             </span>
           </div>
         </div>
@@ -120,12 +121,12 @@ export const StudentDashboard = () => {
           </div>
           <div>
             <span className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Current Level
+              {t('dashboard.currentLevel')}
             </span>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
-              Level {dash.level.level}
+              {t('dashboard.levelN', { level: dash.level.level })}
             </span>
-            <span className="block text-[10px] text-gray-500">{dash.level.nextLevelXp - dash.level.xp} XP to next</span>
+            <span className="block text-[10px] text-gray-500">{t('dashboard.xpToNext', { xp: dash.level.nextLevelXp - dash.level.xp })}</span>
           </div>
         </div>
 
@@ -136,10 +137,10 @@ export const StudentDashboard = () => {
           </div>
           <div>
             <span className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Completed
+              {t('lesson.completed')}
             </span>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
-              {dash.lessonsCompleted} Lessons
+              {t('dashboard.lessonsCount', { count: dash.lessonsCompleted })}
             </span>
           </div>
         </div>
@@ -151,10 +152,10 @@ export const StudentDashboard = () => {
           </div>
           <div>
             <span className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Daily Streak
+              {t('sidebar.dailyStreak')}
             </span>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
-              {dash.streak} Days 🔥
+              {t('dashboard.streakDaysFire', { count: dash.streak })}
             </span>
           </div>
         </div>
@@ -172,10 +173,10 @@ export const StudentDashboard = () => {
             <div className="card-flat p-5 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                  Continue Learning
+                  {t('continueLearning')}
                 </span>
                 <span className="text-xs font-bold text-gray-500">
-                  {activeCourse.progressPercent}% Completed
+                  {t('dashboard.pctCompleted', { pct: activeCourse.progressPercent })}
                 </span>
               </div>
 
@@ -184,7 +185,7 @@ export const StudentDashboard = () => {
                   {activeCourse.name}
                 </h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Current: {next.lessonTitle} ({next.chapterTitle})
+                  {t('dashboard.current', { lesson: next.lessonTitle, chapter: next.chapterTitle })}
                 </p>
               </div>
 
@@ -202,21 +203,21 @@ export const StudentDashboard = () => {
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg flex items-center gap-2 shadow-xs transition-colors"
                 >
                   <Play className="w-4 h-4 fill-white" />
-                  <span>Resume Lesson</span>
+                  <span>{t('dashboard.resumeLesson')}</span>
                 </button>
 
                 <button
                   onClick={() => navigate(`/student/subjects/${activeCourse.id}`)}
                   className="px-4 py-2.5 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-800 font-semibold text-xs rounded-lg transition-colors"
                 >
-                  View Syllabus
+                  {t('dashboard.viewSyllabus')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="card-flat p-5 sm:p-6 flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">You've completed every lesson — amazing work!</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('dashboard.allDoneShort')}</span>
             </div>
           )}
 
@@ -224,13 +225,13 @@ export const StudentDashboard = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                Recent Courses
+                {t('dashboard.recentCourses')}
               </h3>
               <button
                 onClick={() => navigate('/student/subjects')}
                 className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
               >
-                <span>Browse All</span>
+                <span>{t('dashboard.browseAll')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -247,12 +248,12 @@ export const StudentDashboard = () => {
                       {course.name}
                     </span>
                     <span className="text-xs text-gray-500 font-medium">
-                      {course.lessonCount} Lessons
+                      {t('dashboard.lessonsCount', { count: course.lessonCount })}
                     </span>
                   </div>
 
                   <h4 className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1">
-                    {course.name}: Grade {course.gradeLevel} · {course.chapterCount} Chapters
+                    {t('dashboard.courseTitle', { name: course.name, grade: course.gradeLevel, chapters: course.chapterCount })}
                   </h4>
 
                   <div className="w-full h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -263,9 +264,9 @@ export const StudentDashboard = () => {
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
-                    <span>{course.progressPercent}% Completed</span>
+                    <span>{t('dashboard.pctCompleted', { pct: course.progressPercent })}</span>
                     <span className="text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-0.5">
-                      Open <ArrowRight className="w-3 h-3" />
+                      {t('dashboard.open')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
@@ -278,18 +279,18 @@ export const StudentDashboard = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-blue-600" />
-                <span>Weekly Learning Activity</span>
+                <span>{t('dashboard.weeklyActivity')}</span>
               </h3>
-              <span className="text-xs text-gray-500 font-medium">This Week: {weekTotal} Activities · +{dash.xpThisWeek} XP</span>
+              <span className="text-xs text-gray-500 font-medium">{t('dashboard.thisWeek', { count: weekTotal, xp: dash.xpThisWeek })}</span>
             </div>
 
             {/* Basic Flat SVG/CSS Bar Chart */}
             <div className="pt-4 flex items-end justify-between h-40 gap-2 border-b border-gray-200 dark:border-slate-800 pb-2" role="img"
-              aria-label={`Lessons and quizzes per day: ${weeklyData.map((d) => `${d.day} ${d.count}`).join(', ')}`}>
+              aria-label={t('dashboard.chartAria', { days: weeklyData.map((d) => `${d.day} ${d.count}`).join(', ') })}>
               {weeklyData.map((item, idx) => {
                 const heightPercent = Math.round((item.count / maxCount) * 100);
                 return (
-                  <div key={idx} className="flex-1 h-full flex flex-col items-center gap-2 group" title={`${item.lessons} lessons · ${item.quizzes} quizzes`}>
+                  <div key={idx} className="flex-1 h-full flex flex-col items-center gap-2 group" title={t('dashboard.barTitle', { lessons: item.lessons, quizzes: item.quizzes })}>
                     <span className="text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
                       {item.count}
                     </span>
@@ -322,7 +323,7 @@ export const StudentDashboard = () => {
                 </span>
                 <span className="text-xs font-bold text-amber-600 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  {upcomingQuiz.minutes} Mins
+                  {t('dashboard.mins', { count: upcomingQuiz.minutes })}
                 </span>
               </div>
 
@@ -330,7 +331,7 @@ export const StudentDashboard = () => {
                 {upcomingQuiz.title}
               </h4>
               <p className="text-xs text-gray-500">
-                {upcomingQuiz.questions} Questions • {upcomingQuiz.best != null ? `Best score ${upcomingQuiz.best}%` : `Earn up to ${upcomingQuiz.maxXp} XP`}
+                {t('dashboard.questionsCount', { count: upcomingQuiz.questions })} • {upcomingQuiz.best != null ? t('dashboard.bestScore', { pct: upcomingQuiz.best }) : t('dashboard.earnUpTo', { xp: upcomingQuiz.maxXp })}
               </p>
 
               <button
@@ -338,7 +339,7 @@ export const StudentDashboard = () => {
                 className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <Zap className="w-3.5 h-3.5 fill-white" />
-                <span>Start Quiz</span>
+                <span>{t('dashboard.startQuiz')}</span>
               </button>
             </div>
           )}
@@ -348,10 +349,10 @@ export const StudentDashboard = () => {
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                 <CheckSquare className="w-4 h-4 text-emerald-600" />
-                <span>Daily Task Checklist</span>
+                <span>{t('dashboard.dailyChecklist')}</span>
               </h4>
               <span className="text-[11px] font-bold text-gray-500">
-                {missionsDone}/{dash.missions.length} Done
+                {t('dashboard.doneCount', { done: missionsDone, total: dash.missions.length })}
               </span>
             </div>
 
@@ -371,7 +372,7 @@ export const StudentDashboard = () => {
                     <Square className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                   )}
                   <span className="leading-snug flex-1">{t(`missions.${task.code}.title`)} ({task.progress}/{task.target})</span>
-                  <span className="text-[10px] font-bold text-amber-600 no-underline">+{task.xpReward} XP</span>
+                  <span className="text-[10px] font-bold text-amber-600 no-underline">{t('dashboard.plusXp', { xp: task.xpReward })}</span>
                 </div>
               ))}
             </div>
@@ -384,19 +385,19 @@ export const StudentDashboard = () => {
                 <Sparkles className="w-4 h-4 text-indigo-600" />
                 <span>{t('recommendedLessons')}</span>
               </h4>
-              <Link to="/student/recommendations" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">View All</Link>
+              <Link to="/student/recommendations" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">{t('dashboard.viewAll')}</Link>
             </div>
             {!recs ? (
-              <p className="text-xs text-gray-500">Loading suggestions…</p>
+              <p className="text-xs text-gray-500">{t('dashboard.loadingSuggestions')}</p>
             ) : recs.recommendations.length === 0 ? (
-              <p className="text-xs text-gray-500">You're all caught up!</p>
+              <p className="text-xs text-gray-500">{t('dashboard.caughtUp')}</p>
             ) : (
               <div className="space-y-2">
                 {recs.recommendations.map((r) => (
                   <Link key={r.lessonId} to={`/student/lessons/${r.lessonId}`}
                     className="block p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-gray-300 text-xs">
                     <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${r.kind === 'REVISE' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
-                      {r.kind === 'REVISE' ? 'Revise' : r.kind === 'START' ? 'Start' : 'Continue'}
+                      {r.kind === 'REVISE' ? t('recs.kind.REVISE') : r.kind === 'START' ? t('recs.kind.START') : t('recs.kind.CONTINUE')}
                     </span>
                     <span className="block mt-1.5 font-semibold text-gray-900 dark:text-white">{r.title}</span>
                     <span className="block text-[11px] text-gray-500 mt-0.5">{r.subjectName}</span>
@@ -411,7 +412,7 @@ export const StudentDashboard = () => {
             <div className="card-flat p-5 space-y-3">
               <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                 <ClipboardList className="w-4 h-4 text-blue-600" />
-                <span>Teacher Assignments</span>
+                <span>{t('dashboard.teacherAssignments')}</span>
               </h4>
               <div className="space-y-2">
                 {dash.assignments.map((a) => (
@@ -422,7 +423,7 @@ export const StudentDashboard = () => {
                     {a.completed ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" /> : <Square className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />}
                     <span className="leading-snug">
                       <span className={a.completed ? 'line-through' : 'font-semibold'}>{a.title}</span>
-                      <span className="block text-[11px] text-gray-500">{a.teacherName}{a.dueDate ? ` • Due ${new Date(a.dueDate).toLocaleDateString()}` : ''}</span>
+                      <span className="block text-[11px] text-gray-500">{a.teacherName}{a.dueDate ? ` • ${t('assignments.due', { date: new Date(a.dueDate).toLocaleDateString() })}` : ''}</span>
                     </span>
                   </Link>
                 ))}
@@ -433,19 +434,19 @@ export const StudentDashboard = () => {
           {/* 8. Recent Activity List */}
           <div className="card-flat p-5 space-y-4">
             <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-              Recent Activity
+              {t('dashboard.recentActivityTitle')}
             </h4>
 
             {dash.recentActivity.length === 0 ? (
-              <p className="text-xs text-gray-500">No activity yet — start your first lesson!</p>
+              <p className="text-xs text-gray-500">{t('dashboard.noActivity')}</p>
             ) : (
               <div className="space-y-3 text-xs">
                 {dash.recentActivity.slice(0, 5).map((a, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${ACTIVITY_DOT[a.type] ?? 'bg-blue-600'}`} />
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">{a.type === 'QUIZ' ? `Completed Quiz: ${a.title}` : a.title}</p>
-                      <p className="text-[11px] text-gray-500">{a.detail} • {timeAgo(a.at)}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{a.type === 'QUIZ' ? t('dashboard.completedQuiz', { title: activityText(t, a).title }) : activityText(t, a).title}</p>
+                      <p className="text-[11px] text-gray-500">{activityText(t, a).detail} • {timeAgo(a.at, t)}</p>
                     </div>
                   </div>
                 ))}
@@ -456,11 +457,11 @@ export const StudentDashboard = () => {
           {/* 9. Simple Achievement Badges */}
           <div className="card-flat p-5 space-y-3">
             <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-              Achievement Badges
+              {t('dashboard.achievementBadges')}
             </h4>
 
             {dash.recentBadges.length === 0 ? (
-              <p className="text-xs text-gray-500">Complete your first lesson to unlock a badge.</p>
+              <p className="text-xs text-gray-500">{t('dashboard.firstBadge')}</p>
             ) : (
               <div className="grid grid-cols-3 gap-2 text-center">
                 {dash.recentBadges.map((badge) => (
@@ -469,7 +470,7 @@ export const StudentDashboard = () => {
                       <NamedIcon name={badge.icon} className="w-4 h-4" />
                     </div>
                     <span className="block text-[10px] font-bold text-gray-800 dark:text-gray-200 truncate">
-                      {badge.name}
+                      {badgeName(t, badge)}
                     </span>
                   </div>
                 ))}

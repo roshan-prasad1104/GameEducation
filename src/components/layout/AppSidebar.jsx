@@ -34,6 +34,7 @@ const NAV = {
   ADMIN: [
     { to: '/admin/dashboard',       icon: LayoutDashboard, label: 'Dashboard', key: 'dashboard' },
     { to: '/admin/users',           icon: Users,           label: 'Users', key: 'users' },
+    { to: '/admin/classes',         icon: School,          label: 'Classes', key: 'nav.classes' },
     { to: '/admin/content',         icon: FileText,        label: 'Content', key: 'content' },
     { to: '/admin/profile',         icon: Settings,        label: 'Profile', key: 'profile' },
   ],

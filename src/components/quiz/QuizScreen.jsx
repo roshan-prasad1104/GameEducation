@@ -68,7 +68,7 @@ const OptionGrid = ({ question, answer, feedback, submitted, onSelect }) => {
 const lockedById = (session) => new Map((session?.answers ?? []).map((a) => [a.questionId, a]));
 
 const QuizRunner = ({ quiz, session }) => {
-  const { online, showToast, refreshPending } = useApp();
+  const { online, showToast, refreshPending, t } = useApp();
   const navigate = useNavigate();
   const questionList = quiz.questions;
 
@@ -98,8 +98,8 @@ const QuizRunner = ({ quiz, session }) => {
   useEffect(() => { answersRef.current = answers; }, [answers]);
   useEffect(() => { startedAt.current = Date.now(); }, []);
   useEffect(() => {
-    if (session?.answers?.length) showToast('Resuming your quiz. Answers you already submitted are kept.', 'info');
-  }, [session, showToast]);
+    if (session?.answers?.length) showToast(t('quiz.resuming'), 'info');
+  }, [session, showToast, t]);
 
   const currentQ = questionList[currentIndex];
 
@@ -134,10 +134,10 @@ const QuizRunner = ({ quiz, session }) => {
   // When time runs out, submit what has been answered.
   useEffect(() => {
     if (timeLeft === 0 && !hasFinishedRef.current) {
-      showToast("⏰ Time's up! Submitting your answers.", 'info');
+      showToast(`⏰ ${t('quiz.timeUp')}`, 'info');
       handleFinish();
     }
-  }, [timeLeft, handleFinish, showToast]);
+  }, [timeLeft, handleFinish, showToast, t]);
 
   /* ─── Answer management ─── */
 
@@ -202,9 +202,11 @@ const QuizRunner = ({ quiz, session }) => {
   const seconds = timeLeft % 60;
   const timerUrgent = timeLeft < 30;
   const progress = Math.round(((currentIndex + (submitted ? 1 : 0)) / questionList.length) * 100);
-  const typeLabel = currentQ?.options?.length === 2 ? 'True or False' : 'Multiple Choice';
+  const typeLabel = currentQ?.options?.length === 2 ? t('quiz.trueFalse') : t('quiz.multipleChoice');
   const fb = feedback[currentIndex];
   const maxXp = questionList.length * POINTS + 20;
+  // Split the sentence at {xp} so the highlighted amount fits the translated word order.
+  const [earnBefore, earnAfter = ''] = t('quiz.earnUpTo').split('{xp}');
 
   return (
     <div className="max-w-3xl mx-auto space-y-5 pb-16">
@@ -213,13 +215,13 @@ const QuizRunner = ({ quiz, session }) => {
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 flex items-center justify-between border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="min-w-0">
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            {quiz.subject?.name ?? 'Quiz'} · Practice
+            {quiz.subject?.name ?? t('progress.quiz')} · {t('quiz.practice')}
           </span>
           <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-0.5 max-w-xs truncate">
             {quiz.title}
           </h2>
         </div>
-        <div role="timer" aria-label="Time left" className={`flex items-center gap-2 font-extrabold text-sm px-3.5 py-1.5 rounded-xl border transition-colors ${
+        <div role="timer" aria-label={t('quiz.timeLeft')} className={`flex items-center gap-2 font-extrabold text-sm px-3.5 py-1.5 rounded-xl border transition-colors ${
           timerUrgent
             ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-300 animate-pulse'
             : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-300'
@@ -231,15 +233,15 @@ const QuizRunner = ({ quiz, session }) => {
 
       {quiz.__offline && (
         <div className="flex items-center gap-2 text-xs font-semibold text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3">
-          <CloudOff className="w-4 h-4 shrink-0" /> You are taking this quiz offline. It will be scored when you reconnect.
+          <CloudOff className="w-4 h-4 shrink-0" /> {t('offline.quizOffline')}
         </div>
       )}
 
       {/* Progress */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>Question {currentIndex + 1} of {questionList.length}</span>
-          <span>{progress}% Complete</span>
+          <span>{t('quiz.questionOf', { n: currentIndex + 1, total: questionList.length })}</span>
+          <span>{t('quiz.percentComplete', { pct: progress })}</span>
         </div>
         <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
           <div
@@ -294,22 +296,22 @@ const QuizRunner = ({ quiz, session }) => {
           }`}>
             <div className="font-bold text-sm mb-1 flex items-center gap-1.5">
               {fb.correct
-                ? <><CheckCircle2 className="w-4 h-4" /> Correct! +{POINTS} pts</>
-                : <><XCircle className="w-4 h-4" /> Incorrect</>}
+                ? <><CheckCircle2 className="w-4 h-4" /> {t('quiz.correctPts', { points: POINTS })}</>
+                : <><XCircle className="w-4 h-4" /> {t('quiz.incorrect')}</>}
             </div>
             {fb.explanation && (
-              <p><strong>Explanation:</strong> {fb.explanation}</p>
+              <p><strong>{t('quiz.explanationLabel')}</strong> {fb.explanation}</p>
             )}
           </div>
         ) : (
           <div className="px-4 py-3.5 rounded-2xl border text-xs leading-relaxed bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
-            Answer saved. It will be scored when you submit the quiz online.
+            {t('quiz.answerSaved')}
           </div>
         ))}
 
         {/* Action buttons */}
         <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-          <span className="text-xs text-slate-400 font-medium">{POINTS} pts</span>
+          <span className="text-xs text-slate-400 font-medium">{t('quiz.pts', { points: POINTS })}</span>
           {!submitted ? (
             <button
               onClick={handleSubmit}
@@ -320,7 +322,7 @@ const QuizRunner = ({ quiz, session }) => {
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
               }`}
             >
-              Submit Answer
+              {t('quiz.submitAnswer')}
             </button>
           ) : (
             <button
@@ -329,7 +331,7 @@ const QuizRunner = ({ quiz, session }) => {
               className="px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-90 active:scale-95 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/25 flex items-center gap-2 transition-all disabled:opacity-60"
             >
               {(checking || finishing) && <Loader2 className="w-4 h-4 animate-spin" />}
-              {currentIndex === questionList.length - 1 ? 'See Results' : 'Next Question'}
+              {currentIndex === questionList.length - 1 ? t('quiz.seeResults') : t('quiz.nextQuestion')}
               <ArrowRight className="w-4 h-4" />
             </button>
           )}
@@ -339,7 +341,7 @@ const QuizRunner = ({ quiz, session }) => {
       {/* XP incentive */}
       <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
         <Zap className="w-3.5 h-3.5 text-amber-500" />
-        <span>Complete this quiz to earn up to <strong className="text-amber-600 dark:text-amber-400">+{maxXp} XP</strong></span>
+        <span>{earnBefore}<strong className="text-amber-600 dark:text-amber-400">+{maxXp} XP</strong>{earnAfter}</span>
       </div>
     </div>
   );
@@ -359,9 +361,10 @@ const loadQuiz = async (quizId) => {
 
 export const QuizScreen = () => {
   const { quizId } = useParams();
+  const { t } = useApp();
   const { data, error, loading, reload } = useApi(() => loadQuiz(quizId), [quizId]);
   if (loading && !data) return <LoadingState rows={2} />;
   if (error && !data) return <ErrorState error={error} onRetry={reload} />;
-  if (!data.quiz.questions?.length) return <ErrorState error={{ message: 'This quiz has no questions yet.' }} />;
+  if (!data.quiz.questions?.length) return <ErrorState error={{ message: t('quiz.noQuestions') }} />;
   return <QuizRunner key={data.quiz.id} quiz={data.quiz} session={data.session} />;
 };

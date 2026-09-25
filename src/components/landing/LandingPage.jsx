@@ -22,12 +22,12 @@ import {
 } from 'lucide-react';
 
 /* ── Analytics Chart Data ─────────────────────────────────────── */
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 const HUD_DATA = {
   grind: {
-    label: 'Daily Grind',
-    desc: 'Daily focus hours & XP yield',
+    labelKey: 'landing.analytics.grind',
+    descKey: 'landing.analytics.grindDesc',
     values: [1.5, 3.2, 2.8, 4.5, 3.0, 5.1, 4.2],
     xp: [120, 340, 290, 510, 360, 620, 480],
     color: '#F59E0B',
@@ -35,8 +35,8 @@ const HUD_DATA = {
     fillB: 'rgba(245, 158, 11, 0)',
   },
   mastery: {
-    label: 'Mastery Mode',
-    desc: 'Deep conceptual work hours',
+    labelKey: 'landing.analytics.mastery',
+    descKey: 'landing.analytics.masteryDesc',
     values: [0.5, 1.2, 2.5, 1.8, 3.5, 2.2, 4.0],
     xp: [60, 180, 380, 260, 520, 340, 640],
     color: '#A855F7',
@@ -49,6 +49,7 @@ const CHART_W = 560;
 const CHART_H = 150;
 
 function SvgChart({ mode, tooltip, setTooltip }) {
+  const { t } = useApp();
   const d = HUD_DATA[mode];
   const max = Math.max(...d.values) + 0.5;
   const min = Math.min(...d.values) - 0.5;
@@ -133,7 +134,7 @@ function SvgChart({ mode, tooltip, setTooltip }) {
                   fontSize={10}
                   fontWeight="bold"
                 >
-                  {pt.v.toFixed(1)}h focus
+                  {t('landing.analytics.focus', { h: pt.v.toFixed(1) })}
                 </text>
                 <text
                   x={Math.max(50, Math.min(CHART_W - 50, pt.x))}
@@ -143,7 +144,7 @@ function SvgChart({ mode, tooltip, setTooltip }) {
                   fontSize={10}
                   fontWeight="bold"
                 >
-                  +{pt.xp} XP
+                  {t('dashboard.plusXp', { xp: pt.xp })}
                 </text>
               </g>
             )}
@@ -153,7 +154,7 @@ function SvgChart({ mode, tooltip, setTooltip }) {
 
       <div className="flex justify-between mt-2 px-1 text-[11px] font-mono text-indigo-300/60">
         {DAYS.map((day) => (
-          <span key={day}>{day}</span>
+          <span key={day}>{t(`landing.analytics.days.${day}`)}</span>
         ))}
       </div>
     </div>
@@ -165,7 +166,7 @@ function SvgChart({ mode, tooltip, setTooltip }) {
 ───────────────────────────────────────────── */
 
 export const LandingPage = () => {
-  const { language, setLanguage, online, status, user } = useApp();
+  const { language, setLanguage, online, status, user, t } = useApp();
   const isOffline = !online;
   const navigate = useNavigate();
   const [activeGradeTab, setActiveGradeTab] = useState('Grade 8');
@@ -205,10 +206,10 @@ export const LandingPage = () => {
 
           {/* Center: Nav links */}
           <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-300">
-            <a href="#curriculum" className="hover:text-amber-400 transition-colors">Curriculum</a>
-            <a href="#quests" className="hover:text-amber-400 transition-colors">Quests</a>
-            <a href="#analytics" className="hover:text-amber-400 transition-colors">Analytics</a>
-            <a href="#offline" className="hover:text-amber-400 transition-colors">Offline Sync</a>
+            <a href="#curriculum" className="hover:text-amber-400 transition-colors">{t('landing.header.curriculum')}</a>
+            <a href="#quests" className="hover:text-amber-400 transition-colors">{t('landing.header.quests')}</a>
+            <a href="#analytics" className="hover:text-amber-400 transition-colors">{t('landing.header.analytics')}</a>
+            <a href="#offline" className="hover:text-amber-400 transition-colors">{t('landing.header.offlineSync')}</a>
           </div>
 
           {/* Right: Lang switcher + Portal CTA */}
@@ -239,7 +240,7 @@ export const LandingPage = () => {
               onClick={() => handlePortalAccess('/student/dashboard')}
               className="bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 hover:opacity-95 text-black font-bold text-xs px-4 py-2 rounded-full shadow-lg shadow-amber-500/20 flex items-center gap-1.5 transition-all hover:scale-105"
             >
-              <span>Launch Portal</span>
+              <span>{t('landing.header.launchPortal')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -261,27 +262,27 @@ export const LandingPage = () => {
               {/* Tag pill */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono tracking-widest uppercase">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>[ STEM Mastery Platform for Grades 6–12 ]</span>
+                <span>{t('landing.hero.tag')}</span>
               </div>
 
               {/* Editorial Serif Headline */}
               <h1 className="font-serif text-4xl sm:text-6xl lg:text-6xl font-bold leading-[1.08] tracking-tight text-white">
-                Education Engineered for{' '}
+                {t('landing.hero.titleStart')}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-violet-400">
-                  Mastery
+                  {t('landing.hero.titleHighlight')}
                 </span>
-                ,<br className="hidden sm:inline" /> Not Memorization.
+                ,<br className="hidden sm:inline" /> {t('landing.hero.titleEnd')}
               </h1>
 
               {/* Subtitle */}
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Earn real XP, unlock interactive physics & math sandboxes, build production projects, and study 100% offline in regional Indian languages.
+                {t('landing.hero.subtitle')}
               </p>
 
               {/* Grade Selector Chips */}
               <div className="space-y-2 pt-2">
                 <p className="text-[11px] font-mono text-indigo-300/70 uppercase tracking-widest">
-                  [ Select Grade Level ]
+                  {t('landing.hero.selectGrade')}
                 </p>
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
                   {GRADES.map((g) => (
@@ -294,7 +295,7 @@ export const LandingPage = () => {
                           : 'bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10'
                       }`}
                     >
-                      {g.label}
+                      {t('common.grade', { grade: g.id.slice(1) })}
                     </button>
                   ))}
                 </div>
@@ -308,7 +309,7 @@ export const LandingPage = () => {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search topics (e.g. Ohm's Law, Friction)..."
+                    placeholder={t('landing.hero.searchPlaceholder')}
                     className="w-full bg-white/5 border border-white/15 rounded-2xl pl-10 pr-4 py-3 text-xs text-white placeholder-slate-400 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
                   />
                 </div>
@@ -316,7 +317,7 @@ export const LandingPage = () => {
                   onClick={() => handlePortalAccess('/student/dashboard')}
                   className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-indigo-600/30 whitespace-nowrap flex items-center justify-center gap-2 transition"
                 >
-                  <span>Start Quest</span>
+                  <span>{t('landing.hero.startQuest')}</span>
                   <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 </button>
               </div>
@@ -325,15 +326,15 @@ export const LandingPage = () => {
               <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-400 font-mono">
                 <div className="flex items-center gap-1.5">
                   <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <span>14-Day Streak Engine</span>
+                  <span>{t('landing.hero.streakEngine')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <WifiOff className="w-4 h-4 text-emerald-400" />
-                  <span>100% Offline Compatible</span>
+                  <span>{t('landing.hero.offlineReady')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Globe className="w-4 h-4 text-violet-400" />
-                  <span>EN · HI · OD Languages</span>
+                  <span>{t('landing.hero.languages')}</span>
                 </div>
               </div>
             </div>
@@ -350,19 +351,19 @@ export const LandingPage = () => {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-white">Aarav Sharma</h3>
-                      <p className="text-[11px] font-mono text-amber-400">Scholar Level 8 · Grade 8</p>
+                      <p className="text-[11px] font-mono text-amber-400">{t('landing.hud.level')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-bold font-mono">
                     <Flame className="w-3.5 h-3.5 fill-amber-400" />
-                    <span>14-Day Streak</span>
+                    <span>{t('landing.hud.streak')}</span>
                   </div>
                 </div>
 
                 {/* Live XP Progress */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-mono">
-                    <span className="text-slate-400 uppercase">[ Weekly Telemetry ]</span>
+                    <span className="text-slate-400 uppercase">{t('landing.hud.weekly')}</span>
                     <span className="text-amber-400 font-bold">8,420 / 10,000 XP</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-white/5">
@@ -377,21 +378,21 @@ export const LandingPage = () => {
                 <div className="bg-[#0B071A]/70 border border-indigo-500/25 rounded-2xl p-4 space-y-3">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                      Active Quest
+                      {t('landing.hud.activeQuest')}
                     </span>
                     <span className="text-amber-400 font-bold font-mono">+250 XP</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Ohm's Law & Circuit Master</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">Calculate V = I × R with solar lanterns in rural households.</p>
+                    <h4 className="text-sm font-bold text-white">{t('landing.hud.questTitle')}</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">{t('landing.hud.questBody')}</p>
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
-                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-amber-400" /> 15 mins left</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-amber-400" /> {t('landing.hud.minsLeft')}</span>
                     <button
                       onClick={() => handlePortalAccess('/student/dashboard')}
                       className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
                     >
-                      Resume Quest <ChevronRight className="w-3.5 h-3.5" />
+                      {t('landing.hud.resumeQuest')} <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -399,19 +400,19 @@ export const LandingPage = () => {
                 {/* Milestone Badges */}
                 <div className="space-y-2">
                   <p className="text-[11px] font-mono text-slate-400 uppercase tracking-widest">
-                    [ Unlockable Milestones ]
+                    {t('landing.hud.milestones')}
                   </p>
                   <div className="grid grid-cols-3 gap-2.5">
                     {[
-                      { title: 'Streak Master 7', icon: Flame, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-                      { title: 'Math Wizard', icon: Award, color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
-                      { title: 'Offline Explorer', icon: WifiOff, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
+                      { titleKey: 'landing.hud.badgeStreak', icon: Flame, color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
+                      { titleKey: 'landing.hud.badgeMath', icon: Award, color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
+                      { titleKey: 'landing.hud.badgeOffline', icon: WifiOff, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
                     ].map((b, i) => {
                       const Icon = b.icon;
                       return (
                         <div key={i} className={`p-2.5 rounded-xl border ${b.color} text-center space-y-1`}>
                           <Icon className="w-4 h-4 mx-auto" />
-                          <p className="text-[10px] font-bold truncate text-slate-200">{b.title}</p>
+                          <p className="text-[10px] font-bold truncate text-slate-200">{t(b.titleKey)}</p>
                         </div>
                       );
                     })}
@@ -432,13 +433,13 @@ export const LandingPage = () => {
           {/* Section header */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-[11px] font-mono uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
-              [ CORE ARCHITECTURE ]
+              {t('landing.modules.eyebrow')}
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-bold text-white leading-tight">
-              Three Steps to Complete Mastery
+              {t('landing.modules.title')}
             </h2>
             <p className="text-sm text-slate-400">
-              Built for rural students: bite-sized discovery, 5-type practice quizzes, and explainable AI revision.
+              {t('landing.modules.subtitle')}
             </p>
           </div>
 
@@ -450,22 +451,22 @@ export const LandingPage = () => {
               <div className="flex items-start justify-between">
                 <span className="font-mono text-5xl font-black text-amber-500/20">01</span>
                 <span className="text-[10px] font-mono uppercase font-bold tracking-widest text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
-                  [ DISCOVERY ]
+                  {t('landing.modules.discovery')}
                 </span>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
                 <Globe className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">Multilingual NCERT Lessons</h3>
+                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">{t('landing.modules.discoveryTitle')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Conceptual lessons in English, Hindi, and Odia with offline-first caching and automatic English fallback.
+                  {t('landing.modules.discoveryBody')}
                 </p>
               </div>
               <ul className="space-y-2 text-xs text-slate-700 border-t border-slate-200/80 pt-4">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Low-bandwidth video compression</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Local SD-card download support</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Regional voice narration toggles</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> {t('landing.modules.discovery1')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> {t('landing.modules.discovery2')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> {t('landing.modules.discovery3')}</li>
               </ul>
             </div>
 
@@ -474,22 +475,22 @@ export const LandingPage = () => {
               <div className="flex items-start justify-between">
                 <span className="font-mono text-5xl font-black text-indigo-500/20">02</span>
                 <span className="text-[10px] font-mono uppercase font-bold tracking-widest text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full border border-indigo-300">
-                  [ EVALUATION ]
+                  {t('landing.modules.evaluation')}
                 </span>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
                 <FileCode2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">5-Type Quiz Engine</h3>
+                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">{t('landing.modules.evaluationTitle')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Interactive evaluation across 5 distinct question formats with per-question countdown timers and hints.
+                  {t('landing.modules.evaluationBody')}
                 </p>
               </div>
               <ul className="space-y-2 text-xs text-slate-700 border-t border-slate-200/80 pt-4">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> Multiple Choice & True/False</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> Fill-in-Blank & Match Columns</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> Image & Diagram-based questions</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> {t('landing.modules.evaluation1')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> {t('landing.modules.evaluation2')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" /> {t('landing.modules.evaluation3')}</li>
               </ul>
             </div>
 
@@ -498,22 +499,22 @@ export const LandingPage = () => {
               <div className="flex items-start justify-between">
                 <span className="font-mono text-5xl font-black text-violet-500/20">03</span>
                 <span className="text-[10px] font-mono uppercase font-bold tracking-widest text-violet-700 bg-violet-100 px-3 py-1 rounded-full border border-violet-300">
-                  [ ADAPTATION ]
+                  {t('landing.modules.adaptation')}
                 </span>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-600 flex items-center justify-center">
                 <Cpu className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">Explainable AI Mastery Engine</h3>
+                <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">{t('landing.modules.adaptationTitle')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Identifies weak topics automatically after every quiz and generates targeted micro-revision recommendations.
+                  {t('landing.modules.adaptationBody')}
                 </p>
               </div>
               <ul className="space-y-2 text-xs text-slate-700 border-t border-slate-200/80 pt-4">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> Real-time weak-topic detection</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> Targeted revision playlists</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> Verified proof-of-mastery certificates</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> {t('landing.modules.adaptation1')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> {t('landing.modules.adaptation2')}</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" /> {t('landing.modules.adaptation3')}</li>
               </ul>
             </div>
 
@@ -528,10 +529,10 @@ export const LandingPage = () => {
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
             <div className="space-y-2">
               <span className="text-[11px] font-mono uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
-                [ TELEMETRY HUD ]
+                {t('landing.analytics.eyebrow')}
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl font-bold text-white">
-                Quantified Mastery Analytics
+                {t('landing.analytics.title')}
               </h2>
             </div>
 
@@ -545,7 +546,7 @@ export const LandingPage = () => {
               }`}
             >
               {chartMode === 'grind' ? <ToggleLeft className="w-5 h-5 text-amber-400" /> : <ToggleRight className="w-5 h-5 text-violet-400" />}
-              <span>{HUD_DATA[chartMode].label}</span>
+              <span>{t(HUD_DATA[chartMode].labelKey)}</span>
             </button>
           </div>
 
@@ -554,15 +555,15 @@ export const LandingPage = () => {
             {/* Top metric row */}
             <div className="grid grid-cols-3 gap-4 border-b border-indigo-500/20 pb-6 text-center">
               <div>
-                <p className="text-[10px] font-mono uppercase text-slate-400">Total Weekly XP</p>
+                <p className="text-[10px] font-mono uppercase text-slate-400">{t('landing.analytics.totalXp')}</p>
                 <p className="text-xl sm:text-2xl font-black text-amber-400 font-mono mt-1">+2,720 XP</p>
               </div>
               <div>
-                <p className="text-[10px] font-mono uppercase text-slate-400">Accuracy Rate</p>
+                <p className="text-[10px] font-mono uppercase text-slate-400">{t('landing.analytics.accuracy')}</p>
                 <p className="text-xl sm:text-2xl font-black text-emerald-400 font-mono mt-1">88.4%</p>
               </div>
               <div>
-                <p className="text-[10px] font-mono uppercase text-slate-400">Streak Stability</p>
+                <p className="text-[10px] font-mono uppercase text-slate-400">{t('landing.analytics.stability')}</p>
                 <p className="text-xl sm:text-2xl font-black text-violet-400 font-mono mt-1">99.1%</p>
               </div>
             </div>
@@ -570,7 +571,7 @@ export const LandingPage = () => {
             {/* Svg chart */}
             <div className="space-y-2">
               <p className="text-xs font-mono text-indigo-300/70">
-                {HUD_DATA[chartMode].desc} · hover dots for detail
+                {t('landing.analytics.hint', { desc: t(HUD_DATA[chartMode].descKey) })}
               </p>
               <SvgChart mode={chartMode} tooltip={chartTooltip} setTooltip={setChartTooltip} />
             </div>
@@ -585,18 +586,18 @@ export const LandingPage = () => {
 
         <div className="max-w-4xl mx-auto px-4 text-center space-y-8 relative z-10">
           <span className="text-[11px] font-mono uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3.5 py-1.5 rounded-full border border-amber-400/20">
-            [ THE SHIKSHASETU PROMISE ]
+            {t('landing.promise.eyebrow')}
           </span>
 
           <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight text-white">
-            The traditional curriculum was built for yesterday’s world.<br />
+            {t('landing.promise.line1')}<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-violet-400 italic">
-              ShikshaSetu is built for active thinkers.
+              {t('landing.promise.line2')}
             </span>
           </h2>
 
           <p className="text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            We empower students in rural & tribal schools to master STEM through gamification, offline sync, and personalized AI pathways.
+            {t('landing.promise.body')}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -604,14 +605,14 @@ export const LandingPage = () => {
               onClick={() => handlePortalAccess('/student/dashboard')}
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 hover:opacity-95 text-black font-bold text-sm rounded-2xl shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition"
             >
-              <span>Initialize Learning Quest</span>
+              <span>{t('landing.promise.cta')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigate(status === 'authed' && user ? homeFor(user.role) : '/login')}
               className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/15 font-bold text-sm rounded-2xl transition"
             >
-              <span>Sign In / Demo Accounts</span>
+              <span>{t('landing.promise.signIn')}</span>
             </button>
           </div>
         </div>
@@ -623,39 +624,39 @@ export const LandingPage = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="space-y-3">
-              <p className="text-white font-bold tracking-widest uppercase text-[11px]">[ STUDENT PORTAL ]</p>
+              <p className="text-white font-bold tracking-widest uppercase text-[11px]">{t('landing.footer.student')}</p>
               <ul className="space-y-2">
-                <li><button onClick={() => handlePortalAccess('/student/dashboard')} className="hover:text-amber-400">Dashboard</button></li>
-                <li><button onClick={() => handlePortalAccess('/student/subjects')} className="hover:text-amber-400">Subjects & Courses</button></li>
-                <li><button onClick={() => handlePortalAccess('/student/subjects')} className="hover:text-amber-400">Interactive Quizzes</button></li>
-                <li><button onClick={() => handlePortalAccess('/student/leaderboard')} className="hover:text-amber-400">Leaderboard</button></li>
+                <li><button onClick={() => handlePortalAccess('/student/dashboard')} className="hover:text-amber-400">{t('nav.dashboard')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/student/subjects')} className="hover:text-amber-400">{t('landing.footer.subjectsCourses')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/student/subjects')} className="hover:text-amber-400">{t('landing.footer.quizzes')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/student/leaderboard')} className="hover:text-amber-400">{t('nav.leaderboard')}</button></li>
               </ul>
             </div>
 
             <div className="space-y-3">
-              <p className="text-white font-bold tracking-widest uppercase text-[11px]">[ TEACHER ANALYTICS ]</p>
+              <p className="text-white font-bold tracking-widest uppercase text-[11px]">{t('landing.footer.teacher')}</p>
               <ul className="space-y-2">
-                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">Class Progress</button></li>
-                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">Weak Topics Map</button></li>
-                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">Offline Sync Export</button></li>
+                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">{t('landing.footer.classProgress')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">{t('landing.footer.weakMap')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/teacher/dashboard')} className="hover:text-amber-400">{t('landing.footer.syncExport')}</button></li>
               </ul>
             </div>
 
             <div className="space-y-3">
-              <p className="text-white font-bold tracking-widest uppercase text-[11px]">[ ADMIN PANEL ]</p>
+              <p className="text-white font-bold tracking-widest uppercase text-[11px]">{t('landing.footer.admin')}</p>
               <ul className="space-y-2">
-                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">School Telemetry</button></li>
-                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">Content Management</button></li>
-                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">User Governance</button></li>
+                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">{t('landing.footer.telemetry')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">{t('landing.footer.content')}</button></li>
+                <li><button onClick={() => handlePortalAccess('/admin/dashboard')} className="hover:text-amber-400">{t('landing.footer.governance')}</button></li>
               </ul>
             </div>
 
             <div className="space-y-3">
-              <p className="text-white font-bold tracking-widest uppercase text-[11px]">[ OFFLINE PWA ]</p>
+              <p className="text-white font-bold tracking-widest uppercase text-[11px]">{t('landing.footer.pwa')}</p>
               <ul className="space-y-2">
-                <li><span>{isOffline ? 'Mode: Offline' : 'Mode: Online'}</span></li>
-                <li><a href="#" className="hover:text-amber-400">SD Card Cache</a></li>
-                <li><a href="#" className="hover:text-amber-400">Service Worker Status</a></li>
+                <li><span>{isOffline ? t('landing.footer.modeOffline') : t('landing.footer.modeOnline')}</span></li>
+                <li><a href="#" className="hover:text-amber-400">{t('landing.footer.sdCache')}</a></li>
+                <li><a href="#" className="hover:text-amber-400">{t('landing.footer.swStatus')}</a></li>
               </ul>
             </div>
           </div>
@@ -663,9 +664,9 @@ export const LandingPage = () => {
           <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ShikshaSetu Engine v2.4 · All Systems Operational</span>
+              <span>{t('landing.footer.status')}</span>
             </div>
-            <p>© 2026 ShikshaSetu · A Gamified STEM Platform for Rural & Tribal India</p>
+            <p>{t('landing.footer.copyright')}</p>
           </div>
 
         </div>
