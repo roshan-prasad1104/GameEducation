@@ -168,6 +168,8 @@ export const teacherApi = {
   assignments: () => http.get('/teacher/assignments'),
   createAssignment: (data) => http.post('/teacher/assignments', data),
   deleteAssignment: (id) => http.del(`/teacher/assignments/${id}`),
+  /** report: 'students' | 'topics' — CSV for Excel / Power BI. */
+  exportCsv: (report) => http.download(`/teacher/reports/${report}.csv`, `class-${report}.csv`),
   subjects: () => http.get('/subjects'),
   subject: (id) => http.get(`/subjects/${id}`),
   chapter: (id) => http.get(`/chapters/${id}`),

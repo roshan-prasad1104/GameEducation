@@ -92,6 +92,7 @@ export default function App() {
                   <Route key={p} path={p} element={<TeacherDashboard />} />
                 ))}
                 <Route path="students" element={<Navigate to="/teacher/classes" replace />} />
+                <Route path="analytics" element={<Navigate to="/teacher/reports" replace />} />
                 <Route path="students/:studentId" element={<StudentDetailPage />} />
                 <Route path="profile" element={<ProfileView />} />
                 <Route path="*" element={<NotFoundPage />} />
@@ -105,6 +106,9 @@ export default function App() {
                 <Route path="dashboard" element={<AdminDashboardPage />} />
                 <Route path="users" element={<UsersPage />} />
                 <Route path="content" element={<ContentPage />} />
+                {['subjects', 'chapters', 'lessons', 'quizzes'].map((p) => (
+                  <Route key={p} path={p} element={<Navigate to="/admin/content" replace />} />
+                ))}
                 <Route path="quizzes/:quizId" element={<QuizEditorPage />} />
                 <Route path="profile" element={<ProfileView />} />
                 <Route path="*" element={<NotFoundPage />} />

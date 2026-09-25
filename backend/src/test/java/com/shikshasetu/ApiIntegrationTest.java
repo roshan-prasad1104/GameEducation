@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -188,6 +189,17 @@ class ApiIntegrationTest {
         assertThat(getJson("/api/teacher/students", teacher).size()).isGreaterThanOrEqualTo(8);
 
         postJson("/api/teacher/assignments", teacher, Map.of("title", "Both set")).andExpect(status().isBadRequest());
+
+        // Power BI / Excel friendly CSV exports: header + one row per student, teacher-only
+        String csv = mvc.perform(get("/api/teacher/reports/students.csv").header("Authorization", "Bearer " + teacher))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("class-students.csv")))
+                .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        String[] lines = csv.split("\r\n");
+        assertThat(lines[0]).startsWith("﻿student_id,name,email");
+        assertThat(lines.length - 1).isEqualTo(getJson("/api/teacher/students", teacher).size());
+        mvc.perform(get("/api/teacher/reports/topics.csv").header("Authorization", "Bearer " + login("aarav@shiksha.org", "Student@123")))
+                .andExpect(status().isForbidden());
 
         String admin = login("admin@shiksha.org", "Admin@123");
         JsonNode stats = getJson("/api/admin/stats", admin);

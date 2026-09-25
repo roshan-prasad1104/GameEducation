@@ -34,8 +34,8 @@ export const tokenStore = {
 
 export const SESSION_EXPIRED_EVENT = 'shikshasetu:session-expired';
 
-export async function request(path, { method = 'GET', body, signal } = {}) {
-  const headers = { Accept: 'application/json' };
+export async function request(path, { method = 'GET', body, signal, blob = false } = {}) {
+  const headers = { Accept: blob ? '*/*' : 'application/json' };
   const token = tokenStore.get();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -54,6 +54,7 @@ export async function request(path, { method = 'GET', body, signal } = {}) {
   }
 
   if (res.status === 204) return null;
+  if (blob && res.ok) return res.blob();
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
@@ -76,6 +77,16 @@ export async function request(path, { method = 'GET', body, signal } = {}) {
 
 export const http = {
   get: (path, opts) => request(path, { ...opts, method: 'GET' }),
+  /** Authenticated file download (the JWT cannot ride on a plain link). */
+  download: async (path, filename) => {
+    const file = await request(path, { method: 'GET', blob: true });
+    const url = URL.createObjectURL(file);
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  },
   post: (path, body, opts) => request(path, { ...opts, method: 'POST', body }),
   put: (path, body, opts) => request(path, { ...opts, method: 'PUT', body }),
   del: (path, opts) => request(path, { ...opts, method: 'DELETE' }),

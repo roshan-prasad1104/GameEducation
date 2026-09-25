@@ -14,7 +14,8 @@ import {
   Clock,
   Sparkles,
   Trash2,
-  Loader2
+  Loader2,
+  Download
 } from 'lucide-react';
 
 /** Sidebar routes map onto the dashboard's tabs, so every nav item lands on a working view. */
@@ -73,6 +74,7 @@ export const TeacherDashboard = () => {
   const [studentId, setStudentId] = useState('');
   const [saving, setSaving] = useState(false);
   const [assigning, setAssigning] = useState(null);
+  const [exporting, setExporting] = useState(null);
 
   if (overview.loading && !overview.data) return <LoadingState rows={3} />;
   if (overview.error && !overview.data) return <ErrorState error={overview.error} onRetry={overview.reload} />;
@@ -111,6 +113,17 @@ export const TeacherDashboard = () => {
       showToast(err.message, 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const exportCsv = async (report) => {
+    setExporting(report);
+    try {
+      await teacherApi.exportCsv(report);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setExporting(null);
     }
   };
 
@@ -390,6 +403,16 @@ export const TeacherDashboard = () => {
 
       {activeTab === 'reports' && (
         <div className="space-y-6">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <span className="text-xs font-semibold text-slate-500 mr-auto">Export for Excel / Power BI (CSV)</span>
+            {[['students', 'Student report'], ['topics', 'Topic report']].map(([report, label]) => (
+              <button key={report} type="button" onClick={() => exportCsv(report)} disabled={exporting !== null}
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5 disabled:opacity-60">
+                {exporting === report ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: 'Lessons Completed', value: o.lessonsCompleted, cls: 'text-emerald-500' },
