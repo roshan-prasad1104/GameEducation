@@ -1,0 +1,17 @@
+# Optional: PostgreSQL for running the backend with the "postgres" profile.
+#   docker compose up -d
+#   (in backend/)  SPRING_PROFILES_ACTIVE=postgres DATABASE_PASSWORD=shikshasetu ./mvnw spring-boot:run
+# Not needed for local development — the default "dev" profile uses an embedded H2 database.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shikshasetu
+      POSTGRES_USER: shikshasetu
+      POSTGRES_PASSWORD: shikshasetu   # local development only
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
