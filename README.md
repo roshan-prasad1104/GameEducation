@@ -57,7 +57,9 @@ The Vite dev server proxies `/api` to the backend.
 | Teacher | `teacher@shiksha.org` | `Teacher@123` |
 | Admin | `admin@shiksha.org` | `Admin@123` |
 
-Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. The sign-in dialog shows one-click demo buttons in `npm run dev` only. Set `SEED_ENABLED=false` for any real deployment. To reset the demo data, stop the backend and delete `backend/data/`.
+Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. They are all in the teacher's class **Class 8 – Section A** at *Govt. High School, Sundargarh*. The class code is random: the teacher dashboard and the admin **Classes** page show it, and a new student enters it during onboarding (or later in the profile) to join the class.
+
+The sign-in dialog shows one-click demo buttons in `npm run dev` only. Set `SEED_ENABLED=false` for any real deployment. To reset the demo data, stop the backend and delete `backend/data/`.
 
 ### Trying the offline mode
 
@@ -70,15 +72,30 @@ npm run preview        # http://localhost:4173 (also proxies /api)
 
 Sign in as the student, open a chapter and press **Download for offline**. Then switch the browser offline (DevTools → Network → Offline) and reload. The app still opens, the lessons can be read and completed, and the quiz can be taken. When you go back online, the queued actions sync automatically and the quiz result appears.
 
-### Using PostgreSQL
+### Using PostgreSQL (the deployment profile)
+
+H2 stays the zero-install default for local development (`dev` profile). The `postgres` profile is for real deployments. It needs:
+
+| Variable | Default | Notes |
+|---|---|---|
+| `SPRING_PROFILES_ACTIVE` | `dev` | set to `postgres` |
+| `DATABASE_URL` | `jdbc:postgresql://localhost:5432/shikshasetu` | PostgreSQL 14+ |
+| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | `shikshasetu` / *(empty)* | use a normal (non-superuser) role that owns the database |
+| `JWT_SECRET` | *(none)* | **required**: the profile refuses to start without it (32+ random characters) |
+| `DATABASE_POOL_SIZE` | `10` | Hikari connection pool size |
+| `SEED_ENABLED` | `true` | set `false` unless you want the demo curriculum, accounts and history |
 
 ```bash
-docker compose up -d postgres            # or use any PostgreSQL 14+ instance
+# any PostgreSQL 14+ (e.g. `docker compose up -d postgres`, or a local install):
+#   create role shikshasetu login password '...';  create database shikshasetu owner shikshasetu;
 cd backend
-SPRING_PROFILES_ACTIVE=postgres DATABASE_PASSWORD=shikshasetu ./mvnw spring-boot:run
+SPRING_PROFILES_ACTIVE=postgres DATABASE_PASSWORD=... JWT_SECRET=... ./mvnw spring-boot:run
+# or the packaged jar:  ./mvnw -DskipTests package && java -jar target/shikshasetu-backend-1.0.0.jar
 ```
 
-Flyway creates the schema on first start (`V1__baseline_schema.sql`). See `.env.example` for all variables.
+On first start, Flyway applies `V1`–`V6` in `backend/src/main/resources/db/migration`. `V5` is a Java data migration in `backend/src/main/java/db/migration`. Hibernate then validates the entities against the schema, and the seeders load the demo data and the Hindi/Odia/Telugu content. The same migrations run on H2. Existing H2 databases are upgraded in place: students keep their teacher through a class, and whole-class assignments move to that class.
+
+This was checked against a real PostgreSQL 14.15 server, not only unit tests. The binaries came from the `embedded-postgres` test dependency and ran with password auth and a dedicated owner role. The packaged jar migrated and seeded an empty database, and the Postman collection (70/70 assertions) and both browser suites (50/50 checks) passed against it.
 
 ### Docker (whole stack)
 
@@ -87,7 +104,25 @@ JWT_SECRET=<32+ random characters> docker compose --profile full up --build
 # PWA on http://localhost:8081 (nginx, proxies /api) · API on :8080 · PostgreSQL on :5432
 ```
 
-Dockerfiles: `backend/Dockerfile`, `ai-service/Dockerfile`, `Dockerfile` (frontend + `docker/nginx.conf`). See the limitations below: these were not run in the development environment.
+The Dockerfiles are `backend/Dockerfile`, `ai-service/Dockerfile` and `Dockerfile` (frontend plus `docker/nginx.conf`).
+
+**Docker was not available in the development environment, so no image has been built and the stack has never run under Docker.**
+
+What was checked without Docker:
+- **Dockerfiles:** all three pass `hadolint` 2.12 with no findings.
+- **Compose file:** `docker-compose.yml` validates against the official Compose Specification JSON schema.
+- **nginx config:** it was run for real with nginx 1.26. The only changes were the upstream host (`backend` became `127.0.0.1`) and the listen port. Through it, the full browser suite passed (30/30, including the service worker, offline reload and sync). It also served the SPA fallback, the cache headers and the API proxy correctly.
+- **Image contents:** each image runs the same commands that work locally: the backend jar (`java -jar`, migrations and seed from inside the jar), the frontend production build, and the AI service under uvicorn.
+
+That review found and fixed two bugs that would have broken the Docker stack:
+- **Sign-in rejected:** nginx forwarded `Host` without the port. Spring then treated the browser's same-origin POSTs as cross-origin and rejected them with 403. It now forwards `$http_host`, and compose also sets `CORS_ALLOWED_ORIGINS`.
+- **Manifest type:** nginx served `manifest.webmanifest` as `application/octet-stream`. It is now `application/manifest+json`.
+
+Still unverified until someone runs `docker compose --profile full up --build`:
+- the image builds themselves (base images, `npm ci`, `pip install` on `python:3.12-slim`, the Maven build);
+- compose networking and DNS between containers, and start-up ordering (the backend waits for the PostgreSQL healthcheck);
+- file permissions for the non-root users;
+- the named volume.
 
 ### Postman
 
@@ -97,7 +132,13 @@ Import `docs/postman/ShikshaSetu.postman_collection.json`, or run it from the co
 npx newman run docs/postman/ShikshaSetu.postman_collection.json
 ```
 
-The collection has 28 requests and 47 assertions. It covers auth, the full student loop including an idempotent replay, RBAC denials, the teacher analytics and CSV export, and the admin endpoints. Each run registers a new student, so the demo accounts are left unchanged.
+The collection has 39 requests and 70 assertions. It covers:
+- auth and RBAC denials;
+- the full student loop, including localized content, quiz answer locking, removal of the old answer-probing endpoint and an idempotent replay;
+- joining a class with its code;
+- the teacher analytics and CSV export, and the admin endpoints.
+
+Each run registers a new student, so the demo accounts are left unchanged. It passed against both H2 (`npx newman run … `) and PostgreSQL (`--env-var baseUrl=http://localhost:8085/api`).
 
 ---
 
@@ -116,21 +157,56 @@ Functional changes to existing screens:
 ## Features
 
 **Student**
-- Onboarding (grade, language, school) after registration.
+- Onboarding (grade, language, school, optional class code) after registration.
 - Dashboard: level and XP, streak, lessons completed, average quiz score, badges, next lesson, progress by subject, daily missions, teacher assignments, recommendations and recent activity.
 - Subjects → chapters → lessons (Markdown content). Mark a lesson complete → quiz.
-- Chapter quizzes: the original one-question-at-a-time flow with a timer. **Submit Answer** checks each answer on the server (`POST /api/quizzes/{id}/check`) for instant feedback and an explanation. The whole attempt is then graded on the server and scored for XP. Offline, answers are saved without feedback and scored after sync.
+- Chapter quizzes: the original one-question-at-a-time flow with a timer, **Submit Answer** and instant *Correct/Incorrect + explanation*. See **Quiz security** below. The whole attempt is graded on the server and scored for XP. Offline, answers are saved without feedback and scored after sync.
 - Gamification:
   - XP: 20 per lesson; 10 per correct answer + 20 for completing a quiz (first attempt); later attempts only earn XP for improving your best score; +25 perfect-score bonus.
   - Levels: `threshold(L) = 25·(L−1)·(L+2)`, i.e. 0 / 100 / 250 / 450 …
   - Streaks, 9 badges and 4 daily missions.
   - A leaderboard.
 - **For You**: recommendations with the evidence behind them (mastery per subject, weak topics).
-- Offline library, sync status, English / हिन्दी UI, and dark mode.
+- Offline library, sync status, English / हिन्दी / ଓଡ଼ିଆ / తెలుగు interface **and lesson content**, and dark mode.
 
-**Teacher**: class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking). The Class Reports tab exports the roster and the topic accuracy as CSV (UTF-8, one header row) that opens directly in Excel and loads into Power BI.
+**Teacher**: their classes (with each class's join code and a class filter), class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking). The Class Reports tab exports the roster and the topic accuracy as CSV (UTF-8, one header row) that opens directly in Excel and loads into Power BI.
 
-**Admin**: platform statistics (users, content, engagement, AI-service health), user management (create, edit, deactivate, delete, assign a teacher), and content management (subjects, chapters, lessons, quizzes, questions). Content that students have already completed or answered cannot be deleted.
+**Admin**: platform statistics (users, content, engagement, AI-service health), schools and classes (create, assign a teacher, regenerate join codes), user management (create, edit, deactivate, delete, place a student in a class), and content management (subjects, chapters, lessons, quizzes, questions). Content that students have already completed or answered cannot be deleted.
+
+## Languages
+
+The interface and the learning content are available in English, हिन्दी (Hindi), ଓଡ଼ିଆ (Odia) and తెలుగు (Telugu).
+
+- **Interface text:** `src/i18n/{en,hi,or,te}.js`, all with the same 821 keys. `node scripts/check-i18n.mjs` checks keys, `{placeholders}` and script.
+- **Content:** subjects, chapters, all 30 lessons, 15 quizzes and 90 questions with their options and explanations are translated. The translation tables were added in `V3`, and the seed files are in `backend/src/main/resources/seed/i18n/<lang>/<subject>.json`.
+  - The app sends its language as `Accept-Language`, and the API serves translated text with English as the fallback. A lesson without a translation shows a small "shown in English" note.
+  - Answer order, answer keys, topics and scoring are shared, so grading never depends on the language.
+- **Server-generated text:** recommendation reasons, the activity feed, badge and mission names, and weekday names are phrased in the app language. For recommendations, the API returns the facts behind each one (`reasonParams`). In English, the AI service's own explanation is shown word for word.
+- **Not translated:** things people type (names, schools, assignment titles written by a teacher) stay as entered. XP-history entries are stored in English.
+- **How the translations were made:** they were drafted with AI assistance, following NCERT and state-board terminology, with the English term in brackets on first use. Code, formulas and numbers are kept exactly as written. `python scripts/validate_translations.py` checks every file against the English source: structure, verbatim code and formulas, numbers in questions, script, and that no single option carries a note that would give the answer away. **They have not yet been reviewed by native-speaker teachers. That review is recommended before classroom use.**
+- **Updating content:** edit the seed files and run the validator. The `TranslationSeeder` only adds missing translations, and only where the stored English still matches the seed. If an admin later edits a lesson's English text, its existing translations are not updated automatically.
+
+## Schools and classes
+
+- **Structure:** admins manage **schools** and **classes** on the **Classes** page. A class belongs to a school and has one teacher.
+- **Students:** a student belongs to one class, and the class's teacher is the student's teacher.
+- **Joining a class:** students join with the class's 6-character code during onboarding or later in their profile. An admin can also place a student in a class, or move them, from **Users**. Codes can be regenerated, which invalidates the old one.
+- **Teacher scope:** teachers only see and assign work within the classes they teach. The analytics, weak topics, assignments and CSV exports take an optional `classId`, and a teacher with several classes gets a class picker. The backend enforces this: another teacher's student or class returns 404.
+- **Migrating existing data:** `V4`–`V6` moved the old direct student→teacher links into one class per teacher. Each class sits at the school most of that teacher's students named. Whole-class assignments moved to the class. The migration is tested on H2 and PostgreSQL with pre-migration data (`ClassMigrationTest`).
+
+## Quiz security
+
+- **Questions:** quiz questions are sent without answers, and the score is always computed on the server.
+- **Answer locking:** instant feedback now needs an open quiz session (`POST /api/quizzes/{id}/session`). **Submit Answer** calls `POST …/session/answers`, which stores that answer first and only then returns correct/incorrect, the correct option and the explanation.
+- **No changing answers:** a stored answer can't be changed. Asking again returns the original answer, and submitting (online or via offline sync) grades the stored answers even if the request claims otherwise. The old stateless `/check` endpoint, which let a student probe the answer key, is gone.
+- **Resuming:** reloading the page resumes the same session at the first unanswered question.
+- **Remaining trade-offs:**
+  - The answer to a question is revealed once the student has committed to one. Everything is revealed on the result screen after submitting, and retakes only earn XP for improvement.
+  - The quiz timer runs in the browser and is not enforced by the server.
+
+## Charts
+
+The original requirements list Chart.js as the chart library ("Include charts using Chart.js or the chart library already present"). Plotly is only named in the general stack list. All charts therefore stay on the existing Chart.js wrapper, unchanged. Data for external analysis comes from the Power BI/Excel-ready CSV exports rather than a second charting library.
 
 ## How the "AI" works (honest version)
 
@@ -147,7 +223,7 @@ Functional changes to existing screens:
   - IndexedDB stores downloaded chapters (lessons + quiz without answers), "last seen" snapshots of read-only screens, and an outbox of offline actions.
   - The outbox is flushed in order when the browser comes back online.
   - Offline quizzes are scored after sync, because answers are never sent to the client.
-- **Database**: Flyway owns the schema (`db/migration/V1__baseline_schema.sql`, named constraints and foreign-key indexes). Hibernate runs with `ddl-auto=validate`, so a mismatch between the entities and the schema stops startup. Any schema change needs a new `V<n>__*.sql` file. Databases created by earlier builds are adopted as version 1 (`baseline-on-migrate`). Tables: `users`, `student_profiles` (with the teacher relation), `subjects`, `chapters`, `lessons`, `quizzes`, `questions`, `question_options`, `quiz_attempts`, `attempt_answers`, `lesson_progress`, `xp_transactions`, `badges`, `student_badges`, `recommendations`, `assignments`.
+- **Database**: Flyway owns the schema. `V1` is the baseline, `V2` adds quiz sessions, `V3` content translations, `V4`–`V6` schools and classes (with a Java data migration). Hibernate runs with `ddl-auto=validate`, so a mismatch between the entities and the schema stops startup. Any schema change needs a new migration. Databases created by builds before Flyway are adopted as version 1 (`baseline-on-migrate`). Tables: `users`, `student_profiles` (with the teacher relation), `subjects`, `chapters`, `lessons`, `quizzes`, `questions`, `question_options`, `quiz_attempts`, `attempt_answers`, `lesson_progress`, `xp_transactions`, `badges`, `student_badges`, `recommendations`, `assignments`.
 
 ### Main endpoints
 
@@ -155,36 +231,43 @@ Functional changes to existing screens:
 POST /api/auth/login · POST /api/auth/register · GET /api/auth/me · PUT /api/users/me
 GET  /api/subjects · /api/subjects/{id} · /api/chapters/{id} · /api/chapters/{id}/offline-bundle
 GET  /api/lessons/{id} · POST /api/lessons/{id}/complete · GET /api/catalog/outline
-GET  /api/quizzes/{id} · POST /api/quizzes/{id}/check · POST /api/quizzes/{id}/submit
+GET  /api/quizzes/{id} · POST /api/quizzes/{id}/session · POST /api/quizzes/{id}/session/answers · POST /api/quizzes/{id}/submit
 GET  /api/students/me/{dashboard|progress|badges|xp|missions|recommendations|assignments|leaderboard|attempts}
-PUT  /api/students/me/onboarding
+PUT  /api/students/me/onboarding · PUT /api/students/me/class
 GET  /api/teacher/{overview|students|students/{id}|weak-topics|assignments} · POST/DELETE /api/teacher/assignments
-GET  /api/teacher/reports/{students|topics}.csv
+GET  /api/teacher/classes · /api/teacher/reports/{students|topics}.csv      (teacher views accept ?classId=)
+GET/POST/PUT/DELETE /api/admin/schools · /api/admin/classes · POST /api/admin/classes/{id}/join-code
 GET  /api/admin/{stats|users|content|lessons/{id}|quizzes/{id}} · POST/PUT/DELETE users, subjects, chapters, lessons, quizzes, questions
 ```
 
 ## Tests
 
 ```bash
-cd backend && ./mvnw test                                  # 7 tests: auth, RBAC, learning loop, idempotent sync, analytics, CSV,
-                                                           #   and PostgresMigrationTest on a real embedded PostgreSQL
+cd backend && ./mvnw test                                  # 20 tests (7 classes), see below
 cd ai-service && .venv/Scripts/python -m pytest -q         # 18 tests: mastery, recommendations, segmentation, validation
 npm run lint && npm run build                              # frontend
+node scripts/check-i18n.mjs                                # UI dictionaries: same keys, placeholders, script
+python scripts/validate_translations.py                    # lesson/quiz translations against the English source
+npx newman run docs/postman/ShikshaSetu.postman_collection.json   # 39 requests / 70 assertions (backend running)
 ```
 
-`PostgresMigrationTest` starts real PostgreSQL binaries through the `io.zonky.test:embedded-postgres` test dependency, so no Docker or local install is needed. Its first run downloads them from Maven Central. The test then applies the Flyway migrations, validates the entities, loads the seed and runs the learning loop on the `postgres` profile.
+Backend test classes:
+- `ApiIntegrationTest`: auth, RBAC, the learning loop, idempotent sync, analytics, CSV.
+- `QuizSecurityTest`: no answers in quiz payloads, answer locking, graded locked answers, RBAC.
+- `ContentLocalizationTest`: hi/or/te content, fallback, language-independent grading, localized recommendations and activity.
+- `ClassModelTest`: admin → school → class → teacher → student relationships, and teacher scoping and RBAC.
+- `ClassMigrationTest`: V4–V6 on pre-migration data, on H2 **and** PostgreSQL.
+- `PostgresMigrationTest`: all migrations and the learning loop on the `postgres` profile.
+- `LevelsTest`.
 
-End-to-end browser checks (student journey including offline and sync, teacher and admin flows, CSV downloads) were run with Playwright against `npm run preview`. The API was also checked with the Postman collection via newman.
+The PostgreSQL tests start real PostgreSQL binaries through the `io.zonky.test:embedded-postgres` test dependency, so no Docker or local install is needed. The first run downloads them from Maven Central.
+
+End-to-end browser checks were run with Playwright on the production build. They include the offline reload and sync, the teacher and admin flows, CSV downloads, classes, quiz resume, and the student flow in Hindi, Odia and Telugu. They ran through `vite preview` on H2, through the real nginx config, and against the PostgreSQL-backed jar.
 
 ## Known limitations
 
-- Lesson **content** is English only; the UI is translated into English and Hindi. Content translations would need a translation table.
-- **Docker**: the development environment had no Docker, so the Dockerfiles and `docker-compose.yml` have not been built or run. Their individual steps were checked separately:
-  - the frontend build, and `mvn -DskipTests package` followed by `java -jar` on a fresh database (migrations and seed load from the jar);
-  - the `postgres` profile, via the embedded-PostgreSQL test above;
-  - the compose file parses as valid YAML.
-- **PostgreSQL**: the day-to-day demo database is H2 (PostgreSQL mode). PostgreSQL itself is exercised by the automated test, not by a long-running server.
-- A new student is attached to the first teacher; there is no school/class model yet (admins can reassign students).
-- The per-question check endpoint lets a determined student probe answers through the API before submitting. This is an accepted trade-off to keep the original instant-feedback quiz design, since the final score is still computed on the server.
-- Odia and Telugu cover the original screens' labels only; English and Hindi are complete.
-- The student bundle is about 570 kB (180 kB gzipped), mostly React and Chart.js. Teacher and admin screens are code-split.
+- **Docker:** the images have never been built or run (see *Docker* above for what was verified instead).
+- **Translations:** they were drafted with AI assistance and pass the automated checks, but still need review by native-speaker teachers. Content edited by an admin in English does not update its translations. Teacher-typed text and the XP history stay in the language they were written in.
+- **Quiz timer:** it is enforced only in the browser (it restarts if the page is reloaded; locked answers are kept).
+- **Recommendations:** with a class of about 8 students, the KMeans segments are indicative only.
+- **Bundle size:** the student bundle is about 845 kB (239 kB gzipped), mostly React, Chart.js and the four UI dictionaries. Teacher and admin screens are code-split. Loading dictionaries per language would be the next optimisation.
