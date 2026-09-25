@@ -23,8 +23,11 @@ import {
 const SPEECH_LANG = { en: 'en-IN', hi: 'hi-IN', or: 'or-IN', te: 'te-IN' };
 
 /** Splits lesson markdown into the body and its trailing "### Key points" bullet list. */
+// The closing "Key points" section, in each content language (see seed/i18n and scripts/validate_translations.py).
+const KEY_POINTS = /\n#{2,3}\s*(?:Key points|मुख्य बातें|ମୁଖ୍ୟ କଥା|ముఖ్యాంశాలు)\s*\n([\s\S]*)$/i;
+
 const splitKeyPoints = (content = '') => {
-  const m = content.match(/\n#{2,3}\s*Key points\s*\n([\s\S]*)$/i);
+  const m = content.match(KEY_POINTS);
   if (!m) return { body: content, keyPoints: [] };
   const keyPoints = m[1].split('\n').map((l) => l.replace(/^\s*[-*]\s+/, '').trim()).filter(Boolean);
   return { body: content.slice(0, m.index), keyPoints };
@@ -244,6 +247,9 @@ export const LessonView = () => {
                     {lesson.title}
                   </h3>
                   <p className="text-xs sm:text-sm leading-relaxed">{lesson.summary}</p>
+                  {lesson.language && lesson.language !== language && (
+                    <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">{t('lesson.notTranslated')}</p>
+                  )}
                 </div>
 
                 <div className="bg-blue-50 dark:bg-blue-950/40 p-4 rounded-2xl border border-blue-200 dark:border-blue-800 space-y-2">

@@ -127,14 +127,6 @@ class ApiIntegrationTest {
         JsonNode quiz = getJson("/api/quizzes/" + quizId, token);
         assertThat(quiz.at("/questions/0/correctIndex").isMissingNode()).isTrue();
 
-        // Per-question check gives instant feedback without storing anything
-        long firstQuestion = quiz.at("/questions/0/id").asLong();
-        JsonNode check = json.readTree(postJson("/api/quizzes/" + quizId + "/check", token,
-                Map.of("questionId", firstQuestion, "selectedIndex", 0)).andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString());
-        assertThat(check.has("correct")).isTrue();
-        assertThat(check.get("correctIndex").isInt()).isTrue();
-
         // /auth/me carries live gamification state for the sidebar
         JsonNode me = getJson("/api/auth/me", token);
         assertThat(me.get("xp").asInt()).isEqualTo(35);

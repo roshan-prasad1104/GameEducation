@@ -64,15 +64,30 @@ const OptionGrid = ({ question, answer, feedback, submitted, onSelect }) => {
    Quiz runner
 ───────────────────────────────────────────── */
 
-const QuizRunner = ({ quiz }) => {
+/** Locked answers from a resumed session, by question id. */
+const lockedById = (session) => new Map((session?.answers ?? []).map((a) => [a.questionId, a]));
+
+const QuizRunner = ({ quiz, session }) => {
   const { online, showToast, refreshPending } = useApp();
   const navigate = useNavigate();
   const questionList = quiz.questions;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState(() => questionList.map(() => ({})));
-  const [feedback, setFeedback] = useState(() => questionList.map(() => null));
-  const [submitted, setSubmitted] = useState(false);
+  // A resumed session restores the answers the student already confirmed; those cannot change.
+  const firstOpen = (() => {
+    const locked = lockedById(session);
+    const idx = questionList.findIndex((q) => !locked.has(q.id));
+    return idx === -1 ? questionList.length - 1 : idx;
+  })();
+  const [currentIndex, setCurrentIndex] = useState(firstOpen);
+  const [answers, setAnswers] = useState(() => {
+    const locked = lockedById(session);
+    return questionList.map((q) => (locked.has(q.id) ? { selectedIndex: locked.get(q.id).selectedIndex } : {}));
+  });
+  const [feedback, setFeedback] = useState(() => {
+    const locked = lockedById(session);
+    return questionList.map((q) => locked.get(q.id) ?? null);
+  });
+  const [submitted, setSubmitted] = useState(() => lockedById(session).has(questionList[firstOpen]?.id));
   const [checking, setChecking] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(quiz.timeLimitSeconds ?? 300);
@@ -82,6 +97,9 @@ const QuizRunner = ({ quiz }) => {
   const hasFinishedRef = useRef(false);
   useEffect(() => { answersRef.current = answers; }, [answers]);
   useEffect(() => { startedAt.current = Date.now(); }, []);
+  useEffect(() => {
+    if (session?.answers?.length) showToast('Resuming your quiz. Answers you already submitted are kept.', 'info');
+  }, [session, showToast]);
 
   const currentQ = questionList[currentIndex];
 
@@ -138,15 +156,32 @@ const QuizRunner = ({ quiz }) => {
     setSubmitted(true);
     if (!online) return; // offline: no instant feedback, scored after sync
     setChecking(true);
+    const index = currentIndex;
+    const lock = () => learningApi.lockAnswer(quiz.id, currentQ.id, answers[index].selectedIndex);
     try {
-      const res = await learningApi.checkAnswer(quiz.id, currentQ.id, answers[currentIndex].selectedIndex);
-      setFeedback((prev) => {
+      let res;
+      try {
+        res = await lock();
+      } catch (e) {
+        // The quiz was opened offline, so no session exists yet: start one and retry once.
+        if (e.code !== 'NO_ACTIVE_SESSION') throw e;
+        await learningApi.startQuizSession(quiz.id);
+        res = await lock();
+      }
+      // The server keeps the first answer given for a question; show that one.
+      setAnswers((prev) => {
         const copy = [...prev];
-        copy[currentIndex] = res;
+        copy[index] = { ...copy[index], selectedIndex: res.selectedIndex };
         return copy;
       });
-    } catch {
+      setFeedback((prev) => {
+        const copy = [...prev];
+        copy[index] = res;
+        return copy;
+      });
+    } catch (e) {
       // Network dropped mid-quiz: keep going; the attempt is scored on submit or after sync.
+      if (!e?.isNetwork) showToast(e.message, 'error');
     } finally {
       setChecking(false);
     }
@@ -310,11 +345,23 @@ const QuizRunner = ({ quiz }) => {
   );
 };
 
+/** Loads the quiz and, when online, starts or resumes its server-side session. */
+const loadQuiz = async (quizId) => {
+  const quiz = await catalogApi.quiz(quizId);
+  let session = null;
+  try {
+    session = await learningApi.startQuizSession(quizId);
+  } catch (e) {
+    if (!e?.isNetwork) throw e; // offline: answers are saved locally and scored after sync
+  }
+  return { quiz, session };
+};
+
 export const QuizScreen = () => {
   const { quizId } = useParams();
-  const { data, error, loading, reload } = useApi(() => catalogApi.quiz(quizId), [quizId]);
+  const { data, error, loading, reload } = useApi(() => loadQuiz(quizId), [quizId]);
   if (loading && !data) return <LoadingState rows={2} />;
   if (error && !data) return <ErrorState error={error} onRetry={reload} />;
-  if (!data.questions?.length) return <ErrorState error={{ message: 'This quiz has no questions yet.' }} />;
-  return <QuizRunner key={data.id} quiz={data} />;
+  if (!data.quiz.questions?.length) return <ErrorState error={{ message: 'This quiz has no questions yet.' }} />;
+  return <QuizRunner key={data.quiz.id} quiz={data.quiz} session={data.session} />;
 };

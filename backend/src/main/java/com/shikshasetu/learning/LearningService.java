@@ -10,6 +10,7 @@ import com.shikshasetu.learning.LearningDtos.*;
 import com.shikshasetu.user.StudentProfile;
 import com.shikshasetu.user.StudentProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class LearningService {
     private final QuizRepository quizzes;
     private final LessonProgressRepository progressRepo;
     private final QuizAttemptRepository attemptRepo;
+    private final QuizSessionRepository sessions;
     private final StudentProfileRepository profiles;
     private final GamificationService gamification;
     private final TimeService time;
@@ -93,6 +95,11 @@ public class LearningService {
         Map<Long, Integer> selected = new HashMap<>();
         for (AnswerInput a : req.answers()) selected.put(a.questionId(), a.selectedIndex());
 
+        // Answers locked during an online session win over the submitted ones: after seeing the
+        // feedback for a question, a student cannot change that answer (online or via offline sync).
+        Optional<QuizSession> session = sessions.findByOpenKey(QuizSession.openKey(studentId, quizId));
+        session.ifPresent(sn -> sn.getAnswers().forEach(a -> selected.put(a.getQuestion().getId(), a.getSelectedIndex())));
+
         QuizAttempt attempt = new QuizAttempt();
         attempt.setStudent(profile.getUser());
         attempt.setQuiz(quiz);
@@ -118,6 +125,11 @@ public class LearningService {
         attempt.setTotalQuestions(questions.size());
         attempt.setPercentage(Math.round(100f * correct / questions.size()));
         attemptRepo.save(attempt);
+        session.ifPresent(sn -> {
+            sn.setOpenKey(null);
+            sn.setSubmittedAt(at);
+            sn.setAttempt(attempt);
+        });
 
         // XP: full reward on the first attempt, afterwards only for improving your best score.
         int xpBefore = profile.getXp();
@@ -137,13 +149,48 @@ public class LearningService {
         return toResult(attempt, false, reward);
     }
 
-    @Transactional(readOnly = true)
-    public CheckAnswerResult checkAnswer(Long quizId, CheckAnswerRequest req) {
+    @Transactional
+    public QuizSessionView startSession(Long studentId, Long quizId) {
         Quiz quiz = quizzes.findById(quizId).orElseThrow(() -> ApiException.notFound("Quiz"));
-        Question q = quiz.getQuestions().stream().filter(x -> x.getId().equals(req.questionId())).findFirst()
-                .orElseThrow(() -> ApiException.notFound("Question"));
-        return new CheckAnswerResult(q.getId(), req.selectedIndex() == q.getCorrectIndex(), q.getCorrectIndex(),
-                q.getExplanation());
+        QuizSession session = sessions.findByOpenKey(QuizSession.openKey(studentId, quizId)).orElseGet(() -> {
+            QuizSession s = new QuizSession();
+            s.setStudent(profile(studentId).getUser());
+            s.setQuiz(quiz);
+            s.setOpenKey(QuizSession.openKey(studentId, quizId));
+            s.setStartedAt(time.now());
+            return sessions.saveAndFlush(s);
+        });
+        List<CheckAnswerResult> locked = session.getAnswers().stream().map(a -> feedback(a, true)).toList();
+        return new QuizSessionView(session.getId(), quizId, session.getStartedAt(), locked);
+    }
+
+    @Transactional
+    public CheckAnswerResult lockAnswer(Long studentId, Long quizId, CheckAnswerRequest req) {
+        QuizSession session = sessions.findByOpenKey(QuizSession.openKey(studentId, quizId))
+                .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "NO_ACTIVE_SESSION",
+                        "Start the quiz before answering its questions."));
+        Question q = session.getQuiz().getQuestions().stream().filter(x -> x.getId().equals(req.questionId()))
+                .findFirst().orElseThrow(() -> ApiException.notFound("Question"));
+        Optional<QuizSessionAnswer> existing = session.getAnswers().stream()
+                .filter(a -> a.getQuestion().getId().equals(q.getId())).findFirst();
+        if (existing.isPresent()) return feedback(existing.get(), true);
+        if (req.selectedIndex() >= q.getOptions().size()) throw ApiException.badRequest("That option does not exist.");
+
+        QuizSessionAnswer answer = new QuizSessionAnswer();
+        answer.setSession(session);
+        answer.setQuestion(q);
+        answer.setSelectedIndex(req.selectedIndex());
+        answer.setCorrect(req.selectedIndex() == q.getCorrectIndex());
+        answer.setAnsweredAt(time.now());
+        session.getAnswers().add(answer);
+        sessions.flush();
+        return feedback(answer, false);
+    }
+
+    private static CheckAnswerResult feedback(QuizSessionAnswer a, boolean alreadyAnswered) {
+        Question q = a.getQuestion();
+        return new CheckAnswerResult(q.getId(), a.getSelectedIndex(), a.isCorrect(), q.getCorrectIndex(),
+                ContentText.explanation(q), alreadyAnswered);
     }
 
     @Transactional(readOnly = true)
@@ -157,8 +204,8 @@ public class LearningService {
     @Transactional(readOnly = true)
     public List<AttemptSummary> attempts(Long studentId) {
         return attemptRepo.findByStudentIdOrderBySubmittedAtDesc(studentId).stream()
-                .map(a -> new AttemptSummary(a.getId(), a.getQuiz().getId(), a.getQuiz().getTitle(),
-                        a.getQuiz().getChapter().getId(), a.getQuiz().getChapter().getSubject().getName(),
+                .map(a -> new AttemptSummary(a.getId(), a.getQuiz().getId(), ContentText.title(a.getQuiz()),
+                        a.getQuiz().getChapter().getId(), ContentText.name(a.getQuiz().getChapter().getSubject()),
                         a.getCorrectCount(), a.getTotalQuestions(), a.getPercentage(), a.getXpEarned(),
                         a.getSubmittedAt(), a.isSyncedFromOffline()))
                 .toList();
@@ -182,13 +229,13 @@ public class LearningService {
                 .collect(Collectors.toMap(x -> x.getQuestion().getId(), Function.identity(), (x, y) -> x));
         List<QuestionResult> details = quiz.getQuestions().stream().map(q -> {
             AttemptAnswer ans = byQuestion.get(q.getId());
-            return new QuestionResult(q.getId(), q.getPrompt(), List.copyOf(q.getOptions()),
+            return new QuestionResult(q.getId(), ContentText.prompt(q), ContentText.options(q),
                     ans == null ? null : ans.getSelectedIndex(), q.getCorrectIndex(),
-                    ans != null && ans.isCorrect(), q.getExplanation(), q.getTopic());
+                    ans != null && ans.isCorrect(), ContentText.explanation(q), q.getTopic());
         }).toList();
         Chapter c = quiz.getChapter();
-        return new QuizResult(a.getId(), quiz.getId(), quiz.getTitle(), c.getId(), c.getTitle(),
-                c.getSubject().getId(), c.getSubject().getName(), a.getCorrectCount(), a.getTotalQuestions(),
+        return new QuizResult(a.getId(), quiz.getId(), ContentText.title(quiz), c.getId(), ContentText.title(c),
+                c.getSubject().getId(), ContentText.name(c.getSubject()), a.getCorrectCount(), a.getTotalQuestions(),
                 a.getPercentage(), a.getXpEarned(), a.getTimeTakenSeconds(), a.getSubmittedAt(), duplicate,
                 a.isSyncedFromOffline(), details, reward);
     }

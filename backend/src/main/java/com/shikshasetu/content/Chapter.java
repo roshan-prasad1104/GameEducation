@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "chapters")
@@ -38,4 +40,10 @@ public class Chapter {
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quiz> quizzes = new ArrayList<>();
+
+    /** Translations by language code ("hi", "or", "te"); English is the fields above. */
+    @ElementCollection
+    @CollectionTable(name = "chapter_translations", joinColumns = @JoinColumn(name = "chapter_id"))
+    @MapKeyColumn(name = "language", length = 8)
+    private Map<String, Translations.ChapterText> translations = new HashMap<>();
 }

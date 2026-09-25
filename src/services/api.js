@@ -143,8 +143,10 @@ export const learningApi = {
     }
   },
 
-  /** Instant per-question feedback (online only; nothing is stored until the quiz is submitted). */
-  checkAnswer: (quizId, questionId, selectedIndex) => http.post(`/quizzes/${quizId}/check`, { questionId, selectedIndex }),
+  /** Starts (or resumes) the online quiz session; returns the answers already locked in it. */
+  startQuizSession: (quizId) => http.post(`/quizzes/${quizId}/session`),
+  /** Locks the answer to one question and returns instant feedback (online only). */
+  lockAnswer: (quizId, questionId, selectedIndex) => http.post(`/quizzes/${quizId}/session/answers`, { questionId, selectedIndex }),
   attempt: (id) => http.get(`/students/me/attempts/${id}`),
   attempts: () => listWithSnapshot('attempts', () => http.get('/students/me/attempts')),
   syncedResult: (clientAttemptId) => offlineStore.getResult(clientAttemptId),

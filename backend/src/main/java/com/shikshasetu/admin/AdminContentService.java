@@ -7,6 +7,8 @@ import com.shikshasetu.content.*;
 import com.shikshasetu.learning.AttemptAnswerRepository;
 import com.shikshasetu.learning.LessonProgressRepository;
 import com.shikshasetu.learning.QuizAttemptRepository;
+import com.shikshasetu.learning.QuizSessionAnswerRepository;
+import com.shikshasetu.learning.QuizSessionRepository;
 import com.shikshasetu.teacher.AssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ public class AdminContentService {
     private final LessonProgressRepository progress;
     private final QuizAttemptRepository attempts;
     private final AttemptAnswerRepository answers;
+    private final QuizSessionRepository quizSessions;
+    private final QuizSessionAnswerRepository sessionAnswers;
     private final AssignmentRepository assignments;
     private final RecommendationRepository recommendations;
 
@@ -179,6 +183,9 @@ public class AdminContentService {
             throw ApiException.conflict("\"" + q.getTitle() + "\" has student attempts and cannot be deleted.");
         }
         assignments.deleteByQuizId(id);
+        // Only unsubmitted sessions can exist here (a submitted one always has an attempt).
+        quizSessions.deleteAnswersByQuizId(id);
+        quizSessions.deleteSessionsByQuizId(id);
         q.getChapter().getQuizzes().remove(q);
         quizzes.delete(q);
     }
@@ -212,6 +219,7 @@ public class AdminContentService {
         if (answers.existsByQuestionId(id)) {
             throw ApiException.conflict("Students have answered this question, so it cannot be deleted.");
         }
+        sessionAnswers.deleteByQuestionId(id);
         q.getQuiz().getQuestions().remove(q);
         questions.delete(q);
     }

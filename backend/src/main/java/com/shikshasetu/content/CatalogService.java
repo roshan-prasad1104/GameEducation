@@ -55,11 +55,11 @@ public class CatalogService {
 
     /** Compact subject → chapter → lesson/quiz tree (used by teacher assignment pickers). */
     public List<OutlineSubject> outline() {
-        return subjects.findAllByOrderByIdAsc().stream().map(s -> new OutlineSubject(s.getId(), s.getName(),
-                s.getChapters().stream().map(c -> new OutlineChapter(c.getId(), c.getTitle(),
-                        c.getLessons().stream().map(l -> new OutlineItem(l.getId(), l.getTitle())).toList(),
+        return subjects.findAllByOrderByIdAsc().stream().map(s -> new OutlineSubject(s.getId(), ContentText.name(s),
+                s.getChapters().stream().map(c -> new OutlineChapter(c.getId(), ContentText.title(c),
+                        c.getLessons().stream().map(l -> new OutlineItem(l.getId(), ContentText.title(l))).toList(),
                         c.getQuizzes().isEmpty() ? null
-                                : new OutlineItem(c.getQuizzes().getFirst().getId(), c.getQuizzes().getFirst().getTitle())))
+                                : new OutlineItem(c.getQuizzes().getFirst().getId(), ContentText.title(c.getQuizzes().getFirst()))))
                         .toList())).toList();
     }
 
@@ -87,23 +87,23 @@ public class CatalogService {
                 if (done.contains(l.getId())) completed++;
             }
         }
-        return new SubjectCard(s.getId(), s.getCode(), s.getName(), s.getDescription(), s.getColor(), s.getIcon(),
+        return new SubjectCard(s.getId(), s.getCode(), ContentText.name(s), ContentText.description(s), s.getColor(), s.getIcon(),
                 s.getGradeLevel(), s.getChapters().size(), lessonCount, completed, percent(completed, lessonCount));
     }
 
     private ChapterCard chapterCard(Chapter c, Set<Long> done, AuthUser user) {
         int completed = (int) c.getLessons().stream().filter(l -> done.contains(l.getId())).count();
-        return new ChapterCard(c.getId(), c.getTitle(), c.getDescription(), c.getPosition(),
+        return new ChapterCard(c.getId(), ContentText.title(c), ContentText.description(c), c.getPosition(),
                 c.getLessons().size(), completed, quizCard(c, user));
     }
 
     private ChapterDetail chapterDetail(Chapter c, Set<Long> done, AuthUser user) {
         List<LessonCard> cards = c.getLessons().stream()
-                .map(l -> new LessonCard(l.getId(), l.getTitle(), l.getSummary(), l.getTopic(), l.getDurationMinutes(),
+                .map(l -> new LessonCard(l.getId(), ContentText.title(l), ContentText.summary(l), l.getTopic(), l.getDurationMinutes(),
                         l.getPosition(), done.contains(l.getId())))
                 .toList();
         int completed = (int) cards.stream().filter(LessonCard::completed).count();
-        return new ChapterDetail(c.getId(), c.getTitle(), c.getDescription(), c.getPosition(),
+        return new ChapterDetail(c.getId(), ContentText.title(c), ContentText.description(c), c.getPosition(),
                 SubjectRef.of(c.getSubject()), cards, quizCard(c, user), completed);
     }
 
@@ -111,7 +111,7 @@ public class CatalogService {
         if (c.getQuizzes().isEmpty()) return null;
         Quiz q = c.getQuizzes().getFirst();
         Integer best = user != null && user.role() == Role.STUDENT ? attempts.findBestPercentage(user.id(), q.getId()) : null;
-        return new QuizCard(q.getId(), q.getTitle(), q.getDescription(), q.getQuestions().size(),
+        return new QuizCard(q.getId(), ContentText.title(q), ContentText.description(q), q.getQuestions().size(),
                 q.getTimeLimitSeconds(), best);
     }
 
@@ -122,18 +122,18 @@ public class CatalogService {
         Long prev = idx > 0 ? siblings.get(idx - 1).getId() : null;
         Long next = idx >= 0 && idx < siblings.size() - 1 ? siblings.get(idx + 1).getId() : null;
         Long quizId = c.getQuizzes().isEmpty() ? null : c.getQuizzes().getFirst().getId();
-        return new LessonDetail(l.getId(), l.getTitle(), l.getSummary(), l.getTopic(), l.getContent(), l.getVideoUrl(),
+        return new LessonDetail(l.getId(), ContentText.title(l), ContentText.summary(l), l.getTopic(), ContentText.content(l), l.getVideoUrl(),
                 l.getDurationMinutes(), l.getPosition(), done.contains(l.getId()), ChapterRef.of(c),
-                SubjectRef.of(c.getSubject()), prev, next, quizId);
+                SubjectRef.of(c.getSubject()), prev, next, quizId, ContentText.languageOf(l));
     }
 
     private QuizView quizView(Quiz q) {
         Chapter c = q.getChapter();
         List<QuestionView> qs = q.getQuestions().stream()
-                .map(x -> new QuestionView(x.getId(), x.getPrompt(), List.copyOf(x.getOptions()), x.getTopic(), x.getPosition()))
+                .map(x -> new QuestionView(x.getId(), ContentText.prompt(x), ContentText.options(x), x.getTopic(), x.getPosition()))
                 .toList();
-        return new QuizView(q.getId(), q.getTitle(), q.getDescription(), q.getTimeLimitSeconds(),
-                ChapterRef.of(c), SubjectRef.of(c.getSubject()), qs);
+        return new QuizView(q.getId(), ContentText.title(q), ContentText.description(q), q.getTimeLimitSeconds(),
+                ChapterRef.of(c), SubjectRef.of(c.getSubject()), qs, ContentText.languageOf(q));
     }
 
     static int percent(long part, long whole) {

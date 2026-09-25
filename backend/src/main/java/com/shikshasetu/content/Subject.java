@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "subjects")
@@ -40,4 +42,10 @@ public class Subject {
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC")
     private List<Chapter> chapters = new ArrayList<>();
+
+    /** Translations by language code ("hi", "or", "te"); English is the fields above. */
+    @ElementCollection
+    @CollectionTable(name = "subject_translations", joinColumns = @JoinColumn(name = "subject_id"))
+    @MapKeyColumn(name = "language", length = 8)
+    private Map<String, Translations.SubjectText> translations = new HashMap<>();
 }

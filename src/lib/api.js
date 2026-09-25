@@ -34,8 +34,12 @@ export const tokenStore = {
 
 export const SESSION_EXPIRED_EVENT = 'shikshasetu:session-expired';
 
+// Lesson and quiz content is served in the UI language (English when a translation is missing).
+let contentLanguage = 'en';
+export const setContentLanguage = (language) => { contentLanguage = language || 'en'; };
+
 export async function request(path, { method = 'GET', body, signal, blob = false } = {}) {
-  const headers = { Accept: blob ? '*/*' : 'application/json' };
+  const headers = { Accept: blob ? '*/*' : 'application/json', 'Accept-Language': contentLanguage };
   const token = tokenStore.get();
   if (token) headers.Authorization = `Bearer ${token}`;
   if (body !== undefined) headers['Content-Type'] = 'application/json';

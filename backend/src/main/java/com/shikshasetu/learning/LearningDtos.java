@@ -2,6 +2,7 @@ package com.shikshasetu.learning;
 
 import com.shikshasetu.gamification.GamificationDtos.RewardSummary;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -27,10 +28,17 @@ public final class LearningDtos {
             Instant submittedAt,
             Boolean offline) {}
 
-    public record CheckAnswerRequest(@NotNull Long questionId, @NotNull Integer selectedIndex) {}
+    public record CheckAnswerRequest(@NotNull Long questionId, @NotNull @Min(0) Integer selectedIndex) {}
 
-    /** Instant feedback for one question. Nothing is stored; the attempt is graded on submit. */
-    public record CheckAnswerResult(Long questionId, boolean correct, int correctIndex, String explanation) {}
+    /**
+     * Instant feedback for one locked answer. {@code selectedIndex} is the stored answer, which is the
+     * first one given; {@code alreadyAnswered} is true when the question had been answered before.
+     */
+    public record CheckAnswerResult(Long questionId, int selectedIndex, boolean correct, int correctIndex,
+                                    String explanation, boolean alreadyAnswered) {}
+
+    /** The student's open session for a quiz, with the answers already locked (to resume after a reload). */
+    public record QuizSessionView(Long sessionId, Long quizId, Instant startedAt, List<CheckAnswerResult> answers) {}
 
     public record QuestionResult(Long questionId, String prompt, List<String> options, Integer selectedIndex,
                                  int correctIndex, boolean correct, String explanation, String topic) {}

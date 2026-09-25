@@ -25,9 +25,16 @@ public class LearningController {
         return learning.submitQuiz(CurrentUser.id(), id, req);
     }
 
-    @PostMapping("/quizzes/{id}/check")
-    public CheckAnswerResult check(@PathVariable Long id, @Valid @RequestBody CheckAnswerRequest req) {
-        return learning.checkAnswer(id, req);
+    /** Starts the quiz, or resumes the open session with its locked answers. */
+    @PostMapping("/quizzes/{id}/session")
+    public QuizSessionView startSession(@PathVariable Long id) {
+        return learning.startSession(CurrentUser.id(), id);
+    }
+
+    /** Locks the answer to one question and returns instant feedback for it. */
+    @PostMapping("/quizzes/{id}/session/answers")
+    public CheckAnswerResult answer(@PathVariable Long id, @Valid @RequestBody CheckAnswerRequest req) {
+        return learning.lockAnswer(CurrentUser.id(), id, req);
     }
 
     @GetMapping("/students/me/attempts")

@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Multiple-choice question. True/False questions are simply two options. */
 @Entity
@@ -44,4 +46,14 @@ public class Question {
 
     @Column(nullable = false)
     private int position;
+
+    /** Translations by language code ("hi", "or", "te"); English is the fields above. */
+    @ElementCollection
+    @CollectionTable(name = "question_translations", joinColumns = @JoinColumn(name = "question_id"))
+    @MapKeyColumn(name = "language", length = 8)
+    private Map<String, Translations.QuestionText> translations = new HashMap<>();
+
+    @ElementCollection
+    @CollectionTable(name = "question_option_translations", joinColumns = @JoinColumn(name = "question_id"))
+    private List<Translations.OptionText> optionTranslations = new ArrayList<>();
 }

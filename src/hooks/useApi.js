@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useApp } from '../context/AppContext';
 
 /**
  * useApi — runs an async loader and tracks data / error / loading.
@@ -10,7 +11,9 @@ import { useCallback, useEffect, useState } from 'react';
  */
 export const useApi = (loader, deps = []) => {
   const [reloadKey, setReloadKey] = useState(0);
-  const key = `${JSON.stringify(deps)}#${reloadKey}`;
+  // Content is localised, so every screen reloads when the app language changes.
+  const language = useApp()?.language ?? 'en';
+  const key = `${JSON.stringify(deps)}#${reloadKey}#${language}`;
   const [state, setState] = useState({ key: null, data: null, error: null });
 
   useEffect(() => {

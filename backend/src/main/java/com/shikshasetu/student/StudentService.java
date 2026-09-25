@@ -1,5 +1,6 @@
 package com.shikshasetu.student;
 
+import com.shikshasetu.content.ContentText;
 import com.shikshasetu.common.ApiException;
 import com.shikshasetu.common.TimeService;
 import com.shikshasetu.content.CatalogDtos.SubjectCard;
@@ -124,16 +125,16 @@ public class StudentService {
 
     private static LessonPointer pointer(Lesson l) {
         Chapter c = l.getChapter();
-        return new LessonPointer(l.getId(), l.getTitle(), c.getId(), c.getTitle(), c.getSubject().getId(),
-                c.getSubject().getName(), c.getSubject().getColor());
+        return new LessonPointer(l.getId(), ContentText.title(l), c.getId(), ContentText.title(c), c.getSubject().getId(),
+                ContentText.name(c.getSubject()), c.getSubject().getColor());
     }
 
     private List<ActivityItem> recentActivity(List<LessonProgress> done, List<QuizAttempt> quizAttempts,
                                               List<BadgeView> earned) {
         List<ActivityItem> items = new ArrayList<>();
-        done.stream().limit(6).forEach(d -> items.add(new ActivityItem("LESSON", "Completed " + d.getLesson().getTitle(),
-                d.getLesson().getChapter().getSubject().getName(), d.getCompletedAt())));
-        quizAttempts.stream().limit(6).forEach(a -> items.add(new ActivityItem("QUIZ", a.getQuiz().getTitle(),
+        done.stream().limit(6).forEach(d -> items.add(new ActivityItem("LESSON", "Completed " + ContentText.title(d.getLesson()),
+                ContentText.name(d.getLesson().getChapter().getSubject()), d.getCompletedAt())));
+        quizAttempts.stream().limit(6).forEach(a -> items.add(new ActivityItem("QUIZ", ContentText.title(a.getQuiz()),
                 "Scored " + a.getPercentage() + "% · +" + a.getXpEarned() + " XP", a.getSubmittedAt())));
         earned.stream().limit(6).forEach(b -> items.add(new ActivityItem("BADGE", "Unlocked " + b.name(),
                 b.description(), b.earnedAt())));
@@ -155,9 +156,9 @@ public class StudentService {
             Long chapterId = a.getLesson() != null ? a.getLesson().getChapter().getId() : a.getQuiz().getChapter().getId();
             out.add(new AssignmentView(a.getId(), a.getTitle(), a.getNote(), a.getDueDate(),
                     a.getLesson() == null ? null : a.getLesson().getId(),
-                    a.getLesson() == null ? null : a.getLesson().getTitle(),
+                    a.getLesson() == null ? null : ContentText.title(a.getLesson()),
                     a.getQuiz() == null ? null : a.getQuiz().getId(),
-                    a.getQuiz() == null ? null : a.getQuiz().getTitle(), chapterId,
+                    a.getQuiz() == null ? null : ContentText.title(a.getQuiz()), chapterId,
                     a.getTeacher().getName(), null, null, a.getCreatedAt(), completed, null, null));
         }
         return out;

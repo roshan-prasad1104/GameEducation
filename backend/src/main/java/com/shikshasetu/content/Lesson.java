@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Entity
 @Table(name = "lessons")
 @Getter
@@ -42,4 +45,10 @@ public class Lesson {
 
     @Column(nullable = false)
     private int position;
+
+    /** Translations by language code ("hi", "or", "te"); English is the fields above. */
+    @ElementCollection
+    @CollectionTable(name = "lesson_translations", joinColumns = @JoinColumn(name = "lesson_id"))
+    @MapKeyColumn(name = "language", length = 8)
+    private Map<String, Translations.LessonText> translations = new HashMap<>();
 }

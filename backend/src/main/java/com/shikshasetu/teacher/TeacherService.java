@@ -144,7 +144,7 @@ public class TeacherService {
                     .filter(lp -> lp.getLesson().getChapter().getSubject().getId().equals(s.getId())).count();
             int completion = subjectLessons == 0 || rows.isEmpty() ? 0
                     : (int) Math.round(100.0 * completions / (subjectLessons * rows.size()));
-            perf.add(new SubjectPerformance(s.getId(), s.getName(), s.getColor(),
+            perf.add(new SubjectPerformance(s.getId(), ContentText.name(s), s.getColor(),
                     scores.isEmpty() ? null : (int) Math.round(scores.stream().mapToInt(i -> i).average().orElse(0)),
                     scores.size(), completion));
         }
@@ -161,10 +161,10 @@ public class TeacherService {
                 .collect(Collectors.toMap(p -> p.getUser().getId(), p -> p.getUser().getName()));
         List<TeacherActivity> recent = new ArrayList<>();
         allProgress.forEach(lp -> recent.add(new TeacherActivity(names.get(lp.getStudent().getId()),
-                new ActivityItem("LESSON", "Completed " + lp.getLesson().getTitle(),
-                        lp.getLesson().getChapter().getSubject().getName(), lp.getCompletedAt()))));
+                new ActivityItem("LESSON", "Completed " + ContentText.title(lp.getLesson()),
+                        ContentText.name(lp.getLesson().getChapter().getSubject()), lp.getCompletedAt()))));
         allAttempts.forEach(a -> recent.add(new TeacherActivity(names.get(a.getStudent().getId()),
-                new ActivityItem("QUIZ", a.getQuiz().getTitle(), "Scored " + a.getPercentage() + "%", a.getSubmittedAt()))));
+                new ActivityItem("QUIZ", ContentText.title(a.getQuiz()), "Scored " + a.getPercentage() + "%", a.getSubmittedAt()))));
         recent.sort(Comparator.comparing((TeacherActivity t) -> t.item().at()).reversed());
 
         return new Overview(rows.size(), active, avg, allProgress.size(), allAttempts.size(),
@@ -196,7 +196,7 @@ public class TeacherService {
             AnswerFact first = list.getFirst();
             out.add(new TopicStat(topic, titleCase(topic), first.subjectId(), first.subjectName(), list.size(), correct,
                     (int) Math.round(100.0 * correct / list.size()), struggling,
-                    lesson == null ? null : lesson.getId(), lesson == null ? null : lesson.getTitle()));
+                    lesson == null ? null : lesson.getId(), lesson == null ? null : ContentText.title(lesson)));
         });
         out.sort(Comparator.comparingInt(TopicStat::accuracy).thenComparing(TopicStat::answered, Comparator.reverseOrder()));
         return out;
@@ -274,8 +274,8 @@ public class TeacherService {
     private static AssignmentView view(Assignment a, int done, int target) {
         Long chapterId = a.getLesson() != null ? a.getLesson().getChapter().getId() : a.getQuiz().getChapter().getId();
         return new AssignmentView(a.getId(), a.getTitle(), a.getNote(), a.getDueDate(),
-                a.getLesson() == null ? null : a.getLesson().getId(), a.getLesson() == null ? null : a.getLesson().getTitle(),
-                a.getQuiz() == null ? null : a.getQuiz().getId(), a.getQuiz() == null ? null : a.getQuiz().getTitle(),
+                a.getLesson() == null ? null : a.getLesson().getId(), a.getLesson() == null ? null : ContentText.title(a.getLesson()),
+                a.getQuiz() == null ? null : a.getQuiz().getId(), a.getQuiz() == null ? null : ContentText.title(a.getQuiz()),
                 chapterId, null, a.getStudent() == null ? null : a.getStudent().getId(),
                 a.getStudent() == null ? null : a.getStudent().getName(), a.getCreatedAt(), null, done, target);
     }

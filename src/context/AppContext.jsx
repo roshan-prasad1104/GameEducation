@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { authApi, setOfflineOwner } from '../services/api';
-import { SESSION_EXPIRED_EVENT, tokenStore } from '../lib/api';
+import { SESSION_EXPIRED_EVENT, setContentLanguage, tokenStore } from '../lib/api';
 import { flushOutbox, pendingCount } from '../lib/sync';
 import { translate } from '../i18n';
 
@@ -26,7 +26,16 @@ export const AppProvider = ({ children }) => {
   const prefs = readJson(PREFS_KEY) ?? {};
   const [user, setUserState] = useState(null);
   const [status, setStatus] = useState(tokenStore.get() ? 'loading' : 'anon');
-  const [language, setLanguageState] = useState(prefs.language ?? 'en');
+  const [language, setLanguageState] = useState(() => {
+    const initial = prefs.language ?? 'en';
+    setContentLanguage(initial);
+    return initial;
+  });
+  // The API header changes together with the state, before any screen refetches in the new language.
+  const applyLanguage = useCallback((lang) => {
+    setContentLanguage(lang);
+    setLanguageState(lang);
+  }, []);
   const [darkMode, setDarkMode] = useState(prefs.darkMode ?? false);
   const [audioNarrator, setAudioNarrator] = useState(prefs.audioNarrator ?? false);
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
@@ -83,9 +92,9 @@ export const AppProvider = ({ children }) => {
     const u = await authApi.login(email, password);
     setUser(u);
     setStatus('authed');
-    if (u.preferredLanguage) setLanguageState(u.preferredLanguage);
+    if (u.preferredLanguage) applyLanguage(u.preferredLanguage);
     return u;
-  }, [setUser]);
+  }, [setUser, applyLanguage]);
 
   const register = useCallback(async (data) => {
     const u = await authApi.register(data);
@@ -94,7 +103,7 @@ export const AppProvider = ({ children }) => {
     return u;
   }, [setUser]);
 
-  const setLanguage = useCallback((lang) => setLanguageState(lang), []);
+  const setLanguage = applyLanguage;
 
   /** Reflect a server RewardSummary (XP, level, streak) in the signed-in user without refetching. */
   const applyReward = useCallback((reward) => {
