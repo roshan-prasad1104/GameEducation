@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+app:
+  jwt:
+    secret: test-secret-test-secret-test-secret-123456
+  ai:
+    # Point at a closed port so tests exercise the Java fallback deterministically.
+    base-url: http://localhost:1
+    timeout-ms: 300

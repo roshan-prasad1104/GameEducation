@@ -1,0 +1,1533 @@
+{
+  "subjects": [
+    {
+      "code": "math",
+      "name": "Mathematics",
+      "description": "Build strong number sense and problem-solving skills through equations, squares and measurement.",
+      "color": "#6366f1",
+      "icon": "calculator",
+      "gradeLevel": 8,
+      "chapters": [
+        {
+          "title": "Linear Equations in One Variable",
+          "description": "Solve equations with one unknown and use them to model real-life problems such as market sales and ages.",
+          "lessons": [
+            {
+              "title": "Solving Linear Equations",
+              "topic": "linear-equations",
+              "summary": "Learn to solve equations with one unknown using the balance rule and transposition.",
+              "durationMinutes": 8,
+              "content": "## What is a linear equation?\n\nA **linear equation in one variable** has exactly one unknown, usually `x`, and the highest power of that unknown is 1. Examples are `2x + 3 = 11` and `5y − 4 = 3y + 6`. The **solution** is the value of the variable that makes both sides equal.\n\n## The balance rule\n\nThink of an equation as the weighing scale at a village shop. Whatever you do to one side, you must do to the other side to keep it balanced. You may add, subtract, multiply or divide both sides by the same number (but never divide by zero).\n\nA quicker way is **transposing**: when a term moves to the other side, its operation reverses. `+` becomes `−`, and `×` becomes `÷`.\n\n### Worked example\n\nSolve `5x − 4 = 3x + 10`.\n\n1. Transpose `3x` to the left: `5x − 3x − 4 = 10`\n2. Simplify: `2x − 4 = 10`\n3. Transpose `−4` to the right: `2x = 14`\n4. Divide both sides by 2: `x = 7`\n\n**Check:** LHS = 5 × 7 − 4 = 31 and RHS = 3 × 7 + 10 = 31. Both sides match, so `x = 7` is correct.\n\n## Equations with brackets\n\nOpen the brackets first, then solve as usual. For `3(x + 2) = 21`, expand to get `3x + 6 = 21`. Then `3x = 15`, so `x = 5`.\n\n### Key points\n\n- A linear equation has its variable only to the power 1.\n- Do the same operation on both sides to keep the balance.\n- Always substitute your answer back to check it."
+            },
+            {
+              "title": "Word Problems with Linear Equations",
+              "topic": "linear-equation-word-problems",
+              "summary": "Turn everyday situations into equations and solve them step by step.",
+              "durationMinutes": 10,
+              "content": "## From words to equations\n\nMany everyday problems become easy once you turn the words into an equation. Follow these steps:\n\n1. Read the problem carefully and identify the unknown.\n2. Let the unknown be `x`.\n3. Write an equation using the facts given.\n4. Solve the equation.\n5. Check the answer against the original problem.\n\n### Worked example: the village market\n\nRavi sells tomatoes and onions at the weekly market. He earned ₹540 in total, and he earned ₹120 more from tomatoes than from onions. How much did he earn from onions?\n\nLet earnings from onions be `x`. Then earnings from tomatoes are `x + 120`.\n\n- `x + (x + 120) = 540`\n- `2x + 120 = 540`\n- `2x = 420`, so `x = 210`\n\nRavi earned ₹210 from onions and ₹330 from tomatoes. Check: 210 + 330 = 540.\n\n### Worked example: ages\n\nA father is 3 times as old as his son. In 12 years, he will be twice as old as his son. Let the son's age be `x`, so the father's age is `3x`.\n\n`3x + 12 = 2(x + 12)` → `3x + 12 = 2x + 24` → `x = 12`\n\nThe son is 12 and the father is 36. In 12 years: 48 = 2 × 24, which is correct.\n\n## Useful phrases\n\n- \"more than\" → add\n- \"less than\" or \"decreased by\" → subtract\n- \"times\" or \"of\" → multiply\n- \"shared equally\" → divide\n\n### Key points\n\n- Choose a clear variable for the unknown quantity.\n- Translate each sentence into mathematical form.\n- Check the answer against the original words, not just the equation."
+            }
+          ],
+          "quiz": {
+            "title": "Linear Equations Quiz",
+            "description": "Test your skill at solving linear equations and word problems.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Solve: 3x + 5 = 20",
+                "options": [
+                  "x = 5",
+                  "x = 25/3",
+                  "x = 15",
+                  "x = 3"
+                ],
+                "correctIndex": 0,
+                "explanation": "Subtract 5 from both sides to get 3x = 15, then divide by 3 to get x = 5.",
+                "topic": "linear-equations"
+              },
+              {
+                "prompt": "Which of the following is a linear equation in one variable?",
+                "options": [
+                  "x² + 2 = 6",
+                  "2x + 3y = 7",
+                  "4x − 9 = 3",
+                  "1/x = 5"
+                ],
+                "correctIndex": 2,
+                "explanation": "4x − 9 = 3 has one variable with power 1. x² has power 2, 2x + 3y has two variables, and 1/x is not linear.",
+                "topic": "linear-equations"
+              },
+              {
+                "prompt": "Solve: 2(x − 3) = 10",
+                "options": [
+                  "x = 6.5",
+                  "x = 2",
+                  "x = 8",
+                  "x = 5"
+                ],
+                "correctIndex": 2,
+                "explanation": "Expanding gives 2x − 6 = 10, so 2x = 16 and x = 8. Forgetting to multiply the 3 by 2 gives the wrong answer 6.5.",
+                "topic": "linear-equations"
+              },
+              {
+                "prompt": "The sum of two consecutive numbers is 47. What are the numbers?",
+                "options": [
+                  "22 and 23",
+                  "23 and 24",
+                  "24 and 25",
+                  "20 and 27"
+                ],
+                "correctIndex": 1,
+                "explanation": "Let the numbers be x and x + 1. Then 2x + 1 = 47, so x = 23 and the numbers are 23 and 24.",
+                "topic": "linear-equation-word-problems"
+              },
+              {
+                "prompt": "The perimeter of a rectangular field is 180 m and its length is twice its breadth. What is the breadth?",
+                "options": [
+                  "60 m",
+                  "45 m",
+                  "90 m",
+                  "30 m"
+                ],
+                "correctIndex": 3,
+                "explanation": "Let breadth = b, length = 2b. Perimeter = 2(2b + b) = 6b = 180, so b = 30 m. 60 m is the length.",
+                "topic": "linear-equation-word-problems"
+              },
+              {
+                "prompt": "Which equation represents 'a number decreased by 7 equals 15'?",
+                "options": [
+                  "7 − x = 15",
+                  "x − 7 = 15",
+                  "x + 7 = 15",
+                  "7x = 15"
+                ],
+                "correctIndex": 1,
+                "explanation": "'Decreased by 7' means 7 is subtracted from the number, giving x − 7 = 15.",
+                "topic": "linear-equation-word-problems"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Squares and Square Roots",
+          "description": "Explore square numbers, their patterns, and methods to find square roots of perfect squares.",
+          "lessons": [
+            {
+              "title": "Squares and Their Patterns",
+              "topic": "perfect-squares",
+              "summary": "Discover perfect squares and the number patterns that make them easy to spot.",
+              "durationMinutes": 8,
+              "content": "## What is a square number?\n\nWhen a number is multiplied by itself, the result is its **square**. We write 5 × 5 = 25 as 5² = 25. Numbers like 1, 4, 9, 16, 25 and 36 are called **perfect squares**.\n\nThe name comes from geometry: a square plot of land with side 7 m has an area of 7² = 49 m².\n\n## Useful patterns\n\n- A perfect square never ends in 2, 3, 7 or 8.\n- If a number ends in 0, its square ends in 00. For example, 30² = 900.\n- The square of an even number is even; the square of an odd number is odd.\n- The sum of the first n odd numbers is n². For example, 1 + 3 + 5 + 7 = 16 = 4².\n\n### Worked example: squaring numbers ending in 5\n\nFind 35² quickly. Take the tens digit 3 and multiply it by the next number, 4: 3 × 4 = 12. Write 25 after it. So 35² = 1225. The same trick gives 65² = 4225 because 6 × 7 = 42.\n\n### Worked example: is 2352 a perfect square?\n\nIt ends in 2, so it cannot be a perfect square. No calculation is needed.\n\n## Pythagorean triplets\n\nFor any number m greater than 1, the numbers `2m`, `m² − 1` and `m² + 1` form a **Pythagorean triplet**. For m = 4 we get 8, 15 and 17, and indeed 8² + 15² = 64 + 225 = 289 = 17². Village masons use the smaller triplet 3, 4, 5 to mark perfect right angles for a house foundation.\n\n### Key points\n\n- A square is a number multiplied by itself.\n- Perfect squares never end in 2, 3, 7 or 8.\n- The sum of the first n odd numbers equals n²."
+            },
+            {
+              "title": "Finding Square Roots",
+              "topic": "square-roots",
+              "summary": "Find square roots by prime factorisation, repeated subtraction and estimation.",
+              "durationMinutes": 10,
+              "content": "## Square root: the reverse of squaring\n\nThe **square root** of a number is the value which, multiplied by itself, gives that number. Since 9² = 81, we write √81 = 9. Finding a square root is like finding the side of a square field when you already know its area.\n\n## Method 1: Prime factorisation\n\n1. Write the number as a product of prime factors.\n2. Group equal factors into pairs.\n3. Take one factor from each pair and multiply them.\n\n### Worked example\n\nFind √324.\n\n- 324 = 2 × 2 × 3 × 3 × 3 × 3\n- Pairs: (2 × 2), (3 × 3), (3 × 3)\n- √324 = 2 × 3 × 3 = 18\n\nCheck: 18 × 18 = 324.\n\nIf a factor is left without a pair, the number is not a perfect square. For example, 72 = 2 × 2 × 2 × 3 × 3 has one unpaired 2. Multiplying 72 by 2 gives 144, which is 12².\n\n## Method 2: Repeated subtraction\n\nSubtract consecutive odd numbers 1, 3, 5, … until you reach 0. The number of steps is the square root. For 25: 25 − 1 − 3 − 5 − 7 − 9 = 0 takes five steps, so √25 = 5.\n\n## Estimating\n\n√50 lies between √49 = 7 and √64 = 8, and is closer to 7.\n\n### Real-life example\n\nA farmer has a square plot of area 625 m². Its side is √625 = 25 m, so fencing all four sides needs 4 × 25 = 100 m of wire.\n\n### Key points\n\n- Finding a square root reverses squaring.\n- Pair the prime factors and take one from each pair.\n- An unpaired factor means the number is not a perfect square."
+            }
+          ],
+          "quiz": {
+            "title": "Squares and Square Roots Quiz",
+            "description": "Check your understanding of square numbers and square roots.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which of these numbers cannot be a perfect square?",
+                "options": [
+                  "1296",
+                  "2025",
+                  "3048",
+                  "144"
+                ],
+                "correctIndex": 2,
+                "explanation": "A perfect square never ends in 2, 3, 7 or 8. 3048 ends in 8, so it is not a perfect square. The others are 36², 45² and 12².",
+                "topic": "perfect-squares"
+              },
+              {
+                "prompt": "What is 1 + 3 + 5 + 7 + 9 + 11?",
+                "options": [
+                  "36",
+                  "30",
+                  "49",
+                  "25"
+                ],
+                "correctIndex": 0,
+                "explanation": "These are the first 6 odd numbers, and their sum is 6² = 36.",
+                "topic": "perfect-squares"
+              },
+              {
+                "prompt": "True or False: The square of an odd number is always odd.",
+                "options": [
+                  "True",
+                  "False"
+                ],
+                "correctIndex": 0,
+                "explanation": "Odd × odd is always odd, for example 7² = 49 and 9² = 81.",
+                "topic": "perfect-squares"
+              },
+              {
+                "prompt": "What is √576?",
+                "options": [
+                  "22",
+                  "24",
+                  "26",
+                  "28"
+                ],
+                "correctIndex": 1,
+                "explanation": "24 × 24 = 576, so √576 = 24.",
+                "topic": "square-roots"
+              },
+              {
+                "prompt": "What is the smallest number by which 72 must be multiplied to make it a perfect square?",
+                "options": [
+                  "3",
+                  "6",
+                  "2",
+                  "4"
+                ],
+                "correctIndex": 2,
+                "explanation": "72 = 2 × 2 × 2 × 3 × 3. One 2 is unpaired, so multiply by 2 to get 144 = 12².",
+                "topic": "square-roots"
+              },
+              {
+                "prompt": "A square courtyard has an area of 196 m². What is the length of its side?",
+                "options": [
+                  "49 m",
+                  "98 m",
+                  "16 m",
+                  "14 m"
+                ],
+                "correctIndex": 3,
+                "explanation": "Side = √196 = 14 m. Dividing the area by 4 (giving 49) is a common mistake that confuses area with perimeter.",
+                "topic": "square-roots"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Mensuration",
+          "description": "Measure boundaries, surfaces and capacities of 2D shapes and 3D solids used in daily life.",
+          "lessons": [
+            {
+              "title": "Perimeter and Area of Plane Figures",
+              "topic": "area-perimeter",
+              "summary": "Calculate perimeters and areas of rectangles, triangles, trapeziums and circles.",
+              "durationMinutes": 10,
+              "content": "## Perimeter vs area\n\n**Perimeter** is the total length of the boundary of a shape. **Area** is the amount of surface it covers. A farmer fencing a field needs the perimeter; a farmer buying seed for that field needs the area.\n\n## Formulas to remember\n\n- Rectangle: perimeter = 2(l + b), area = l × b\n- Square: perimeter = 4a, area = a²\n- Triangle: area = ½ × base × height\n- Trapezium: area = ½ × (sum of parallel sides) × height\n- Circle: circumference = 2πr, area = πr²\n\nUse π = 22/7 or 3.14.\n\n### Worked example: rectangular field\n\nA field is 40 m long and 25 m wide.\n\n- Perimeter = 2(40 + 25) = 130 m\n- Area = 40 × 25 = 1000 m²\n\nIf fencing costs ₹15 per metre, the total cost is 130 × 15 = ₹1950.\n\n### Worked example: trapezium-shaped plot\n\nA plot has parallel sides of 30 m and 20 m, and the distance between them is 12 m.\n\nArea = ½ × (30 + 20) × 12 = ½ × 50 × 12 = 300 m²\n\n### Worked example: circular well\n\nThe opening of a well has radius 1.4 m.\n\n- Circumference = 2 × 22/7 × 1.4 = 8.8 m\n- Area = 22/7 × 1.4 × 1.4 = 6.16 m²\n\n## Units\n\nPerimeter is measured in units of length such as m or cm. Area is measured in square units such as m² or cm². Remember that 1 m² = 10,000 cm², because 1 m = 100 cm on each side.\n\n### Key points\n\n- Perimeter measures the boundary; area measures the surface.\n- Area of a trapezium = ½ × (sum of parallel sides) × height.\n- Area always uses square units such as m²."
+            },
+            {
+              "title": "Volume and Surface Area",
+              "topic": "volume-surface-area",
+              "summary": "Find the volume and surface area of cuboids, cubes and cylinders.",
+              "durationMinutes": 10,
+              "content": "## Solids in three dimensions\n\nArea measures a flat surface. **Volume** measures the space inside a solid and uses cubic units such as cm³ or m³. **Surface area** is the total area of all the faces of a solid.\n\n## Cuboid and cube\n\nFor a cuboid with length l, breadth b and height h:\n\n- Volume = l × b × h\n- Total surface area = 2(lb + bh + hl)\n\nFor a cube with side a:\n\n- Volume = a³\n- Total surface area = 6a²\n\n## Cylinder\n\nFor a cylinder with radius r and height h:\n\n- Volume = πr²h\n- Curved surface area = 2πrh\n- Total surface area = 2πr(r + h)\n\n### Worked example: village water tank\n\nA water tank is a cuboid 5 m long, 4 m wide and 2 m deep.\n\nVolume = 5 × 4 × 2 = 40 m³\n\nSince 1 m³ = 1000 litres, the tank holds 40,000 litres of water.\n\n### Worked example: grain drum\n\nA cylindrical drum for storing grain has radius 0.7 m and height 1 m.\n\n- Volume = 22/7 × 0.7 × 0.7 × 1 = 1.54 m³\n- Curved surface area (to paint the side) = 2 × 22/7 × 0.7 × 1 = 4.4 m²\n\n## Unit conversions\n\n- 1 litre = 1000 cm³\n- 1 m³ = 1000 litres\n\n### Key points\n\n- Volume measures capacity and uses cubic units.\n- Surface area is the sum of the areas of all faces.\n- 1 m³ equals 1000 litres."
+            }
+          ],
+          "quiz": {
+            "title": "Mensuration Quiz",
+            "description": "Apply area, perimeter and volume formulas to practical problems.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Find the area of a trapezium whose parallel sides are 10 cm and 6 cm and whose height is 5 cm.",
+                "options": [
+                  "80 cm²",
+                  "40 cm²",
+                  "30 cm²",
+                  "21 cm²"
+                ],
+                "correctIndex": 1,
+                "explanation": "Area = ½ × (10 + 6) × 5 = ½ × 16 × 5 = 40 cm². Forgetting the ½ gives 80 cm².",
+                "topic": "area-perimeter"
+              },
+              {
+                "prompt": "A square garden has a perimeter of 48 m. What is its area?",
+                "options": [
+                  "144 m²",
+                  "48 m²",
+                  "576 m²",
+                  "96 m²"
+                ],
+                "correctIndex": 0,
+                "explanation": "Side = 48 ÷ 4 = 12 m, so area = 12² = 144 m².",
+                "topic": "area-perimeter"
+              },
+              {
+                "prompt": "What is the circumference of a circle of radius 7 cm? (Use π = 22/7)",
+                "options": [
+                  "154 cm",
+                  "22 cm",
+                  "44 cm",
+                  "49 cm"
+                ],
+                "correctIndex": 2,
+                "explanation": "Circumference = 2πr = 2 × 22/7 × 7 = 44 cm. 154 cm² is the area, not the circumference.",
+                "topic": "area-perimeter"
+              },
+              {
+                "prompt": "What is the volume of a cube with side 4 cm?",
+                "options": [
+                  "16 cm³",
+                  "48 cm³",
+                  "96 cm³",
+                  "64 cm³"
+                ],
+                "correctIndex": 3,
+                "explanation": "Volume = a³ = 4 × 4 × 4 = 64 cm³. 96 cm² is its total surface area (6 × 16).",
+                "topic": "volume-surface-area"
+              },
+              {
+                "prompt": "A tank measures 2 m × 1.5 m × 1 m. How many litres of water can it hold?",
+                "options": [
+                  "300 L",
+                  "3000 L",
+                  "30,000 L",
+                  "3.5 L"
+                ],
+                "correctIndex": 1,
+                "explanation": "Volume = 2 × 1.5 × 1 = 3 m³, and 1 m³ = 1000 L, so it holds 3000 L.",
+                "topic": "volume-surface-area"
+              },
+              {
+                "prompt": "Which formula gives the curved surface area of a cylinder?",
+                "options": [
+                  "πr²h",
+                  "2πr(r + h)",
+                  "2πrh",
+                  "πr²"
+                ],
+                "correctIndex": 2,
+                "explanation": "Curved surface area = 2πrh. πr²h is volume and 2πr(r + h) is total surface area.",
+                "topic": "volume-surface-area"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "physics",
+      "name": "Physics",
+      "description": "Understand forces, motion and light through experiments you can relate to everyday life.",
+      "color": "#f59e0b",
+      "icon": "atom",
+      "gradeLevel": 8,
+      "chapters": [
+        {
+          "title": "Force and Pressure",
+          "description": "Explore pushes and pulls, their effects, and how force spread over an area creates pressure.",
+          "lessons": [
+            {
+              "title": "What is a Force?",
+              "topic": "force-basics",
+              "summary": "Understand force as a push or pull and the effects it can produce.",
+              "durationMinutes": 8,
+              "content": "## Push and pull\n\nA **force** is a push or a pull on an object. Pulling a bucket up from a well, pushing a bicycle up a slope or kicking a football all involve a force. A force always arises from an **interaction** between at least two objects. The SI unit of force is the **newton (N)**.\n\n## What can a force do?\n\n- Make a stationary object start moving\n- Change the speed of a moving object\n- Change the direction of motion\n- Change the shape of an object, like kneading dough or pressing wet clay\n\n## Magnitude and direction\n\nA force has both a size (**magnitude**) and a **direction**. If two people push a cart in the same direction, their forces add up. If they push in opposite directions, the **net force** is the difference, and the cart moves in the direction of the larger force. If the forces are equal and opposite, the net force is zero and nothing moves.\n\n### Worked example\n\nTwo farmers pull ropes tied to a bullock cart stuck in mud. One pulls east with 300 N and the other pulls west with 200 N.\n\n- Net force = 300 − 200 = 100 N towards the east\n- If both pulled east, the net force would be 300 + 200 = 500 N\n\n## Contact and non-contact forces\n\n- **Contact forces** act only when objects touch: muscular force and friction.\n- **Non-contact forces** act from a distance: magnetic force, electrostatic force and gravitational force.\n\nA ripe mango falls from a tree because of gravity, even though nothing touches it.\n\n### Key points\n\n- Force is a push or pull, measured in newtons (N).\n- Forces can change speed, direction or shape.\n- Gravity, magnetic and electrostatic forces act without contact."
+            },
+            {
+              "title": "Pressure in Solids, Liquids and Gases",
+              "topic": "pressure",
+              "summary": "Learn how force spread over an area creates pressure, and how liquids and air exert it too.",
+              "durationMinutes": 10,
+              "content": "## What is pressure?\n\n**Pressure** is the force acting on a unit area of a surface.\n\n`Pressure = Force ÷ Area`\n\nIts SI unit is the **pascal (Pa)**, where 1 Pa = 1 N/m². The same force acting on a smaller area produces a greater pressure.\n\n## Everyday examples\n\n- A sharp knife cuts vegetables easily because its thin edge has a very small area.\n- Porters place a round cloth on their heads to increase the contact area and reduce pressure.\n- Tractors have wide tyres so they do not sink into soft, muddy fields.\n- School bags have wide straps so they do not dig into your shoulders.\n\n### Worked example\n\nA wooden box weighs 600 N.\n\n- Resting on a face of area 2 m²: pressure = 600 ÷ 2 = 300 Pa\n- Resting on a face of area 0.5 m²: pressure = 600 ÷ 0.5 = 1200 Pa\n\nSame weight, but four times the pressure on the smaller face.\n\n## Pressure in liquids\n\nLiquids push on the bottom and the walls of their container. Liquid pressure **increases with depth**. This is why dams are built thicker at the bottom, and why water spurts out farther from a hole near the base of a tank than from a hole near the top.\n\n## Pressure in gases\n\nThe air around us exerts **atmospheric pressure**, about 1,00,000 Pa at sea level. A rubber suction hook sticks to a smooth wall because the air outside presses it firmly once the air inside is pushed out. We are not crushed because the pressure inside our bodies balances the air pressure outside.\n\n### Key points\n\n- Pressure = Force ÷ Area, measured in pascals.\n- A smaller area means greater pressure for the same force.\n- Liquid pressure increases with depth."
+            }
+          ],
+          "quiz": {
+            "title": "Force and Pressure Quiz",
+            "description": "Check your understanding of forces and pressure in everyday life.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which of the following is a non-contact force?",
+                "options": [
+                  "Friction",
+                  "Muscular force",
+                  "Magnetic force",
+                  "The force of a hammer on a nail"
+                ],
+                "correctIndex": 2,
+                "explanation": "A magnet can attract iron from a distance without touching it. The other forces need contact.",
+                "topic": "force-basics"
+              },
+              {
+                "prompt": "Forces of 50 N and 30 N push a box in opposite directions. What is the net force?",
+                "options": [
+                  "80 N",
+                  "20 N in the direction of the 50 N force",
+                  "20 N in the direction of the 30 N force",
+                  "0 N"
+                ],
+                "correctIndex": 1,
+                "explanation": "Opposite forces subtract: 50 − 30 = 20 N, acting in the direction of the larger force.",
+                "topic": "force-basics"
+              },
+              {
+                "prompt": "What is the SI unit of force?",
+                "options": [
+                  "Newton",
+                  "Joule",
+                  "Pascal",
+                  "Watt"
+                ],
+                "correctIndex": 0,
+                "explanation": "Force is measured in newtons (N). The pascal is the unit of pressure and the joule is the unit of energy.",
+                "topic": "force-basics"
+              },
+              {
+                "prompt": "A force of 200 N acts on an area of 4 m². What is the pressure?",
+                "options": [
+                  "800 Pa",
+                  "50 Pa",
+                  "204 Pa",
+                  "0.02 Pa"
+                ],
+                "correctIndex": 1,
+                "explanation": "Pressure = Force ÷ Area = 200 ÷ 4 = 50 Pa. Multiplying instead of dividing gives 800.",
+                "topic": "pressure"
+              },
+              {
+                "prompt": "Why are dams made thicker at the bottom?",
+                "options": [
+                  "Water is colder at the bottom",
+                  "Air pressure pushes harder on the base",
+                  "The base must hold more mud",
+                  "Liquid pressure increases with depth"
+                ],
+                "correctIndex": 3,
+                "explanation": "Water pressure is greatest at the bottom of the reservoir, so the dam wall must be strongest there.",
+                "topic": "pressure"
+              },
+              {
+                "prompt": "Why do porters place a round cloth on their heads before lifting a heavy load?",
+                "options": [
+                  "It increases the area, reducing pressure",
+                  "It decreases the area, increasing pressure",
+                  "It reduces the weight of the load",
+                  "It only makes the load look neat"
+                ],
+                "correctIndex": 0,
+                "explanation": "The cloth spreads the weight over a larger area, so the pressure on the head is less.",
+                "topic": "pressure"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Friction",
+          "description": "Understand the force that opposes motion, where it helps us, and how we control it.",
+          "lessons": [
+            {
+              "title": "Understanding Friction",
+              "topic": "friction",
+              "summary": "Find out what friction is, why it happens and how its types compare.",
+              "durationMinutes": 8,
+              "content": "## What is friction?\n\nPush a book along a table and it slows down and stops. The force that opposes the relative motion between two surfaces in contact is called **friction**. It always acts opposite to the direction of motion (or attempted motion).\n\n## Why does friction happen?\n\nEven surfaces that look smooth have tiny bumps called **irregularities**. When two surfaces touch, these bumps lock into each other. Rough surfaces have more irregularities and produce more friction. Pressing the surfaces together harder also increases friction.\n\n## Types of friction\n\n1. **Static friction** acts when you try to move an object that is at rest.\n2. **Sliding friction** acts when an object slides over a surface.\n3. **Rolling friction** acts when an object rolls over a surface.\n\nTheir order is: static friction > sliding friction > rolling friction. That is why starting to push a heavy object is harder than keeping it moving, and why wheels make work so much easier.\n\n### Worked example\n\nA farmer wants to move a 50 kg sack of wheat across the courtyard.\n\n- At first, it needs a big push to overcome **static friction**.\n- Once the sack is sliding, less effort is needed because **sliding friction** is smaller.\n- If he loads the sack onto a hand cart with wheels, the effort drops even further because **rolling friction** is the smallest.\n\n## Friction produces heat\n\nRub your palms together quickly and they feel warm. Friction converts some energy of motion into heat. A matchstick lights because friction against the rough side of the box heats its tip.\n\n### Key points\n\n- Friction opposes relative motion between surfaces in contact.\n- It is caused by the interlocking of surface irregularities.\n- Rolling friction is less than sliding friction, which is less than static friction."
+            },
+            {
+              "title": "Increasing and Reducing Friction",
+              "topic": "friction-control",
+              "summary": "See why friction is both useful and wasteful, and how we increase or reduce it.",
+              "durationMinutes": 8,
+              "content": "## Friction: friend and foe\n\nWithout friction we could not walk, write with a pen, or hold a glass. A bicycle's brakes work only because of friction. But friction also wears out tyres, shoe soles and machine parts, and it wastes energy as heat.\n\n## Ways to increase friction\n\n- **Treads** on tyres grip the road, which is especially important on wet roads during the monsoon.\n- Shoe soles have grooves to stop us from slipping.\n- Kabaddi players rub their hands in soil for a better grip.\n- Brake pads press against the wheel rim to slow a bicycle.\n\n## Ways to reduce friction\n\n- **Lubricants** such as oil and grease form a thin layer between moving parts.\n- **Ball bearings** replace sliding with rolling. They are found in bicycle hubs, ceiling fans and water pumps.\n- **Polishing** makes surfaces smoother.\n- Sprinkling fine powder on a carrom board helps the coins glide.\n\n## Fluid friction\n\nAir and water also resist motion. This resistance is called **fluid friction** or **drag**. Fish, birds, boats and aeroplanes have pointed, **streamlined** shapes that cut through fluids and reduce drag.\n\n### Worked example\n\nA cyclist finds pedalling hard and hears squeaking from the wheels. What should she do?\n\n1. Clean and oil the chain to reduce friction between its links.\n2. Check that the ball bearings in the wheel hubs are greased.\n3. Keep oil away from the brake pads, because there we need friction to stop safely.\n\nAfter this, less effort is needed and the cycle runs smoothly.\n\n### Key points\n\n- Friction is useful for grip and braking but causes wear and wasted energy.\n- Lubricants, ball bearings and polishing reduce friction.\n- Streamlined shapes reduce fluid friction (drag)."
+            }
+          ],
+          "quiz": {
+            "title": "Friction Quiz",
+            "description": "Test what you know about friction and how to control it.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which type of friction is the smallest?",
+                "options": [
+                  "Static friction",
+                  "Sliding friction",
+                  "Rolling friction",
+                  "All are equal"
+                ],
+                "correctIndex": 2,
+                "explanation": "Rolling friction is smaller than sliding and static friction, which is why wheels make moving loads easier.",
+                "topic": "friction"
+              },
+              {
+                "prompt": "Friction is mainly caused by:",
+                "options": [
+                  "Gravity pulling objects down",
+                  "Interlocking of irregularities on the surfaces",
+                  "Magnetic attraction between surfaces",
+                  "Air pressure on the object"
+                ],
+                "correctIndex": 1,
+                "explanation": "Tiny bumps on both surfaces lock into each other and resist motion.",
+                "topic": "friction"
+              },
+              {
+                "prompt": "True or False: Friction acts in the same direction as the motion of an object.",
+                "options": [
+                  "True",
+                  "False"
+                ],
+                "correctIndex": 1,
+                "explanation": "Friction always acts opposite to the direction of motion, which is why it slows objects down.",
+                "topic": "friction"
+              },
+              {
+                "prompt": "How do ball bearings reduce friction?",
+                "options": [
+                  "By replacing sliding with rolling",
+                  "By making surfaces rougher",
+                  "By increasing the weight of parts",
+                  "By producing more heat"
+                ],
+                "correctIndex": 0,
+                "explanation": "Ball bearings let parts roll instead of slide, and rolling friction is much smaller.",
+                "topic": "friction-control"
+              },
+              {
+                "prompt": "Why do bicycle and tractor tyres have treads?",
+                "options": [
+                  "To make them look attractive",
+                  "To reduce their weight",
+                  "To increase grip on the road",
+                  "To reduce air pressure in the tyre"
+                ],
+                "correctIndex": 2,
+                "explanation": "Treads increase friction with the ground, giving better grip, especially on wet roads.",
+                "topic": "friction-control"
+              },
+              {
+                "prompt": "A streamlined shape, like that of a fish or aeroplane, mainly reduces:",
+                "options": [
+                  "Static friction",
+                  "Gravity",
+                  "Magnetic force",
+                  "Fluid friction (drag)"
+                ],
+                "correctIndex": 3,
+                "explanation": "Pointed, streamlined bodies move through air or water with less drag.",
+                "topic": "friction-control"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Light: Reflection",
+          "description": "Study how light bounces off surfaces and how mirrors form images.",
+          "lessons": [
+            {
+              "title": "Laws of Reflection",
+              "topic": "reflection-of-light",
+              "summary": "Learn the laws of reflection and the difference between regular and diffused reflection.",
+              "durationMinutes": 8,
+              "content": "## What is reflection?\n\nWhen light falls on a surface and bounces back, we call it **reflection**. Polished surfaces such as mirrors, a steel plate or the still water of a pond reflect light very well.\n\n## Important terms\n\n- **Incident ray**: the ray of light falling on the surface.\n- **Reflected ray**: the ray that bounces back.\n- **Normal**: an imaginary line drawn at 90° to the surface at the point where the ray strikes.\n- **Angle of incidence (∠i)**: the angle between the incident ray and the normal.\n- **Angle of reflection (∠r)**: the angle between the reflected ray and the normal.\n\n## Laws of reflection\n\n1. The angle of incidence is equal to the angle of reflection: ∠i = ∠r.\n2. The incident ray, the normal and the reflected ray all lie in the same plane.\n\n### Worked example\n\nA ray of light strikes a mirror, making an angle of 30° with the mirror's surface. What is the angle of reflection?\n\nAngles are measured from the **normal**, not from the surface.\n\n- ∠i = 90° − 30° = 60°\n- So ∠r = 60°\n\nA common mistake is to answer 30°.\n\n## Regular and diffused reflection\n\nWhen parallel rays fall on a smooth surface like a mirror, they stay parallel after reflection. This is **regular reflection**, and it forms clear images. When light falls on a rough surface like paper, cardboard or a mud wall, the reflected rays scatter in many directions. This is **diffused reflection**. The laws of reflection still hold for every single ray; the scattering happens because the surface is uneven.\n\n### Key points\n\n- The angle of incidence equals the angle of reflection.\n- Angles are measured from the normal, not from the surface.\n- Smooth surfaces give regular reflection; rough surfaces give diffused reflection."
+            },
+            {
+              "title": "Images in Plane Mirrors",
+              "topic": "plane-mirror-images",
+              "summary": "Explore the features of images formed by plane mirrors and how multiple images form.",
+              "durationMinutes": 8,
+              "content": "## Features of a plane mirror image\n\nThe image formed by a flat (plane) mirror is:\n\n- **Virtual**: it cannot be caught on a screen.\n- **Erect**: it is the right way up.\n- The **same size** as the object.\n- As far **behind** the mirror as the object is in front of it.\n- **Laterally inverted**: left appears as right.\n\n### Worked example\n\nPriya stands 2 m in front of a mirror.\n\n- Her image is 2 m behind the mirror.\n- The distance between Priya and her image is 2 + 2 = 4 m.\n\nIf she walks 0.5 m towards the mirror, she is 1.5 m away, her image is 1.5 m behind it, and the distance between them becomes 3 m.\n\n## Lateral inversion\n\nRaise your right hand in front of a mirror and the image seems to raise its left hand. This is why the word AMBULANCE is painted in reverse on the front of ambulances: drivers ahead see it the right way round in their rear-view mirrors and can make way quickly.\n\n## Multiple images\n\nWhen two plane mirrors are placed at an angle θ to each other, several images form. The number of images is:\n\n`n = (360° ÷ θ) − 1`\n\n- At 90°: 360 ÷ 90 − 1 = 3 images\n- At 60°: 360 ÷ 60 − 1 = 5 images\n\nA **kaleidoscope** uses mirrors placed at an angle to create beautiful repeating patterns.\n\n## Periscope\n\nA periscope uses two plane mirrors placed at 45° to let you see over walls or obstacles. Submarines use periscopes to look above the water surface.\n\n### Key points\n\n- Plane mirror images are virtual, erect and the same size as the object.\n- The image is as far behind the mirror as the object is in front.\n- Images in a plane mirror are laterally inverted."
+            }
+          ],
+          "quiz": {
+            "title": "Reflection of Light Quiz",
+            "description": "Apply the laws of reflection and the properties of plane mirror images.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "If the angle of incidence is 40°, what is the angle of reflection?",
+                "options": [
+                  "50°",
+                  "40°",
+                  "80°",
+                  "90°"
+                ],
+                "correctIndex": 1,
+                "explanation": "By the first law of reflection, the angle of reflection equals the angle of incidence, so it is 40°.",
+                "topic": "reflection-of-light"
+              },
+              {
+                "prompt": "A ray makes an angle of 25° with the surface of a plane mirror. What is the angle of reflection?",
+                "options": [
+                  "25°",
+                  "50°",
+                  "65°",
+                  "115°"
+                ],
+                "correctIndex": 2,
+                "explanation": "The angle of incidence is measured from the normal: 90° − 25° = 65°, so the angle of reflection is also 65°.",
+                "topic": "reflection-of-light"
+              },
+              {
+                "prompt": "Diffused reflection takes place from which surface?",
+                "options": [
+                  "A plane mirror",
+                  "Still water",
+                  "A polished steel plate",
+                  "A sheet of cardboard"
+                ],
+                "correctIndex": 3,
+                "explanation": "Cardboard is rough, so reflected rays scatter in many directions. The other surfaces are smooth and give regular reflection.",
+                "topic": "reflection-of-light"
+              },
+              {
+                "prompt": "A person stands 3 m in front of a plane mirror. What is the distance between the person and the image?",
+                "options": [
+                  "3 m",
+                  "1.5 m",
+                  "6 m",
+                  "9 m"
+                ],
+                "correctIndex": 2,
+                "explanation": "The image is 3 m behind the mirror, so the total distance is 3 + 3 = 6 m.",
+                "topic": "plane-mirror-images"
+              },
+              {
+                "prompt": "How many images are formed when two plane mirrors are placed at 60° to each other?",
+                "options": [
+                  "6",
+                  "5",
+                  "4",
+                  "3"
+                ],
+                "correctIndex": 1,
+                "explanation": "n = (360 ÷ 60) − 1 = 6 − 1 = 5 images.",
+                "topic": "plane-mirror-images"
+              },
+              {
+                "prompt": "Why is AMBULANCE written in reverse on the front of an ambulance?",
+                "options": [
+                  "So drivers ahead can read it correctly in their rear-view mirrors",
+                  "It is a traditional spelling style",
+                  "To make the letters look bigger",
+                  "Because light bends through the windscreen"
+                ],
+                "correctIndex": 0,
+                "explanation": "Mirrors cause lateral inversion, so the reversed word appears correct in a rear-view mirror.",
+                "topic": "plane-mirror-images"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "chemistry",
+      "name": "Chemistry",
+      "description": "Discover what things are made of, how they change, and the chemistry behind fire and metals.",
+      "color": "#8b5cf6",
+      "icon": "flask",
+      "gradeLevel": 8,
+      "chapters": [
+        {
+          "title": "Matter and Its Changes",
+          "description": "Learn how matter exists as solids, liquids and gases, and how it undergoes physical and chemical changes.",
+          "lessons": [
+            {
+              "title": "States of Matter",
+              "topic": "states-of-matter",
+              "summary": "Compare solids, liquids and gases and learn how matter changes from one state to another.",
+              "durationMinutes": 8,
+              "content": "## What is matter?\n\n**Matter** is anything that has mass and occupies space. All matter is made of tiny particles. The three common states of matter are solid, liquid and gas.\n\n## Comparing the three states\n\n- **Solid**: fixed shape and fixed volume. Particles are tightly packed with strong attraction. Examples: stone, ice, an iron plough.\n- **Liquid**: fixed volume but no fixed shape; it takes the shape of its container. Particles can slide past each other. Examples: water, milk, kerosene.\n- **Gas**: no fixed shape or volume. Particles are far apart and move freely, so gases can be compressed easily. Examples: air, steam, LPG vapour.\n\n## Changing states\n\nHeating makes particles move faster; cooling slows them down.\n\n- **Melting**: solid → liquid (ice melts at 0 °C)\n- **Boiling**: liquid → gas (water boils at 100 °C at sea level)\n- **Condensation**: gas → liquid\n- **Freezing**: liquid → solid\n- **Sublimation**: solid → gas directly, as with camphor and naphthalene balls\n\n### Worked example\n\nWhy do wet clothes dry faster on a sunny, windy day, but slowly in the monsoon?\n\nDrying happens by **evaporation**: water particles at the surface gain enough energy to escape as vapour, even below 100 °C. Heat, wind and spreading the clothes out all speed up evaporation. In the monsoon the air is already full of water vapour (high **humidity**), so evaporation is slow.\n\n## Compressibility\n\nGases are the most compressible state. A large amount of cooking gas is squeezed into a small LPG cylinder, where it is stored as a liquid under pressure.\n\n### Key points\n\n- Solids have a fixed shape; liquids have a fixed volume; gases have neither.\n- Heating and cooling change matter from one state to another.\n- Evaporation happens at all temperatures and is faster with heat and wind."
+            },
+            {
+              "title": "Physical and Chemical Changes",
+              "topic": "physical-chemical-changes",
+              "summary": "Tell apart changes that form new substances from those that do not.",
+              "durationMinutes": 8,
+              "content": "## Physical changes\n\nIn a **physical change**, a substance changes its size, shape or state, but **no new substance** is formed. Many physical changes can be reversed. Examples: melting ice, dissolving sugar in water, chopping vegetables, folding paper.\n\n**Crystallisation**, where large pure crystals of a substance such as alum or copper sulphate are obtained from its solution, is also a physical change.\n\n## Chemical changes\n\nIn a **chemical change**, one or more **new substances** with different properties are formed. Most chemical changes cannot be reversed easily. Signs of a chemical change include:\n\n- Heat or light given out or absorbed\n- A change in colour\n- A gas being produced\n- A change in smell\n- A solid (precipitate) forming\n\nExamples: burning wood, cooking food, milk turning into curd and iron rusting.\n\n## Rusting\n\n`Iron + oxygen + water → rust (iron oxide)`\n\nRust is flaky and weakens iron. Iron tools left out in the rain rust quickly. We can prevent rusting by painting, oiling or greasing, or by **galvanisation** (coating iron with zinc).\n\n### Worked example: baking soda and vinegar\n\nAdd a spoonful of baking soda to some vinegar in a glass. It fizzes and bubbles.\n\n1. The bubbles are a new substance, **carbon dioxide** gas.\n2. Pass this gas through lime water and the lime water turns milky, which confirms it is carbon dioxide.\n3. Since new substances are formed, this is a **chemical change**.\n\n### Key points\n\n- Physical changes do not form new substances.\n- Chemical changes form new substances, often with gas, heat or a colour change.\n- Rusting needs both oxygen and water."
+            }
+          ],
+          "quiz": {
+            "title": "Matter and Changes Quiz",
+            "description": "Check your understanding of states of matter and types of changes.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which state of matter has a fixed volume but no fixed shape?",
+                "options": [
+                  "Gas",
+                  "Solid",
+                  "Plasma",
+                  "Liquid"
+                ],
+                "correctIndex": 3,
+                "explanation": "A liquid keeps its volume but takes the shape of its container.",
+                "topic": "states-of-matter"
+              },
+              {
+                "prompt": "Camphor changing directly from solid to vapour is called:",
+                "options": [
+                  "Sublimation",
+                  "Evaporation",
+                  "Melting",
+                  "Condensation"
+                ],
+                "correctIndex": 0,
+                "explanation": "Sublimation is the direct change from solid to gas without becoming a liquid.",
+                "topic": "states-of-matter"
+              },
+              {
+                "prompt": "Why do clothes dry slowly during the monsoon?",
+                "options": [
+                  "The sun is hotter in the monsoon",
+                  "The air already contains a lot of water vapour",
+                  "Water boils at a lower temperature",
+                  "Wind stops completely in the monsoon"
+                ],
+                "correctIndex": 1,
+                "explanation": "High humidity means the air is nearly saturated with water vapour, so evaporation from the clothes is slow.",
+                "topic": "states-of-matter"
+              },
+              {
+                "prompt": "Which of the following is a chemical change?",
+                "options": [
+                  "Melting of butter",
+                  "Dissolving salt in water",
+                  "Curdling of milk",
+                  "Tearing paper"
+                ],
+                "correctIndex": 2,
+                "explanation": "Milk turning into curd forms new substances that cannot be turned back into milk. The others are physical changes.",
+                "topic": "physical-chemical-changes"
+              },
+              {
+                "prompt": "What does iron need in order to rust?",
+                "options": [
+                  "Oxygen only",
+                  "Water only",
+                  "Sunlight and heat",
+                  "Both oxygen and water"
+                ],
+                "correctIndex": 3,
+                "explanation": "Rusting needs both oxygen and water (moisture). Iron in dry air or in boiled, oil-covered water does not rust.",
+                "topic": "physical-chemical-changes"
+              },
+              {
+                "prompt": "Which gas is produced when baking soda reacts with vinegar?",
+                "options": [
+                  "Carbon dioxide",
+                  "Oxygen",
+                  "Hydrogen",
+                  "Nitrogen"
+                ],
+                "correctIndex": 0,
+                "explanation": "The reaction releases carbon dioxide, which turns lime water milky.",
+                "topic": "physical-chemical-changes"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Metals and Non-metals",
+          "description": "Compare the physical and chemical properties of metals and non-metals and their uses in daily life.",
+          "lessons": [
+            {
+              "title": "Properties of Metals and Non-metals",
+              "topic": "metal-properties",
+              "summary": "Compare the physical properties of metals and non-metals and learn the key exceptions.",
+              "durationMinutes": 8,
+              "content": "## Physical properties of metals\n\n- **Lustre**: metals are shiny when freshly cut or polished.\n- **Malleability**: they can be beaten into thin sheets, like aluminium foil or the silver varq on sweets.\n- **Ductility**: they can be drawn into thin wires, like copper wires.\n- **Conductivity**: they are good conductors of heat and electricity, which is why cooking pots are made of aluminium or steel.\n- **Sonority**: they make a ringing sound when struck, like a temple bell or a school bell.\n- Most metals are hard and solid at room temperature.\n\n## Physical properties of non-metals\n\nNon-metals are usually dull, **brittle** (they break into pieces when hammered), poor conductors and not sonorous. Examples include sulphur, carbon (coal), phosphorus, iodine and oxygen.\n\n## Important exceptions\n\n- **Mercury** is a metal but is liquid at room temperature.\n- **Sodium** and **potassium** are metals soft enough to cut with a knife.\n- **Graphite**, a form of carbon, is a non-metal that conducts electricity.\n- **Iodine** is a non-metal that has lustre.\n\n### Worked example: the blacksmith's test\n\nA village blacksmith hammers two unknown pieces.\n\n1. The first piece flattens into a sheet and rings when struck. It is **malleable** and **sonorous**, so it is a metal.\n2. The second piece crumbles into powder. It is **brittle**, so it is a non-metal, such as a lump of sulphur or coal.\n\n## Why pan handles are not metal\n\nMetal pans conduct heat well, so their handles are made of wood or plastic, which are poor conductors, to protect our hands.\n\n### Key points\n\n- Metals are lustrous, malleable, ductile, sonorous and good conductors.\n- Non-metals are usually dull, brittle and poor conductors.\n- Mercury (a liquid metal) and graphite (a conducting non-metal) are exceptions."
+            },
+            {
+              "title": "Chemical Reactions of Metals and Non-metals",
+              "topic": "metal-reactions",
+              "summary": "See how metals and non-metals react with oxygen, water and acids, and learn about displacement.",
+              "durationMinutes": 10,
+              "content": "## Reaction with oxygen\n\nMetals burn in oxygen to form **metal oxides**, which are **basic**. A solution of a metal oxide turns red litmus blue. For example, magnesium ribbon burns with a dazzling white light:\n\n`Magnesium + oxygen → magnesium oxide`\n\nNon-metals burn in oxygen to form **acidic oxides**. Sulphur burns to form sulphur dioxide, which dissolves in water to form sulphurous acid. This turns blue litmus red.\n\n## Reaction with water\n\n- **Sodium** reacts vigorously with water and air, so it is stored in kerosene.\n- **Phosphorus** catches fire in air, so it is stored in water.\n- **Iron** reacts slowly with air and water, which causes rusting.\n\n## Reaction with acids\n\nMany metals react with dilute acids to produce **hydrogen gas**:\n\n`Zinc + dilute hydrochloric acid → zinc chloride + hydrogen`\n\nHydrogen burns with a \"pop\" sound when a lit matchstick is brought near. Non-metals usually do not react with dilute acids.\n\n## Displacement reactions\n\nA more reactive metal pushes out, or **displaces**, a less reactive metal from its salt solution.\n\n### Worked example\n\nPlace an iron nail in blue copper sulphate solution and leave it for some time.\n\n1. The nail gets a brownish coating of copper.\n2. The blue solution turns light green.\n\n`Iron + copper sulphate → iron sulphate + copper`\n\nThis happens because iron is more reactive than copper. If you put copper in iron sulphate solution, nothing happens.\n\nPart of the reactivity order: sodium > magnesium > zinc > iron > copper.\n\n### Key points\n\n- Metal oxides are basic; non-metal oxides are acidic.\n- Many metals react with dilute acids to release hydrogen.\n- A more reactive metal displaces a less reactive one from its salt solution."
+            }
+          ],
+          "quiz": {
+            "title": "Metals and Non-metals Quiz",
+            "description": "Test your knowledge of how metals and non-metals look, behave and react.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which property allows a metal to be drawn into thin wires?",
+                "options": [
+                  "Sonority",
+                  "Malleability",
+                  "Lustre",
+                  "Ductility"
+                ],
+                "correctIndex": 3,
+                "explanation": "Ductility is the ability to be drawn into wires. Malleability is about beating into sheets.",
+                "topic": "metal-properties"
+              },
+              {
+                "prompt": "Which metal is a liquid at room temperature?",
+                "options": [
+                  "Sodium",
+                  "Mercury",
+                  "Aluminium",
+                  "Iron"
+                ],
+                "correctIndex": 1,
+                "explanation": "Mercury is the only common metal that is liquid at room temperature.",
+                "topic": "metal-properties"
+              },
+              {
+                "prompt": "Which non-metal is a good conductor of electricity?",
+                "options": [
+                  "Graphite",
+                  "Sulphur",
+                  "Iodine",
+                  "Phosphorus"
+                ],
+                "correctIndex": 0,
+                "explanation": "Graphite, a form of carbon, conducts electricity and is used in pencil leads and battery electrodes.",
+                "topic": "metal-properties"
+              },
+              {
+                "prompt": "What is the nature of the oxide formed when sulphur burns?",
+                "options": [
+                  "Basic",
+                  "Neutral",
+                  "Acidic",
+                  "Salty"
+                ],
+                "correctIndex": 2,
+                "explanation": "Non-metal oxides like sulphur dioxide form acids in water and turn blue litmus red.",
+                "topic": "metal-reactions"
+              },
+              {
+                "prompt": "Why is sodium stored in kerosene?",
+                "options": [
+                  "It reacts vigorously with air and water",
+                  "It melts at room temperature",
+                  "It is too heavy to store in air",
+                  "It gives off a bad smell"
+                ],
+                "correctIndex": 0,
+                "explanation": "Sodium reacts violently with oxygen and moisture, so it is kept under kerosene to keep air and water away.",
+                "topic": "metal-reactions"
+              },
+              {
+                "prompt": "An iron nail is placed in copper sulphate solution. What happens?",
+                "options": [
+                  "Nothing happens",
+                  "The nail gets coated with copper and the solution turns light green",
+                  "The solution turns dark blue",
+                  "The nail dissolves and hydrogen is released"
+                ],
+                "correctIndex": 1,
+                "explanation": "Iron is more reactive than copper, so it displaces copper, forming green iron sulphate solution.",
+                "topic": "metal-reactions"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Combustion and Flame",
+          "description": "Learn how substances burn, how flames are structured, and how to choose cleaner fuels.",
+          "lessons": [
+            {
+              "title": "Combustion and Its Types",
+              "topic": "combustion",
+              "summary": "Understand what burning needs, the types of combustion and how fires are controlled.",
+              "durationMinutes": 8,
+              "content": "## What is combustion?\n\n**Combustion** is a chemical process in which a substance reacts with oxygen to give off heat, and often light. The substance that burns is called a **fuel** or a **combustible** substance. Wood, cow-dung cakes, LPG, kerosene and paper are combustible; stone, glass and iron nails are not.\n\n## Three conditions for combustion\n\n1. A **fuel**\n2. **Oxygen** (from air), which supports combustion\n3. Enough **heat** to reach the **ignition temperature**, the lowest temperature at which a substance catches fire\n\nRemove any one of these and the fire goes out.\n\n### Worked example: the paper cup of water\n\nA paper cup filled with water can be held over a candle flame without burning.\n\n- The water absorbs the heat from the flame.\n- This keeps the paper below its ignition temperature.\n- Only when the water has boiled away does the paper catch fire.\n\n## Types of combustion\n\n- **Rapid combustion**: the fuel burns quickly, giving heat and light, like LPG on a gas stove.\n- **Spontaneous combustion**: a substance bursts into flame without any apparent cause, like white phosphorus at room temperature.\n- **Explosion**: a sudden reaction producing heat, light and sound, like firecrackers.\n\n## Controlling fire\n\nWater is the most common fire extinguisher. It cools the burning material below its ignition temperature, and the steam formed cuts off air. But **never** use water on electrical fires or oil fires. Water conducts electricity, and burning oil floats on water and spreads. For these, use a carbon dioxide extinguisher: CO₂ is heavier than air, so it blankets the fire and cuts off oxygen.\n\n### Key points\n\n- Combustion needs fuel, oxygen and heat.\n- Ignition temperature is the lowest temperature at which a substance catches fire.\n- Do not use water on oil or electrical fires."
+            },
+            {
+              "title": "Flame and Fuels",
+              "topic": "flame-and-fuels",
+              "summary": "Explore the zones of a flame, what makes a good fuel and the effects of burning fuels.",
+              "durationMinutes": 10,
+              "content": "## Zones of a candle flame\n\n1. **Innermost zone** (dark): unburnt wax vapour; the least hot part.\n2. **Middle zone** (yellow, luminous): partial combustion; glowing carbon particles give light.\n3. **Outermost zone** (blue, non-luminous): complete combustion; the **hottest** part.\n\nGoldsmiths blow air on the outermost zone of a flame through a metal pipe to melt gold and silver.\n\n## Qualities of a good fuel\n\n- Easily available and cheap\n- Burns easily at a moderate rate\n- Has a high **calorific value**\n- Leaves little ash and causes little pollution\n\n## Calorific value\n\nThe **calorific value** of a fuel is the heat produced by completely burning 1 kg of it, measured in **kJ/kg**.\n\n- Cow-dung cake: 6,000–8,000 kJ/kg\n- Wood: 17,000–22,000 kJ/kg\n- Coal: 25,000–33,000 kJ/kg\n- LPG: 55,000 kJ/kg\n- Hydrogen: 1,50,000 kJ/kg\n\n### Worked example\n\nA family burns 10 kg of wood a day at about 20,000 kJ/kg, giving 10 × 20,000 = 2,00,000 kJ. How much LPG gives the same heat?\n\n2,00,000 ÷ 55,000 ≈ 3.6 kg\n\nLPG gives the same heat from far less fuel, with almost no smoke.\n\n## Harmful effects of burning fuels\n\n- **Carbon dioxide** adds to global warming.\n- **Carbon monoxide** is poisonous; never sleep in a closed room with a burning coal stove.\n- **Sulphur dioxide** and **nitrogen oxides** cause acid rain.\n- Smoke from chulhas harms the lungs; cleaner fuels like LPG and biogas are safer.\n\n### Key points\n\n- The outermost zone of a flame is the hottest.\n- Calorific value is measured in kJ/kg; higher is better.\n- LPG and biogas are cleaner than wood and dung cakes."
+            }
+          ],
+          "quiz": {
+            "title": "Combustion and Flame Quiz",
+            "description": "Check what you know about burning, fire safety and fuels.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which of these is NOT required for combustion?",
+                "options": [
+                  "Fuel",
+                  "Oxygen",
+                  "Carbon dioxide",
+                  "Heat to reach the ignition temperature"
+                ],
+                "correctIndex": 2,
+                "explanation": "Combustion needs fuel, oxygen and heat. Carbon dioxide is a product of burning and is actually used to put fires out.",
+                "topic": "combustion"
+              },
+              {
+                "prompt": "Why should water not be used to put out an oil fire?",
+                "options": [
+                  "Oil floats on water, so the fire spreads",
+                  "Water turns into hydrogen and burns",
+                  "Water is too cold for oil",
+                  "Water raises the ignition temperature of oil"
+                ],
+                "correctIndex": 0,
+                "explanation": "Oil is lighter than water and floats on top, so throwing water spreads the burning oil around.",
+                "topic": "combustion"
+              },
+              {
+                "prompt": "A paper cup with water does not burn over a candle because:",
+                "options": [
+                  "Paper is not combustible",
+                  "Water keeps the paper below its ignition temperature",
+                  "The candle flame has no oxygen",
+                  "Water increases the oxygen supply"
+                ],
+                "correctIndex": 1,
+                "explanation": "The water absorbs heat, so the paper cannot reach the temperature needed to catch fire.",
+                "topic": "combustion"
+              },
+              {
+                "prompt": "Which is the hottest zone of a candle flame?",
+                "options": [
+                  "Innermost dark zone",
+                  "Middle luminous zone",
+                  "Outermost non-luminous zone",
+                  "All zones are equally hot"
+                ],
+                "correctIndex": 2,
+                "explanation": "Complete combustion happens in the outermost blue zone, making it the hottest.",
+                "topic": "flame-and-fuels"
+              },
+              {
+                "prompt": "In which unit is calorific value measured?",
+                "options": [
+                  "kJ/kg",
+                  "kg/m³",
+                  "N/m²",
+                  "°C"
+                ],
+                "correctIndex": 0,
+                "explanation": "Calorific value is the heat (kJ) produced by burning 1 kg of fuel, so its unit is kJ/kg.",
+                "topic": "flame-and-fuels"
+              },
+              {
+                "prompt": "Which of these fuels has the highest calorific value?",
+                "options": [
+                  "Wood",
+                  "Cow-dung cake",
+                  "Coal",
+                  "LPG"
+                ],
+                "correctIndex": 3,
+                "explanation": "LPG gives about 55,000 kJ/kg, more than coal, wood or dung cakes.",
+                "topic": "flame-and-fuels"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "biology",
+      "name": "Biology",
+      "description": "Study living things, from the tiny cell and invisible microbes to the crops that feed us.",
+      "color": "#10b981",
+      "icon": "leaf",
+      "gradeLevel": 8,
+      "chapters": [
+        {
+          "title": "Cell: Structure and Functions",
+          "description": "Explore the cell as the building block of life and compare plant and animal cells.",
+          "lessons": [
+            {
+              "title": "The Cell: Unit of Life",
+              "topic": "cell-basics",
+              "summary": "Learn what cells are, how they were discovered and the three main parts of every cell.",
+              "durationMinutes": 8,
+              "content": "## What is a cell?\n\nThe **cell** is the basic structural and functional unit of all living things. Robert Hooke discovered cells in 1665 when he observed thin slices of cork under a simple microscope and saw tiny box-like compartments.\n\nSome organisms, like Amoeba, Paramecium and bacteria, are made of just one cell. They are **unicellular**. Others, like humans and mango trees, are made of millions of cells. They are **multicellular**.\n\n## Size and shape\n\nMost cells are too small to see without a microscope. The smallest are bacterial cells, while an ostrich egg is the largest single cell. Shape depends on the job a cell does: nerve cells are long and branched to carry messages.\n\n## Three main parts of a cell\n\n1. **Cell membrane**: a thin outer boundary that controls what enters and leaves the cell.\n2. **Cytoplasm**: a jelly-like fluid between the membrane and the nucleus.\n3. **Nucleus**: the control centre of the cell. It contains **chromosomes**, which carry **genes** that pass traits from parents to offspring.\n\n## Prokaryotes and eukaryotes\n\nCells without a well-defined nuclear membrane, like bacteria and blue-green algae, are **prokaryotic**. Cells with a proper nucleus enclosed by a membrane are **eukaryotic**.\n\n### Worked example: observing onion peel\n\n1. Peel a thin, transparent layer from the inside of an onion scale.\n2. Place it on a glass slide in a drop of water.\n3. Add a drop of iodine or safranin stain.\n4. Cover it with a coverslip and view it under a microscope.\n\nYou will see brick-shaped cells arranged side by side, each with a stained nucleus.\n\n### Key points\n\n- The cell is the basic unit of life.\n- The cell membrane, cytoplasm and nucleus are the three main parts.\n- Bacteria are prokaryotes because they lack a nuclear membrane."
+            },
+            {
+              "title": "Plant and Animal Cells",
+              "topic": "plant-animal-cells",
+              "summary": "Compare plant and animal cells and see how cells build tissues and organs.",
+              "durationMinutes": 8,
+              "content": "## What they share\n\nBoth plant and animal cells have a cell membrane, cytoplasm, a nucleus and mitochondria.\n\n## What makes plant cells different\n\n- **Cell wall**: a rigid layer outside the cell membrane, made mainly of **cellulose**. It gives the cell strength and shape and protects it. This is why a sugarcane stalk or a tree trunk is stiff.\n- **Plastids**: green plastids called **chloroplasts** contain **chlorophyll**, which traps sunlight for photosynthesis.\n- **Large central vacuole**: a big sac filled with cell sap that keeps the cell firm.\n\nAnimal cells have **no cell wall** and **no chloroplasts**, and their vacuoles are small.\n\n## Why plants need a cell wall\n\nPlants cannot move away from heat, wind or dry weather. The cell wall gives them extra protection and support so they can stand upright.\n\n### Worked example: identify the cell\n\nA student sees these features under a microscope: a thick outer boundary, many green bodies and a large clear space in the middle of each cell.\n\n1. Thick outer boundary → cell wall\n2. Green bodies → chloroplasts\n3. Large clear space → central vacuole\n\nConclusion: these are **plant cells**, probably from a leaf. Cells from the inside of your cheek, by contrast, are irregular in shape with no wall and no green bodies, so they are animal cells.\n\n## From cells to organisms\n\nSimilar cells group together to form a **tissue**. Tissues form **organs** such as the heart or a leaf, and organs work together as **organ systems**.\n\nCell → tissue → organ → organ system → organism\n\n### Key points\n\n- Only plant cells have a cell wall and chloroplasts.\n- Plant cells have a large central vacuole; animal cells have small ones.\n- Cells form tissues, tissues form organs, and organs form organ systems."
+            }
+          ],
+          "quiz": {
+            "title": "Cell Structure Quiz",
+            "description": "Test your knowledge of cells and their parts.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Who first observed and named cells?",
+                "options": [
+                  "Robert Hooke",
+                  "Charles Darwin",
+                  "Louis Pasteur",
+                  "Isaac Newton"
+                ],
+                "correctIndex": 0,
+                "explanation": "Robert Hooke observed cork cells under a microscope in 1665 and called them cells.",
+                "topic": "cell-basics"
+              },
+              {
+                "prompt": "Which part of the cell controls its activities?",
+                "options": [
+                  "Cell membrane",
+                  "Cytoplasm",
+                  "Nucleus",
+                  "Vacuole"
+                ],
+                "correctIndex": 2,
+                "explanation": "The nucleus is the control centre and contains the chromosomes that direct the cell's activities.",
+                "topic": "cell-basics"
+              },
+              {
+                "prompt": "Organisms whose cells lack a well-defined nuclear membrane are called:",
+                "options": [
+                  "Eukaryotes",
+                  "Prokaryotes",
+                  "Multicellular organisms",
+                  "Protozoa"
+                ],
+                "correctIndex": 1,
+                "explanation": "Prokaryotes, such as bacteria, have nuclear material that is not enclosed by a membrane.",
+                "topic": "cell-basics"
+              },
+              {
+                "prompt": "Which structure is found in plant cells but not in animal cells?",
+                "options": [
+                  "Nucleus",
+                  "Cell membrane",
+                  "Chloroplast",
+                  "Mitochondria"
+                ],
+                "correctIndex": 2,
+                "explanation": "Chloroplasts are present only in plant cells. The other parts are found in both.",
+                "topic": "plant-animal-cells"
+              },
+              {
+                "prompt": "The plant cell wall is made mainly of:",
+                "options": [
+                  "Protein",
+                  "Cellulose",
+                  "Fat",
+                  "Chlorophyll"
+                ],
+                "correctIndex": 1,
+                "explanation": "The plant cell wall is made mainly of cellulose, which makes it strong and rigid.",
+                "topic": "plant-animal-cells"
+              },
+              {
+                "prompt": "Which is the correct order of organisation in a multicellular organism?",
+                "options": [
+                  "Tissue → cell → organ → organ system",
+                  "Cell → organ → tissue → organ system",
+                  "Organ → tissue → cell → organ system",
+                  "Cell → tissue → organ → organ system"
+                ],
+                "correctIndex": 3,
+                "explanation": "Cells form tissues, tissues form organs, and organs form organ systems.",
+                "topic": "plant-animal-cells"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Microorganisms: Friend and Foe",
+          "description": "Discover the invisible world of microbes and how they help and harm us.",
+          "lessons": [
+            {
+              "title": "Types of Microorganisms",
+              "topic": "microorganism-types",
+              "summary": "Meet the five major groups of microorganisms and where they live.",
+              "durationMinutes": 8,
+              "content": "## Tiny living things\n\n**Microorganisms** (or microbes) are living things too small to be seen with the naked eye. We need a microscope to see them. They live almost everywhere: in soil, water and air, inside our bodies, and even in hot springs and ice.\n\n## Five major groups\n\n1. **Bacteria**: single-celled organisms. Lactobacillus, which turns milk into curd, is a bacterium.\n2. **Fungi**: include bread mould, yeast and mushrooms.\n3. **Protozoa**: single-celled organisms such as Amoeba, Paramecium and Plasmodium, which causes malaria.\n4. **Algae**: green organisms such as Chlamydomonas and Spirogyra that make their own food by photosynthesis. You often see them as green slime in ponds.\n5. **Viruses**: very tiny particles that reproduce only inside the cells of a host. They cause diseases like the common cold, influenza, polio and chickenpox.\n\nMicroorganisms may be **unicellular**, like bacteria and many protozoa, or **multicellular**, like many algae and fungi.\n\n## Viruses are special\n\nViruses are different from the other groups. Outside a host they behave like non-living particles. Only after entering a living cell do they multiply and show signs of life.\n\n### Worked example: growing bread mould\n\n1. Moisten a slice of bread and keep it in a warm, dark place.\n2. After two or three days, whitish-grey cottony patches appear on it.\n3. These patches are **bread mould**, a fungus.\n\nSpores of the fungus were floating in the air. They landed on the bread and grew because it was warm and moist. Keeping bread dry and cool slows this growth.\n\n### Key points\n\n- The five groups are bacteria, fungi, protozoa, algae and viruses.\n- Microbes live almost everywhere, even in extreme conditions.\n- Viruses reproduce only inside the cells of a host."
+            },
+            {
+              "title": "Microbes: Friends and Foes",
+              "topic": "useful-harmful-microbes",
+              "summary": "Learn how microbes help us in food, medicine and farming, and how some cause disease.",
+              "durationMinutes": 10,
+              "content": "## Useful microorganisms\n\n- **Curd**: the bacterium Lactobacillus turns milk into curd.\n- **Baking**: yeast releases **carbon dioxide** gas, which makes dough rise for bread and bhature.\n- **Fermentation**: yeast converts sugar into alcohol. Louis Pasteur discovered fermentation.\n- **Medicines**: **antibiotics** such as penicillin are made from microbes. Alexander Fleming discovered penicillin from a mould.\n- **Vaccines**: made from dead or weakened microbes, vaccines train the body to fight diseases like polio and measles.\n- **Soil fertility**: **Rhizobium** bacteria in the root nodules of pulses fix nitrogen from the air into the soil.\n- **Cleaning the environment**: microbes decompose dead plants and animal waste into manure.\n\n## Harmful microorganisms\n\n- **Human diseases**: cholera and typhoid (bacteria, through contaminated water), tuberculosis (bacteria, through air), malaria (protozoan, spread by mosquitoes).\n- **Animal diseases**: anthrax (bacteria) and foot-and-mouth disease (virus) in cattle.\n- **Plant diseases**: rust of wheat (fungus) and yellow vein mosaic of bhindi (virus).\n- **Food poisoning**: some microbes spoil food and produce toxins.\n\n## Preserving food\n\nSalt, sugar, oil and vinegar stop microbes from growing, which is why pickles and jams last long. **Pasteurisation** heats milk to about 70 °C for 15–30 seconds and then chills it quickly.\n\n### Worked example\n\nWhy do farmers grow pulses such as moong or chana between cereal crops?\n\n1. Rhizobium in the root nodules of pulses fixes atmospheric nitrogen.\n2. This nitrogen stays in the soil after harvest.\n3. The next crop, such as wheat, needs less fertiliser.\n\n### Key points\n\n- Microbes help make curd, bread, medicines and fertile soil.\n- Many diseases spread through water, air and insects.\n- Salt, sugar, oil and pasteurisation stop microbe growth."
+            }
+          ],
+          "quiz": {
+            "title": "Microorganisms Quiz",
+            "description": "Check your understanding of microbes and their roles.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Malaria is caused by:",
+                "options": [
+                  "A bacterium",
+                  "A virus",
+                  "A protozoan",
+                  "A fungus"
+                ],
+                "correctIndex": 2,
+                "explanation": "Malaria is caused by Plasmodium, a protozoan spread by female Anopheles mosquitoes.",
+                "topic": "microorganism-types"
+              },
+              {
+                "prompt": "Bread mould is an example of:",
+                "options": [
+                  "Algae",
+                  "Fungi",
+                  "Bacteria",
+                  "Protozoa"
+                ],
+                "correctIndex": 1,
+                "explanation": "Bread mould is a fungus that grows from spores in warm, moist conditions.",
+                "topic": "microorganism-types"
+              },
+              {
+                "prompt": "Which microorganisms can reproduce only inside the cells of a host?",
+                "options": [
+                  "Viruses",
+                  "Algae",
+                  "Fungi",
+                  "Protozoa"
+                ],
+                "correctIndex": 0,
+                "explanation": "Viruses need a living host cell to multiply; outside it they behave like non-living particles.",
+                "topic": "microorganism-types"
+              },
+              {
+                "prompt": "Which bacterium converts milk into curd?",
+                "options": [
+                  "Rhizobium",
+                  "Lactobacillus",
+                  "Penicillium",
+                  "Plasmodium"
+                ],
+                "correctIndex": 1,
+                "explanation": "Lactobacillus multiplies in milk and turns it into curd. Rhizobium fixes nitrogen and Penicillium is a mould.",
+                "topic": "useful-harmful-microbes"
+              },
+              {
+                "prompt": "Why does dough rise when yeast is added?",
+                "options": [
+                  "Yeast releases carbon dioxide gas",
+                  "Yeast releases oxygen gas",
+                  "Yeast absorbs water",
+                  "Yeast makes the dough cooler"
+                ],
+                "correctIndex": 0,
+                "explanation": "Yeast respires and releases carbon dioxide, whose bubbles make the dough expand.",
+                "topic": "useful-harmful-microbes"
+              },
+              {
+                "prompt": "How do Rhizobium bacteria help farmers?",
+                "options": [
+                  "By killing insect pests",
+                  "By producing antibiotics",
+                  "By fixing atmospheric nitrogen in root nodules of pulses",
+                  "By making seeds germinate faster"
+                ],
+                "correctIndex": 2,
+                "explanation": "Rhizobium lives in the root nodules of leguminous plants and fixes nitrogen, making the soil more fertile.",
+                "topic": "useful-harmful-microbes"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Crop Production and Management",
+          "description": "Follow a crop from preparing the soil to harvesting and storing the grain.",
+          "lessons": [
+            {
+              "title": "Agricultural Practices",
+              "topic": "agricultural-practices",
+              "summary": "Learn about crop seasons and the steps from preparing the soil to adding manure.",
+              "durationMinutes": 10,
+              "content": "## Crops and seasons\n\nA **crop** is a large number of plants of the same kind grown in one place. In India, crops are grouped by season:\n\n- **Kharif crops** are sown in the rainy season (about June to September): paddy, maize, soyabean, groundnut and cotton.\n- **Rabi crops** are sown in winter (about October to March): wheat, gram, pea, mustard and linseed.\n\n## Steps in crop production\n\n1. **Preparation of soil**: ploughing (tilling) loosens the soil so roots can breathe and grow deep, and it brings nutrients to the top. Tools include the plough, hoe and cultivator. The field is then levelled to prevent soil erosion.\n2. **Sowing**: good-quality seeds are sown at the correct depth and spacing, often with a **seed drill**.\n3. **Adding manure and fertilisers** to replace nutrients used by the previous crop.\n4. **Irrigation**, **weeding**, **harvesting** and **storage** follow.\n\n## Manure vs fertiliser\n\n- **Manure** is organic, made from decomposed plant and animal waste. It improves soil texture and its ability to hold water.\n- **Fertilisers** such as urea and NPK are factory-made chemicals rich in specific nutrients. Overuse harms the soil and pollutes water.\n\n**Crop rotation**, growing pulses and cereals in alternate seasons, is a natural way to restore soil nitrogen.\n\n### Worked example: choosing good seeds\n\nA farmer pours wheat seeds into a bucket of water and stirs.\n\n1. Some seeds float. These are damaged or hollow, so they are lighter than water.\n2. The rest sink. These are healthy and full.\n3. The farmer removes the floating seeds and sows only the ones that sank.\n\n### Key points\n\n- Kharif crops are sown in the rainy season; rabi crops are sown in winter.\n- Ploughing loosens the soil so roots can breathe and grow deep.\n- Manure improves soil texture; fertilisers supply specific nutrients."
+            },
+            {
+              "title": "Irrigation, Harvesting and Storage",
+              "topic": "irrigation-storage",
+              "summary": "See how crops are watered, protected from weeds, harvested and stored safely.",
+              "durationMinutes": 10,
+              "content": "## Irrigation\n\nSupplying water to crops at regular intervals is called **irrigation**. Sources include wells, tube wells, ponds, rivers, canals and dams.\n\nTraditional methods such as the moat (pulley system), chain pump, dhekli and rahat use human or animal power. Today, pumps run on diesel, electricity, biogas or solar power.\n\nTwo modern methods save water:\n\n- **Sprinkler system**: rotating nozzles on pipes spray water like rain. It suits uneven land.\n- **Drip system**: water falls drop by drop directly at the roots. It is ideal for fruit trees and gardens and wastes very little water.\n\n## Weeding\n\n**Weeds** are unwanted plants that compete with the crop for water, nutrients, space and light. They are removed by hand with a khurpi, by tilling before sowing, or by spraying **weedicides**. Farmers should cover their nose and mouth while spraying.\n\n## Harvesting\n\nCutting the mature crop is **harvesting**, done with a sickle or a harvester. Separating the grain from the chaff is **threshing**. On small farms, **winnowing** uses the wind to blow away the lighter chaff.\n\n## Storage\n\nFreshly harvested grain has moisture. It is dried in the sun before storing, because moist grain is attacked by pests, fungi and bacteria. Grain is stored in jute bags or metal bins at home, and in **silos** and **granaries** on a large scale.\n\n### Worked example: drip vs flood\n\nA farmer has 1000 litres of water a day for his orchard. With flood irrigation, roughly half may be lost to evaporation and runoff, so only about 500 litres reach the roots. Drip irrigation delivers about 90%, or roughly 900 litres, where it is needed.\n\n### Key points\n\n- Drip and sprinkler systems save water.\n- Weeds compete with crops and should be removed early.\n- Grain must be dried well before storage."
+            }
+          ],
+          "quiz": {
+            "title": "Crop Production Quiz",
+            "description": "Test your knowledge of farming practices from sowing to storage.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which of these is a rabi crop?",
+                "options": [
+                  "Paddy",
+                  "Maize",
+                  "Wheat",
+                  "Cotton"
+                ],
+                "correctIndex": 2,
+                "explanation": "Wheat is sown in winter, making it a rabi crop. Paddy, maize and cotton are kharif crops.",
+                "topic": "agricultural-practices"
+              },
+              {
+                "prompt": "When seeds are put in water, the ones that float are:",
+                "options": [
+                  "Healthy seeds",
+                  "Damaged or hollow seeds",
+                  "Seeds treated with fertiliser",
+                  "Seeds that need more water"
+                ],
+                "correctIndex": 1,
+                "explanation": "Damaged or hollow seeds are lighter and float, while healthy seeds sink.",
+                "topic": "agricultural-practices"
+              },
+              {
+                "prompt": "What is an advantage of manure over chemical fertilisers?",
+                "options": [
+                  "It improves soil texture and water-holding capacity",
+                  "It is richer in specific nutrients",
+                  "It is made in factories",
+                  "It dissolves quickly in water"
+                ],
+                "correctIndex": 0,
+                "explanation": "Manure adds organic matter that improves soil texture and helps it hold water. Fertilisers are richer in specific nutrients.",
+                "topic": "agricultural-practices"
+              },
+              {
+                "prompt": "Which irrigation method is best for fruit trees in an area with little water?",
+                "options": [
+                  "Flood irrigation",
+                  "Drip irrigation",
+                  "Chain pump",
+                  "Moat"
+                ],
+                "correctIndex": 1,
+                "explanation": "Drip irrigation delivers water drop by drop at the roots, wasting very little.",
+                "topic": "irrigation-storage"
+              },
+              {
+                "prompt": "Separating grain from chaff is called:",
+                "options": [
+                  "Harvesting",
+                  "Sowing",
+                  "Weeding",
+                  "Threshing"
+                ],
+                "correctIndex": 3,
+                "explanation": "Threshing separates grain seeds from the chaff after harvesting.",
+                "topic": "irrigation-storage"
+              },
+              {
+                "prompt": "Why are grains dried in the sun before storage?",
+                "options": [
+                  "To reduce moisture so pests and microbes cannot spoil them",
+                  "To make them heavier",
+                  "To change their colour",
+                  "To add nutrients to them"
+                ],
+                "correctIndex": 0,
+                "explanation": "Moist grain encourages fungi, bacteria and insects. Drying keeps the stored grain safe.",
+                "topic": "irrigation-storage"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "cs",
+      "name": "Computer Science",
+      "description": "Learn to think like a programmer and use technology safely, from algorithms to Python and the Internet.",
+      "color": "#0ea5e9",
+      "icon": "cpu",
+      "gradeLevel": 8,
+      "chapters": [
+        {
+          "title": "Algorithms and Flowcharts",
+          "description": "Learn to break problems into clear steps and represent them visually with flowcharts.",
+          "lessons": [
+            {
+              "title": "What is an Algorithm?",
+              "topic": "algorithms",
+              "summary": "Learn what an algorithm is, its properties and its three building blocks.",
+              "durationMinutes": 8,
+              "content": "## Step-by-step thinking\n\nAn **algorithm** is a finite set of clear, step-by-step instructions for solving a problem. A recipe for making tea is an algorithm: boil water, add tea leaves, add milk and sugar, strain and serve. Computers follow algorithms written as programs.\n\n## Properties of a good algorithm\n\n- **Input**: it takes zero or more values to work on.\n- **Output**: it produces at least one result.\n- **Definiteness**: every step is clear and has only one meaning.\n- **Finiteness**: it must stop after a finite number of steps.\n- **Effectiveness**: every step is simple enough to actually carry out.\n\n### Worked example: the larger of two numbers\n\n1. Start.\n2. Read two numbers `a` and `b`.\n3. If `a > b`, print `a`.\n4. Otherwise, print `b`.\n5. Stop.\n\nTry it with `a = 12` and `b = 7`: step 3 is true, so the output is 12.\n\n### Worked example: a market bill\n\nA shopkeeper at the weekly market wants the total bill for a customer.\n\n1. Start.\n2. Set `total = 0`.\n3. For each item, read its price and add it to `total`.\n4. Print `total`.\n5. Stop.\n\nFor items priced ₹20, ₹35 and ₹15, the total becomes 20, then 55, then 70. The output is ₹70.\n\n## Three building blocks\n\nEvery algorithm is built from just three ideas:\n\n- **Sequence**: steps carried out one after another.\n- **Selection**: choosing between paths using a condition (if … otherwise).\n- **Repetition** (a loop): repeating steps, such as adding each item's price.\n\n### Key points\n\n- An algorithm is a finite, clear, step-by-step procedure.\n- Every algorithm must stop after a finite number of steps.\n- Sequence, selection and repetition are the building blocks of all algorithms."
+            },
+            {
+              "title": "Drawing Flowcharts",
+              "topic": "flowcharts",
+              "summary": "Represent algorithms visually using standard flowchart symbols.",
+              "durationMinutes": 8,
+              "content": "## What is a flowchart?\n\nA **flowchart** is a diagram that shows the steps of an algorithm using standard shapes connected by arrows (→). It makes the logic easy to see and check before writing a program.\n\n## Standard symbols\n\n- **Oval (terminal)**: Start and Stop.\n- **Parallelogram**: Input or Output, such as \"Read marks\" or \"Print result\".\n- **Rectangle (process)**: a calculation or action, such as `sum = a + b`.\n- **Diamond (decision)**: a yes/no question with two exits.\n- **Arrows (flow lines)**: show the direction in which steps are followed.\n\n### Worked example: pass or fail\n\nHere is a flowchart described step by step:\n\n1. Oval: Start\n2. Parallelogram: Input `marks`\n3. Diamond: Is `marks ≥ 33`?\n4. If Yes → Parallelogram: Print \"Pass\"\n5. If No → Parallelogram: Print \"Fail\"\n6. Oval: Stop\n\nWith `marks = 45`, the condition is true, so we follow the Yes arrow and print \"Pass\".\n\n### Worked example: watering a row of plants\n\n1. Start → Process: set `count = 1`\n2. Decision: Is `count ≤ 10`?\n3. If Yes → Process: water plant number `count`, then set `count = count + 1`, and follow the arrow back to the decision.\n4. If No → Stop.\n\nThe arrow going back to the decision box creates a **loop**. Plants 1 to 10 are watered, and the loop ends when `count` becomes 11.\n\n## Tips for neat flowcharts\n\n- Have exactly one Start and at least one Stop.\n- Label both exits of every diamond as Yes and No.\n- Test the flowchart with sample values; this is called a **dry run**.\n\n### Key points\n\n- Oval = start/stop, parallelogram = input/output, rectangle = process, diamond = decision.\n- A decision box always has two exits.\n- An arrow back to an earlier step creates a loop."
+            }
+          ],
+          "quiz": {
+            "title": "Algorithms and Flowcharts Quiz",
+            "description": "Test your ability to think in steps and read flowcharts.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which property says that an algorithm must stop after a finite number of steps?",
+                "options": [
+                  "Definiteness",
+                  "Finiteness",
+                  "Effectiveness",
+                  "Input"
+                ],
+                "correctIndex": 1,
+                "explanation": "Finiteness means the algorithm always ends. Definiteness is about each step being clear.",
+                "topic": "algorithms"
+              },
+              {
+                "prompt": "An algorithm sets total = 0 and then adds the prices 10, 25 and 5 one by one. What is the final total?",
+                "options": [
+                  "35",
+                  "0",
+                  "40",
+                  "25"
+                ],
+                "correctIndex": 2,
+                "explanation": "0 + 10 = 10, 10 + 25 = 35, 35 + 5 = 40.",
+                "topic": "algorithms"
+              },
+              {
+                "prompt": "'If it is raining, take an umbrella; otherwise take a cap.' This is an example of:",
+                "options": [
+                  "Selection",
+                  "Sequence",
+                  "Repetition",
+                  "Output"
+                ],
+                "correctIndex": 0,
+                "explanation": "A choice based on a condition is called selection.",
+                "topic": "algorithms"
+              },
+              {
+                "prompt": "Which flowchart symbol is used for a decision?",
+                "options": [
+                  "Oval",
+                  "Rectangle",
+                  "Parallelogram",
+                  "Diamond"
+                ],
+                "correctIndex": 3,
+                "explanation": "A diamond holds a yes/no question and has two exits.",
+                "topic": "flowcharts"
+              },
+              {
+                "prompt": "Which flowchart symbol is used for input and output?",
+                "options": [
+                  "Parallelogram",
+                  "Diamond",
+                  "Oval",
+                  "Rectangle"
+                ],
+                "correctIndex": 0,
+                "explanation": "Parallelograms show reading input or printing output. Rectangles are for processing.",
+                "topic": "flowcharts"
+              },
+              {
+                "prompt": "In a flowchart, count starts at 1 and a loop runs while count ≤ 5, adding 1 to count each time. How many times does the loop body run?",
+                "options": [
+                  "4",
+                  "5",
+                  "6",
+                  "1"
+                ],
+                "correctIndex": 1,
+                "explanation": "The body runs for count = 1, 2, 3, 4 and 5, which is 5 times. When count becomes 6 the loop stops.",
+                "topic": "flowcharts"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Python Basics: Variables and Data Types",
+          "description": "Start programming in Python by storing values in variables and working with different data types.",
+          "lessons": [
+            {
+              "title": "Variables in Python",
+              "topic": "python-variables",
+              "summary": "Store and update values using variables and the assignment operator in Python.",
+              "durationMinutes": 8,
+              "content": "## What is a variable?\n\nA **variable** is a named place in memory that stores a value. Think of labelled jars in a kitchen: one says \"rice\", another says \"dal\". In Python, you create a variable with the **assignment operator** `=`:\n\n- `crop = \"wheat\"`\n- `bags = 40`\n- `price = 2275.5`\n\nHere `=` does not mean \"equals\" as in maths. It means \"store the value on the right in the name on the left\".\n\n## Rules for naming variables\n\n- Use only letters, digits and the underscore `_`.\n- A name cannot start with a digit: `2bags` is invalid, but `bags2` is fine.\n- No spaces are allowed: write `total_price`, not `total price`.\n- Names are case-sensitive: `Bags` and `bags` are different variables.\n- You cannot use Python keywords such as `if`, `for` or `while`.\n\n## Updating a variable\n\n- `bags = 40`\n- `bags = bags + 10`\n\nPython first works out the right side using the old value (40 + 10), then stores 50 in `bags`.\n\n### Worked example: milk collection\n\nA dairy centre records the milk a farmer brings in the morning and the evening.\n\n- `morning = 12`\n- `evening = 9`\n- `total = morning + evening`\n- `print(total)`\n\nOutput: `21`\n\nIf the rate is ₹35 per litre, then `earning = total * 35` stores 735, so the farmer earns ₹735.\n\n## Input and output\n\n`print()` displays a value on the screen. `input()` reads what the user types, for example `name = input(\"Your name: \")`.\n\n### Key points\n\n- A variable is a name that stores a value.\n- `=` assigns a value; the right side is worked out first.\n- Variable names cannot start with a digit or contain spaces."
+            },
+            {
+              "title": "Data Types and Operators",
+              "topic": "python-data-types",
+              "summary": "Work with integers, decimals, text and True/False values, and use arithmetic operators.",
+              "durationMinutes": 10,
+              "content": "## Common data types\n\n- `int`: whole numbers, such as `25` or `-3`\n- `float`: decimal numbers, such as `3.14` or `72.5`\n- `str`: text inside quotes, such as `\"Hello\"` or `'rice'`\n- `bool`: either `True` or `False`\n\nYou can check a value's type with `type()`. For example, `type(3.5)` tells you the value is a `float`.\n\n## Arithmetic operators\n\n- `+` add, `-` subtract, `*` multiply\n- `/` division, which always gives a float: `7 / 2` → `3.5`\n- `//` floor division, which drops the decimal part: `7 // 2` → `3`\n- `%` remainder: `7 % 2` → `1`\n- `**` power: `2 ** 3` → `8`\n\n## Strings behave differently\n\n- `5 + 5` gives `10`, but `\"5\" + \"5\"` gives `\"55\"` because strings are joined.\n- `\"ab\" * 3` gives `\"ababab\"`.\n\n`input()` always returns a string, so convert it before doing maths: `age = int(input(\"Age: \"))`.\n\n### Worked example: packing mangoes\n\nA farmer has 250 mangoes and each box holds 12.\n\n- `mangoes = 250`\n- `boxes = mangoes // 12`\n- `left = mangoes % 12`\n- `print(boxes, left)`\n\nOutput: `20 10`\n\nCheck: 12 × 20 = 240 and 250 − 240 = 10. So 20 full boxes can be packed and 10 mangoes are left over.\n\n## Comparison operators\n\n`==`, `!=`, `<`, `>`, `<=` and `>=` compare two values and give a `bool`. For example, `10 > 3` gives `True`, and `4 == 5` gives `False`.\n\n### Key points\n\n- `int`, `float`, `str` and `bool` are the basic data types.\n- `/` gives a float, `//` gives floor division and `%` gives the remainder.\n- `input()` returns a string, so convert it before doing arithmetic."
+            }
+          ],
+          "quiz": {
+            "title": "Python Basics Quiz",
+            "description": "Check your understanding of Python variables, data types and operators.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "Which of these is a valid Python variable name?",
+                "options": [
+                  "2crop",
+                  "crop yield",
+                  "crop_yield",
+                  "for"
+                ],
+                "correctIndex": 2,
+                "explanation": "crop_yield uses only letters and an underscore. 2crop starts with a digit, 'crop yield' has a space, and 'for' is a keyword.",
+                "topic": "python-variables"
+              },
+              {
+                "prompt": "After running x = 5 and then x = x + 3, what is the value of x?",
+                "options": [
+                  "8",
+                  "5",
+                  "3",
+                  "53"
+                ],
+                "correctIndex": 0,
+                "explanation": "The right side is worked out first: 5 + 3 = 8, which is then stored in x.",
+                "topic": "python-variables"
+              },
+              {
+                "prompt": "After running a = 4, then b = a * 3, then a = 10, what is the value of b?",
+                "options": [
+                  "30",
+                  "12",
+                  "10",
+                  "4"
+                ],
+                "correctIndex": 1,
+                "explanation": "b was calculated as 4 × 3 = 12 when a was 4. Changing a later does not change b.",
+                "topic": "python-variables"
+              },
+              {
+                "prompt": "What is the value of 17 % 5 in Python?",
+                "options": [
+                  "3",
+                  "2",
+                  "3.4",
+                  "12"
+                ],
+                "correctIndex": 1,
+                "explanation": "% gives the remainder: 17 = 5 × 3 + 2, so the remainder is 2.",
+                "topic": "python-data-types"
+              },
+              {
+                "prompt": "What does print(\"3\" + \"4\") display?",
+                "options": [
+                  "7",
+                  "12",
+                  "Error",
+                  "34"
+                ],
+                "correctIndex": 3,
+                "explanation": "\"3\" and \"4\" are strings, so + joins them to make \"34\" instead of adding numbers.",
+                "topic": "python-data-types"
+              },
+              {
+                "prompt": "What is the data type of the value True?",
+                "options": [
+                  "str",
+                  "int",
+                  "bool",
+                  "float"
+                ],
+                "correctIndex": 2,
+                "explanation": "True and False are the two values of the bool (Boolean) data type.",
+                "topic": "python-data-types"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Internet and Online Safety",
+          "description": "Learn how the Internet works and how to protect yourself while using it.",
+          "lessons": [
+            {
+              "title": "How the Internet Works",
+              "topic": "internet-basics",
+              "summary": "Understand networks, IP addresses, DNS and how data travels in packets.",
+              "durationMinutes": 8,
+              "content": "## A network of networks\n\nA **network** is a group of computers connected to share data. The **Internet** is a worldwide network of networks that links billions of devices, including phones, computers and servers.\n\n## Key ideas\n\n- **IP address**: a unique number that identifies a device on a network, like a postal address. Example: `192.168.1.10`.\n- **Domain name**: an easy-to-remember name for a website, such as `example.com`.\n- **DNS** (Domain Name System): translates domain names into IP addresses, much like the contact list on your phone turns names into numbers.\n- **Packets**: data is broken into small pieces called packets, which travel separately and are put back together at the destination.\n- **Router**: a device that forwards packets towards their destination.\n- **ISP** (Internet Service Provider): the company that connects you to the Internet through mobile towers or fibre cables.\n\n## Internet vs Web\n\nThe **World Wide Web** is one service that runs on the Internet: a collection of web pages you open in a browser.\n\n### Worked example: watching a farming video\n\n1. You type a website name into your browser.\n2. DNS finds the IP address of that website's server.\n3. Your request travels as packets through your mobile tower and many routers to the server.\n4. The server sends the video back in thousands of packets.\n5. Your phone reassembles the packets and plays the video.\n\nIf some packets are lost on a weak signal, they must be sent again. That is why a poor connection causes buffering.\n\n### Key points\n\n- The Internet is a global network of networks.\n- DNS converts domain names into IP addresses.\n- Data travels in packets through routers and is reassembled at the destination."
+            },
+            {
+              "title": "Staying Safe Online",
+              "topic": "online-safety",
+              "summary": "Protect yourself with strong passwords and learn to spot scams and online threats.",
+              "durationMinutes": 8,
+              "content": "## Why online safety matters\n\nWe use the Internet for UPI payments, online classes, government services and chatting with friends. Criminals try to exploit careless users, so a few habits can protect you and your family.\n\n## Strong passwords\n\n- Use at least 12 characters with a mix of capital letters, small letters, numbers and symbols.\n- Avoid your name, birth date or phone number.\n- Use different passwords for different accounts.\n- **Never share an OTP or PIN** with anyone, even someone who claims to be from a bank. Banks never ask for them.\n- Turn on **two-factor authentication** where available.\n\n## Common threats\n\n- **Phishing**: fake messages, calls or websites that pretend to be from a bank or the government to steal your details. For example: \"Your crop subsidy payment is stuck. Click here and enter your Aadhaar number and OTP.\"\n- **Malware**: harmful software hidden in unknown apps or links. Install apps only from official app stores.\n- **Cyberbullying**: harassment through messages or posts. Do not reply; block, report and tell a trusted adult.\n- **Fake news**: check with reliable sources before forwarding a message.\n\n### Worked example: spot the scam\n\nMessage: \"Congratulations! You have won a ₹50,000 lottery. Pay a ₹500 processing fee to claim it today.\"\n\nRed flags:\n\n1. You never entered any lottery.\n2. It asks you to pay money first.\n3. It creates urgency with \"today\".\n\nThe right action is to not pay, not click, and to block and report the sender. In India, cyber fraud can be reported on the national helpline number **1930**.\n\n## Your digital footprint\n\nEverything you post leaves a lasting trace. Think before sharing your location, photos or personal details.\n\n### Key points\n\n- Use strong, unique passwords and never share OTPs.\n- Look for red flags in suspicious messages.\n- Report fraud and cyberbullying, and tell a trusted adult."
+            }
+          ],
+          "quiz": {
+            "title": "Internet and Safety Quiz",
+            "description": "Test your knowledge of how the Internet works and how to stay safe online.",
+            "timeLimitSeconds": 300,
+            "questions": [
+              {
+                "prompt": "What does DNS do?",
+                "options": [
+                  "Stores all the web pages on the Internet",
+                  "Translates domain names into IP addresses",
+                  "Blocks viruses from your phone",
+                  "Increases your internet speed"
+                ],
+                "correctIndex": 1,
+                "explanation": "DNS works like a phone book, converting names such as example.com into the IP addresses computers use.",
+                "topic": "internet-basics"
+              },
+              {
+                "prompt": "Data sent over the Internet is broken into small pieces called:",
+                "options": [
+                  "Packets",
+                  "Files",
+                  "Domains",
+                  "Browsers"
+                ],
+                "correctIndex": 0,
+                "explanation": "Data travels in packets, which are reassembled at the destination.",
+                "topic": "internet-basics"
+              },
+              {
+                "prompt": "True or False: The Internet and the World Wide Web are exactly the same thing.",
+                "options": [
+                  "True",
+                  "False"
+                ],
+                "correctIndex": 1,
+                "explanation": "The Web is one service that runs on the Internet. Email and video calls use the Internet too.",
+                "topic": "internet-basics"
+              },
+              {
+                "prompt": "Which of these is the strongest password?",
+                "options": [
+                  "ravi2009",
+                  "12345678",
+                  "password",
+                  "Kh3t!Mango#27"
+                ],
+                "correctIndex": 3,
+                "explanation": "It is long and mixes capital and small letters, numbers and symbols, and contains no personal details.",
+                "topic": "online-safety"
+              },
+              {
+                "prompt": "A caller says he is from your bank and asks for the OTP you just received. What should you do?",
+                "options": [
+                  "Share it quickly to avoid problems",
+                  "Share only half of it",
+                  "Refuse and hang up, because banks never ask for OTPs",
+                  "Send it by SMS instead"
+                ],
+                "correctIndex": 2,
+                "explanation": "An OTP gives access to your account. Genuine banks never ask for it, so this is a scam.",
+                "topic": "online-safety"
+              },
+              {
+                "prompt": "What is phishing?",
+                "options": [
+                  "A fake message or website that tricks you into revealing personal details",
+                  "A way to speed up the Internet",
+                  "A type of antivirus software",
+                  "An app for catching fish"
+                ],
+                "correctIndex": 0,
+                "explanation": "Phishing uses fake messages or sites that look genuine to steal passwords, OTPs or bank details.",
+                "topic": "online-safety"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
