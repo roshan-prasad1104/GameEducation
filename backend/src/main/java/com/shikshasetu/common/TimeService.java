@@ -17,6 +17,10 @@ public class TimeService {
         this.zone = props.zone();
     }
 
+    public ZoneId zone() {
+        return zone;
+    }
+
     public Instant now() {
         return Instant.now();
     }

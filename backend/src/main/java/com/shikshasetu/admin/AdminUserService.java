@@ -46,6 +46,10 @@ public class AdminUserService {
 
     @Transactional
     public AdminUser create(CreateUserRequest req) {
+        if (req.role() == Role.ADMIN) {
+            throw new ApiException(org.springframework.http.HttpStatus.BAD_REQUEST, "ROLE_NOT_ALLOWED",
+                    "The platform has a single admin account; create students or teachers instead.");
+        }
         String email = req.email().trim().toLowerCase(Locale.ROOT);
         if (users.existsByEmailIgnoreCase(email)) throw ApiException.conflict("An account with this email already exists.");
         User u = users.save(new User(req.name().trim(), email, encoder.encode(req.password()), req.role()));

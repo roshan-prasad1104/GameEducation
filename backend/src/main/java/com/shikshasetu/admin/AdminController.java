@@ -2,6 +2,9 @@ package com.shikshasetu.admin;
 
 import com.shikshasetu.admin.AdminDtos.*;
 import com.shikshasetu.security.CurrentUser;
+import com.shikshasetu.teacher.StudentReportResponse;
+import com.shikshasetu.teacher.StudentReportService;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,13 @@ public class AdminController {
     private final AdminStatsService stats;
     private final AdminUserService users;
     private final AdminContentService content;
+    private final StudentReportService reports;
+
+    /** PDF progress report for any student (admin scope). */
+    @GetMapping("/students/{id}/report.pdf")
+    public ResponseEntity<byte[]> studentReport(@PathVariable Long id) {
+        return StudentReportResponse.of(id, reports.forAdmin(id));
+    }
 
     @GetMapping("/stats")
     public Stats stats() {

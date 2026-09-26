@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pencil, Plus, Search, Trash2, Users } from 'lucide-react';
+import { FileDown, Pencil, Plus, Search, Trash2, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useApi } from '../../hooks/useApi';
 import { adminApi } from '../../services/api';
@@ -62,7 +62,8 @@ const UserForm = ({ user, classes, onDone, onCancel }) => {
         hint={editing ? t('admin.passwordKeep') : t('validation.passwordHint')} />
       {!editing && (
         <Field as="select" label={t('admin.role')} value={form.role} onChange={set('role')}>
-          {['STUDENT', 'TEACHER', 'ADMIN'].map((r) => <option key={r} value={r}>{t(`roles.${r}`)}</option>)}
+          {/* The platform has a single admin account (the server rejects creating another). */}
+          {['STUDENT', 'TEACHER'].map((r) => <option key={r} value={r}>{t(`roles.${r}`)}</option>)}
         </Field>
       )}
       {form.role === 'STUDENT' && (
@@ -103,6 +104,14 @@ export const UsersPage = () => {
   const rows = useMemo(() => (data ?? [])
     .filter((u) => role === 'ALL' || u.role === role)
     .filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(query.trim().toLowerCase())), [data, role, query]);
+
+  const downloadReport = async (u) => {
+    try {
+      await adminApi.studentReport(u.id);
+    } catch {
+      showToast(t('teacherView.reportFailed'), 'error');
+    }
+  };
 
   const remove = async (u) => {
     if (!window.confirm(t('admin.confirmDeleteUser', { name: u.name }))) return;
@@ -160,6 +169,10 @@ export const UsersPage = () => {
                   </td>
                   <td className="px-3 py-3">{u.active ? <Badge tone="success">{t('admin.active')}</Badge> : <Badge tone="danger">{t('admin.inactive')}</Badge>}</td>
                   <td className="px-5 py-3 text-right whitespace-nowrap">
+                    {u.role === 'STUDENT' && (
+                      <Button variant="ghost" size="sm" aria-label={t('teacherView.downloadPdf')} title={t('teacherView.downloadPdf')}
+                        onClick={() => downloadReport(u)}><FileDown className="h-4 w-4" /></Button>
+                    )}
                     <Button variant="ghost" size="sm" aria-label={t('common.edit')} onClick={() => setEditing(u)}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="sm" aria-label={t('common.delete')} disabled={u.id === me.id} onClick={() => remove(u)}><Trash2 className="h-4 w-4" /></Button>
                   </td>

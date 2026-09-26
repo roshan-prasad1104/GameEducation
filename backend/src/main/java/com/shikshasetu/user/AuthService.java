@@ -6,6 +6,7 @@ import com.shikshasetu.school.SchoolService;
 import com.shikshasetu.security.JwtService;
 import com.shikshasetu.user.AuthDtos.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,22 +33,40 @@ public class AuthService {
                 .filter(u -> encoder.matches(req.password(), u.getPasswordHash()))
                 .orElseThrow(() -> new BadCredentialsException("bad credentials"));
         if (!user.isActive()) throw new DisabledException("disabled");
+        // Checked only after the password, so it reveals nothing to someone without the credentials.
+        if (req.role() != null && req.role() != user.getRole()) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "ROLE_MISMATCH",
+                    "This account is not a " + req.role().name().toLowerCase(Locale.ROOT) + " account. Choose the right role and try again.");
+        }
         user.setLastLoginAt(Instant.now());
         return respond(user);
     }
 
-    /** Public self-registration always creates a STUDENT. Teachers and admins are created by an admin. */
+    /** Roles anyone may sign up for. ADMIN is never publicly available: there is one seeded admin. */
+    public static final Set<Role> PUBLIC_ROLES = Set.of(Role.STUDENT, Role.TEACHER);
+
+    /**
+     * Public self-registration: STUDENT (default) or TEACHER. The requested role is validated here,
+     * never trusted; ADMIN is rejected. A new teacher starts without classes, so they see no student
+     * data until an admin assigns them a class.
+     */
     @Transactional
     public AuthResponse register(RegisterRequest req) {
+        Role role = req.role() == null ? Role.STUDENT : req.role();
+        if (!PUBLIC_ROLES.contains(role)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "ROLE_NOT_ALLOWED", "You can only sign up as a student or a teacher.");
+        }
         String email = req.email().trim().toLowerCase(Locale.ROOT);
         if (users.existsByEmailIgnoreCase(email)) {
             throw ApiException.conflict("An account with this email already exists.");
         }
-        User user = users.save(new User(req.name().trim(), email, encoder.encode(req.password()), Role.STUDENT));
-        StudentProfile profile = new StudentProfile(user);
-        profile.setGradeLevel(req.gradeLevel());
-        // No class yet: the student joins one with the class code (onboarding/profile) or an admin places them.
-        profiles.save(profile);
+        User user = users.save(new User(req.name().trim(), email, encoder.encode(req.password()), role));
+        if (role == Role.STUDENT) {
+            StudentProfile profile = new StudentProfile(user);
+            profile.setGradeLevel(req.gradeLevel());
+            // No class yet: the student joins one with the class code (onboarding/profile) or an admin places them.
+            profiles.save(profile);
+        }
         return respond(user);
     }
 

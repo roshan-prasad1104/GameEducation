@@ -40,8 +40,9 @@ async function listWithSnapshot(key, fetcher) {
 // ---------------------------------------------------------------------------
 
 export const authApi = {
-  async login(email, password) {
-    const res = await http.post('/auth/login', { email, password });
+  /** `role` is the role picked on the sign-in screen; the server rejects a mismatch (ROLE_MISMATCH). */
+  async login(email, password, role) {
+    const res = await http.post('/auth/login', { email, password, role });
     tokenStore.set(res.token);
     return res.user;
   },
@@ -176,8 +177,10 @@ export const teacherApi = {
   assignments: (classId) => http.get(`/teacher/assignments${classQuery(classId)}`),
   createAssignment: (data) => http.post('/teacher/assignments', data),
   deleteAssignment: (id) => http.del(`/teacher/assignments/${id}`),
-  /** report: 'students' | 'topics' — CSV for Excel / Power BI. */
-  exportCsv: (report, classId) => http.download(`/teacher/reports/${report}.csv${classQuery(classId)}`, `class-${report}.csv`),
+  /** Topic accuracy as CSV for Excel / Power BI. */
+  exportTopicsCsv: (classId) => http.download(`/teacher/reports/topics.csv${classQuery(classId)}`, 'class-topics.csv'),
+  /** One student's progress report as a PDF (only the teacher's own students). */
+  studentReport: (id) => http.download(`/teacher/students/${id}/report.pdf`, `student-report-${id}.pdf`),
   subjects: () => http.get('/subjects'),
   subject: (id) => http.get(`/subjects/${id}`),
   chapter: (id) => http.get(`/chapters/${id}`),
@@ -187,6 +190,7 @@ export const teacherApi = {
 export const adminApi = {
   stats: () => http.get('/admin/stats'),
   users: () => http.get('/admin/users'),
+  studentReport: (id) => http.download(`/admin/students/${id}/report.pdf`, `student-report-${id}.pdf`),
   schools: () => http.get('/admin/schools'),
   createSchool: (data) => http.post('/admin/schools', data),
   updateSchool: (id, data) => http.put(`/admin/schools/${id}`, data),

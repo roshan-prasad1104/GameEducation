@@ -59,7 +59,18 @@ The Vite dev server proxies `/api` to the backend.
 
 Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. They are all in the teacher's class **Class 8 – Section A** at *Govt. High School, Sundargarh*. The class code is random: the teacher dashboard and the admin **Classes** page show it, and a new student enters it during onboarding (or later in the profile) to join the class.
 
-All roles use the same sign-in form. After sign-in, each role goes to its own dashboard (`/admin`, `/teacher` or `/student`). Pages for other roles redirect back to the user's home, and the API returns 403.
+All roles use the same sign-in form, which has a **Student / Teacher / Admin** selector.
+- The chosen role is sent with the credentials. If it doesn't match the account's real role, the server rejects the sign-in with `ROLE_MISMATCH` and issues no token. The check runs only after the password is verified, so it reveals nothing to someone without the credentials.
+- After sign-in, each role goes to its own dashboard (`/admin`, `/teacher` or `/student`). Pages for other roles redirect back to the user's home, and the API returns 403.
+
+Registration offers **Student / Teacher** only:
+- Students go through onboarding as before.
+- Teachers go straight to their dashboard, which stays empty until an admin assigns them a class.
+
+There is exactly **one admin account** (`admin@shiksha.org`, seeded):
+- Public registration rejects `role=ADMIN` with 400 `ROLE_NOT_ALLOWED`; the requested role is validated on the server, never trusted.
+- The admin **Users** page can only create students and teachers, and the API rejects `ADMIN` there too.
+- No endpoint changes an existing user's role.
 
 The sign-in dialog has a **Demo accounts** list (role + email; click to sign in, passwords are never displayed). It appears:
 - in `npm run dev`;
@@ -138,11 +149,11 @@ Import `docs/postman/ShikshaSetu.postman_collection.json`, or run it from the co
 npx newman run docs/postman/ShikshaSetu.postman_collection.json
 ```
 
-The collection has 39 requests and 70 assertions. It covers:
+The collection has 49 requests and 90 assertions. It covers:
 - auth and RBAC denials;
 - the full student loop, including localized content, quiz answer locking, removal of the old answer-probing endpoint and an idempotent replay;
 - joining a class with its code;
-- the teacher analytics and CSV export, and the admin endpoints.
+- the teacher analytics, the PDF student report and topic CSV, the single-admin rules, and the admin endpoints.
 
 Each run registers a new student, so the demo accounts are left unchanged. It passed against both H2 (`npx newman run … `) and PostgreSQL (`--env-var baseUrl=http://localhost:8085/api`).
 
@@ -158,7 +169,7 @@ Functional changes to existing screens:
 - "Regional Voice" reads the lesson aloud through the browser's speech synthesis.
 - The fictional coin rewards store tab became an XP-history tab.
 - Leaderboard tabs are now weekly, all-time and classmates.
-- Public sign-up is student-only.
+- Sign-in and sign-up have a role selector (sign-up: Student or Teacher only).
 
 ## Features
 
@@ -175,7 +186,7 @@ Functional changes to existing screens:
 - **For You**: recommendations with the evidence behind them (mastery per subject, weak topics).
 - Offline library, sync status, English / हिन्दी / ଓଡ଼ିଆ / తెలుగు interface **and lesson content**, and dark mode.
 
-**Teacher**: their classes (with each class's join code and a class filter), class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking). The Class Reports tab exports the roster and the topic accuracy as CSV (UTF-8, one header row) that opens directly in Excel and loads into Power BI.
+**Teacher**: their classes (with each class's join code and a class filter), class overview (KPIs, average score by subject, score distribution, 14-day activity, completion by subject), students needing support (KMeans segments), a student list with filters, per-student detail with topic accuracy, a weak-topics page, and assignments (a lesson or quiz, to the whole class or one student, with completion tracking). **Student reports are PDFs**: pick a student on the Class Reports tab, or open a student, and press **Download PDF**. Admins can download any student's report from **Users**. The report contains student details, class and teacher, progress, subject performance, recent quizzes, topic accuracy and badges. It only uses tracked data: there is no attendance register, so it shows active days. Topic accuracy is still exported as CSV (UTF-8, one header row) for Excel and Power BI.
 
 **Admin**: platform statistics (users, content, engagement, AI-service health), schools and classes (create, assign a teacher, regenerate join codes), user management (create, edit, deactivate, delete, place a student in a class), and content management (subjects, chapters, lessons, quizzes, questions). Content that students have already completed or answered cannot be deleted.
 
@@ -197,7 +208,7 @@ The interface and the learning content are available in English, हिन्द
 - **Structure:** admins manage **schools** and **classes** on the **Classes** page. A class belongs to a school and has one teacher.
 - **Students:** a student belongs to one class, and the class's teacher is the student's teacher.
 - **Joining a class:** students join with the class's 6-character code during onboarding or later in their profile. An admin can also place a student in a class, or move them, from **Users**. Codes can be regenerated, which invalidates the old one.
-- **Teacher scope:** teachers only see and assign work within the classes they teach. The analytics, weak topics, assignments and CSV exports take an optional `classId`, and a teacher with several classes gets a class picker. The backend enforces this: another teacher's student or class returns 404.
+- **Teacher scope:** teachers only see and assign work within the classes they teach. The analytics, weak topics, assignments and the topic CSV take an optional `classId`, and PDF reports are limited to the teacher's own students (404 otherwise), and a teacher with several classes gets a class picker. The backend enforces this: another teacher's student or class returns 404.
 - **Migrating existing data:** `V4`–`V6` moved the old direct student→teacher links into one class per teacher. Each class sits at the school most of that teacher's students named. Whole-class assignments moved to the class. The migration is tested on H2 and PostgreSQL with pre-migration data (`ClassMigrationTest`).
 
 ## Quiz security
@@ -212,7 +223,7 @@ The interface and the learning content are available in English, हिन्द
 
 ## Charts
 
-The original requirements list Chart.js as the chart library ("Include charts using Chart.js or the chart library already present"). Plotly is only named in the general stack list. All charts therefore stay on the existing Chart.js wrapper, unchanged. Data for external analysis comes from the Power BI/Excel-ready CSV exports rather than a second charting library.
+The original requirements list Chart.js as the chart library ("Include charts using Chart.js or the chart library already present"). Plotly is only named in the general stack list. All charts therefore stay on the existing Chart.js wrapper, unchanged. Data for external analysis comes from the Power BI/Excel-ready topic CSV rather than a second charting library.
 
 ## How the "AI" works (honest version)
 
@@ -222,7 +233,7 @@ The original requirements list Chart.js as the chart library ("Include charts us
 
 ## Architecture notes
 
-- **Auth**: `POST /api/auth/login` returns a JWT (HS256). Passwords are hashed with BCrypt. Roles (`STUDENT`, `TEACHER`, `ADMIN`) are enforced in `SecurityConfig` on every endpoint group, and the React route guards are only for UX. Public registration always creates a student.
+- **Auth**: `POST /api/auth/login` returns a JWT (HS256). Passwords are hashed with BCrypt. Roles (`STUDENT`, `TEACHER`, `ADMIN`) are enforced in `SecurityConfig` on every endpoint group, and the React route guards are only for UX. Login checks the selected role against the account; public registration creates students or teachers only, and there is a single admin.
 - **Idempotency**: lesson completion is unique per student and lesson. Quiz submissions carry a client UUID (`clientAttemptId`, unique per student). Every XP grant has a unique `refKey`. Replaying offline actions therefore never double-counts.
 - **Offline** (`src/lib/offlineStore.js`, `src/lib/sync.js`, `public/sw.js`):
   - The service worker caches the app shell and hashed assets.
@@ -241,7 +252,8 @@ GET  /api/quizzes/{id} · POST /api/quizzes/{id}/session · POST /api/quizzes/{i
 GET  /api/students/me/{dashboard|progress|badges|xp|missions|recommendations|assignments|leaderboard|attempts}
 PUT  /api/students/me/onboarding · PUT /api/students/me/class
 GET  /api/teacher/{overview|students|students/{id}|weak-topics|assignments} · POST/DELETE /api/teacher/assignments
-GET  /api/teacher/classes · /api/teacher/reports/{students|topics}.csv      (teacher views accept ?classId=)
+GET  /api/teacher/classes · /api/teacher/reports/topics.csv      (teacher views accept ?classId=)
+GET  /api/teacher/students/{id}/report.pdf · /api/admin/students/{id}/report.pdf      (application/pdf)
 GET/POST/PUT/DELETE /api/admin/schools · /api/admin/classes · POST /api/admin/classes/{id}/join-code
 GET  /api/admin/{stats|users|content|lessons/{id}|quizzes/{id}} · POST/PUT/DELETE users, subjects, chapters, lessons, quizzes, questions
 ```
@@ -249,16 +261,17 @@ GET  /api/admin/{stats|users|content|lessons/{id}|quizzes/{id}} · POST/PUT/DELE
 ## Tests
 
 ```bash
-cd backend && ./mvnw test                                  # 20 tests (7 classes), see below
+cd backend && ./mvnw test                                  # 23 tests (8 classes), see below
 cd ai-service && .venv/Scripts/python -m pytest -q         # 18 tests: mastery, recommendations, segmentation, validation
 npm run lint && npm run build                              # frontend
 node scripts/check-i18n.mjs                                # UI dictionaries: same keys, placeholders, script
 python scripts/validate_translations.py                    # lesson/quiz translations against the English source
-npx newman run docs/postman/ShikshaSetu.postman_collection.json   # 39 requests / 70 assertions (backend running)
+npx newman run docs/postman/ShikshaSetu.postman_collection.json   # 49 requests / 90 assertions (backend running)
 ```
 
 Backend test classes:
-- `ApiIntegrationTest`: auth, RBAC, the learning loop, idempotent sync, analytics, CSV.
+- `ApiIntegrationTest`: auth, RBAC, the learning loop, idempotent sync, analytics, topic CSV.
+- `AuthRoleAndReportTest`: the 3 × 3 sign-in role matrix, public registration (student, teacher, forged ADMIN), the single admin, and the PDF report (parsed text, content type, file name, teacher/admin/student scoping).
 - `QuizSecurityTest`: no answers in quiz payloads, answer locking, graded locked answers, RBAC.
 - `ContentLocalizationTest`: hi/or/te content, fallback, language-independent grading, localized recommendations and activity.
 - `ClassModelTest`: admin → school → class → teacher → student relationships, and teacher scoping and RBAC.
@@ -268,12 +281,13 @@ Backend test classes:
 
 The PostgreSQL tests start real PostgreSQL binaries through the `io.zonky.test:embedded-postgres` test dependency, so no Docker or local install is needed. The first run downloads them from Maven Central.
 
-End-to-end browser checks were run with Playwright on the production build. They include the offline reload and sync, the teacher and admin flows, CSV downloads, classes, quiz resume, and the student flow in Hindi, Odia and Telugu. They ran through `vite preview` on H2, through the real nginx config, and against the PostgreSQL-backed jar.
+End-to-end browser checks were run with Playwright on the production build. They include the offline reload and sync, the teacher and admin flows, role selection and mismatches, PDF and CSV downloads, classes, quiz resume, and the student flow in Hindi, Odia and Telugu. They ran through `vite preview` on H2, through the real nginx config, and against the PostgreSQL-backed jar.
 
 ## Known limitations
 
 - **Docker:** the images have never been built or run (see *Docker* above for what was verified instead).
 - **Translations:** they were drafted with AI assistance and pass the automated checks, but still need review by native-speaker teachers. Content edited by an admin in English does not update its translations. Teacher-typed text and the XP history stay in the language they were written in.
+- **PDF reports** are generated in English with the built-in Helvetica font (OpenPDF cannot shape Devanagari, Odia or Telugu text). Names typed in those scripts would not render in the PDF; the app screens are unaffected.
 - **Quiz timer:** it is enforced only in the browser (it restarts if the page is reloaded; locked answers are kept).
 - **Recommendations:** with a class of about 8 students, the KMeans segments are indicative only.
 - **Bundle size:** the student bundle is about 845 kB (239 kB gzipped), mostly React, Chart.js and the four UI dictionaries. Teacher and admin screens are code-split. Loading dictionaries per language would be the next optimisation.

@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeacherController {
     private final TeacherService teacher;
+    private final StudentReportService reports;
 
     // classId (optional) narrows a view to one of the teacher's classes; without it all their classes count.
 
@@ -40,15 +41,10 @@ public class TeacherController {
         return teacher.weakTopics(CurrentUser.id(), classId);
     }
 
-    /** One row per student: the roster with performance and support segment. */
-    @GetMapping("/reports/students.csv")
-    public ResponseEntity<byte[]> studentsCsv(@RequestParam(required = false) Long classId) {
-        List<List<?>> rows = teacher.students(CurrentUser.id(), classId).stream().<List<?>>map(s -> Arrays.asList(
-                s.id(), s.name(), s.email(), s.gradeLevel(), s.xp(), s.level(), s.streak(), s.lessonsCompleted(),
-                s.quizAttempts(), s.averageScore(), s.lastActive(), s.activeDays(), s.segment(), s.weakestTopic())).toList();
-        return CsvReport.of("class-students.csv", List.of("student_id", "name", "email", "grade", "xp", "level",
-                "streak_days", "lessons_completed", "quiz_attempts", "average_score_pct", "last_active",
-                "active_days_14d", "segment", "weakest_topic"), rows);
+    /** PDF progress report for one of the teacher's students (404 for anyone else's). */
+    @GetMapping("/students/{id}/report.pdf")
+    public ResponseEntity<byte[]> studentReport(@PathVariable Long id) {
+        return StudentReportResponse.of(id, reports.forTeacher(CurrentUser.id(), id));
     }
 
     /** One row per topic: answer accuracy across the class. */

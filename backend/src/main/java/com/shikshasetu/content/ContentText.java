@@ -19,8 +19,22 @@ public final class ContentText {
 
     private ContentText() {}
 
+    /** Forces a language for work that is not tied to the request's language (e.g. PDF reports). */
+    private static final ThreadLocal<String> OVERRIDE = new ThreadLocal<>();
+
+    public static <T> T inLanguage(String language, java.util.function.Supplier<T> work) {
+        String previous = OVERRIDE.get();
+        OVERRIDE.set(language);
+        try {
+            return work.get();
+        } finally {
+            if (previous == null) OVERRIDE.remove(); else OVERRIDE.set(previous);
+        }
+    }
+
     /** "hi" for "hi", "hi-IN" or "hi-IN,en;q=0.8"; English for anything unsupported. */
     public static String language() {
+        if (OVERRIDE.get() != null) return OVERRIDE.get();
         if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs)) return ENGLISH;
         return parse(attrs.getRequest());
     }

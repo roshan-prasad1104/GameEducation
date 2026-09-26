@@ -77,6 +77,7 @@ export const TeacherDashboard = () => {
   const [saving, setSaving] = useState(false);
   const [assigning, setAssigning] = useState(null);
   const [exporting, setExporting] = useState(null);
+  const [reportStudent, setReportStudent] = useState('');
 
   if (overview.loading && !overview.data) return <LoadingState rows={3} />;
   if (overview.error && !overview.data) return <ErrorState error={overview.error} onRetry={overview.reload} />;
@@ -125,12 +126,14 @@ export const TeacherDashboard = () => {
     }
   };
 
-  const exportCsv = async (report) => {
-    setExporting(report);
+  const download = async (kind) => {
+    if (kind === 'pdf' && !reportStudent) { showToast(t('teacherView.chooseStudentFirst'), 'warn'); return; }
+    setExporting(kind);
     try {
-      await teacherApi.exportCsv(report, classId);
+      if (kind === 'pdf') await teacherApi.studentReport(reportStudent);
+      else await teacherApi.exportTopicsCsv(classId);
     } catch (err) {
-      showToast(err.message, 'error');
+      showToast(kind === 'pdf' ? t('teacherView.reportFailed') : err.message, 'error');
     } finally {
       setExporting(null);
     }
@@ -434,10 +437,15 @@ export const TeacherDashboard = () => {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <span className="text-xs font-semibold text-slate-500 mr-auto">{t('teacherView.exportLabel')}</span>
-            {[['students', t('teacherView.studentReport')], ['topics', t('teacherView.topicReport')]].map(([report, label]) => (
-              <button key={report} type="button" onClick={() => exportCsv(report)} disabled={exporting !== null}
+            <select value={reportStudent} onChange={(e) => setReportStudent(e.target.value)} aria-label={t('teacherView.studentReport')}
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl text-xs text-slate-900 dark:text-white">
+              <option value="">{t('teacherView.chooseStudent')}</option>
+              {roster.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            {[['pdf', t('teacherView.downloadPdf')], ['topics', t('teacherView.topicReport')]].map(([kind, label]) => (
+              <button key={kind} type="button" onClick={() => download(kind)} disabled={exporting !== null}
                 className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5 disabled:opacity-60">
-                {exporting === report ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {exporting === kind ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 {label}
               </button>
             ))}

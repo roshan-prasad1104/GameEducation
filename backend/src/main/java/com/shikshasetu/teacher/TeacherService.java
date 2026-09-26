@@ -57,9 +57,12 @@ public class TeacherService {
 
     /** All of the teacher's classes, or one of them (404 when {@code classId} is not the teacher's class). */
     private ClassData load(Long teacherId, Long classId) {
-        List<StudentProfile> roster = classId == null
+        return load(classId == null
                 ? profiles.findActiveByTeacherId(teacherId)
-                : profiles.findActiveByClassroomId(schools.ownClass(teacherId, classId).getId());
+                : profiles.findActiveByClassroomId(schools.ownClass(teacherId, classId).getId()));
+    }
+
+    private ClassData load(List<StudentProfile> roster) {
         List<Long> ids = roster.stream().map(p -> p.getUser().getId()).toList();
         if (ids.isEmpty()) return new ClassData(roster, Map.of(), Map.of(), List.of());
         Map<Long, List<LessonProgress>> progress = progressRepo.findByStudentIdIn(ids).stream()
@@ -212,7 +215,20 @@ public class TeacherService {
 
     public StudentDetail student(Long teacherId, Long studentId) {
         StudentProfile p = ownStudent(teacherId, studentId);
-        ClassData d = load(teacherId, p.getClassroom().getId());
+        return detail(p, load(teacherId, p.getClassroom().getId()));
+    }
+
+    /** Admin view of any student, analysed within their class (or alone when they have none). */
+    public StudentDetail studentForAdmin(Long studentId) {
+        StudentProfile p = profiles.findByUserId(studentId).orElseThrow(() -> ApiException.notFound("Student"));
+        List<StudentProfile> roster = new ArrayList<>(p.getClassroom() == null ? List.of()
+                : profiles.findActiveByClassroomId(p.getClassroom().getId()));
+        if (roster.stream().noneMatch(x -> x.getId().equals(p.getId()))) roster.add(p);
+        return detail(p, load(roster));
+    }
+
+    private StudentDetail detail(StudentProfile p, ClassData d) {
+        Long studentId = p.getUser().getId();
         StudentRow row = rows(d).list().stream().filter(r -> r.id().equals(studentId)).findFirst()
                 .orElseThrow(() -> ApiException.notFound("Student"));
         AuthUser asStudent = new AuthUser(studentId, p.getUser().getEmail(), p.getUser().getName(), Role.STUDENT);

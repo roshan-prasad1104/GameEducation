@@ -18,9 +18,17 @@ const DEMO_ACCOUNTS = [
   { role: 'STUDENT', email: 'aarav@shiksha.org', password: 'Student@123' },
 ];
 
+/** Roles offered on each screen. There is one admin account, so admin is never offered for sign-up. */
+const LOGIN_ROLES = ['STUDENT', 'TEACHER', 'ADMIN'];
+const REGISTER_ROLES = ['STUDENT', 'TEACHER'];
+
+/** Pre-select the role of the area the user was trying to open (e.g. /teacher/... → Teacher). */
+const roleFromPath = (path = '') => (path.startsWith('/admin') ? 'ADMIN' : path.startsWith('/teacher') ? 'TEACHER' : 'STUDENT');
+
 /**
  * Sign-in / sign-up dialog, shown over the landing page at /login and /register.
- * Public sign-up creates student accounts; teacher and admin accounts are created by an admin.
+ * One form for every role: the chosen role is sent to the server, which checks it against the
+ * account's real role. Public sign-up creates students or teachers; the admin account is seeded.
  */
 export const AuthModal = ({ mode }) => {
   const { language, setLanguage, showToast, login, register, t } = useApp();
@@ -33,6 +41,16 @@ export const AuthModal = ({ mode }) => {
   const [grade, setGrade] = useState(8);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [role, setRole] = useState(() => roleFromPath(location.state?.from));
+  const roles = mode === 'login' ? LOGIN_ROLES : REGISTER_ROLES;
+  const activeRole = roles.includes(role) ? role : 'STUDENT';
+
+  /** Server errors about roles are shown in the UI language. */
+  const errorText = (e) => {
+    if (e.code === 'ROLE_MISMATCH') return t('authModal.roleMismatch', { role: t(`roles.${activeRole}`) });
+    if (e.code === 'ROLE_NOT_ALLOWED') return t('authModal.roleNotAllowed');
+    return e.status === 401 ? t('auth.invalidCredentials') : e.message;
+  };
 
   const close = () => navigate('/');
   const setMode = (m) => { setError(null); navigate(m === 'login' ? '/login' : '/register', { replace: true, state: location.state }); };
@@ -44,9 +62,10 @@ export const AuthModal = ({ mode }) => {
   };
 
   const signInDemo = async (acct) => {
+    setRole(acct.role);
     setSubmitting(true); setError(null);
     try {
-      const u = await login(acct.email, acct.password);
+      const u = await login(acct.email, acct.password, acct.role);
       showToast(t('dashboard.welcome', { name: u.name.split(' ')[0] }), 'success');
       goHome(u);
     } catch (e) {
@@ -62,12 +81,15 @@ export const AuthModal = ({ mode }) => {
     setSubmitting(true); setError(null);
     try {
       const u = mode === 'login'
-        ? await login(email.trim(), password)
-        : await register({ name: name.trim(), email: email.trim(), password, gradeLevel: Number(grade) });
+        ? await login(email.trim(), password, activeRole)
+        : await register({
+          name: name.trim(), email: email.trim(), password, role: activeRole,
+          gradeLevel: activeRole === 'STUDENT' ? Number(grade) : null,
+        });
       showToast(mode === 'login' ? t('dashboard.welcome', { name: u.name.split(' ')[0] }) : t('authModal.accountCreated', { name: u.name.split(' ')[0] }), 'success');
       goHome(u);
     } catch (e) {
-      setError(e.status === 401 ? t('auth.invalidCredentials') : e.message);
+      setError(errorText(e));
     } finally {
       setSubmitting(false);
     }
@@ -124,17 +146,44 @@ export const AuthModal = ({ mode }) => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Role: one form, the server checks the choice against the account */}
+            <div>
+              <p id="role-label" className="block text-xs font-medium text-slate-200 mb-1.5">
+                {mode === 'login' ? t('authModal.signInAs') : t('authModal.registerAs')}
+              </p>
+              <div role="radiogroup" aria-labelledby="role-label" className={`grid gap-2 ${roles.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                {roles.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    role="radio"
+                    aria-checked={activeRole === r}
+                    onClick={() => { setRole(r); setError(null); }}
+                    className={`text-xs font-medium px-2 py-2 rounded-lg border transition-colors ${
+                      activeRole === r
+                        ? 'bg-brand-600/20 border-brand-400 text-white'
+                        : 'bg-slate-900 border-slate-600 text-slate-300 hover:border-brand-400'
+                    }`}
+                  >
+                    {t(`roles.${r}`)}
+                  </button>
+                ))}
+              </div>
+              {mode === 'register' && activeRole === 'TEACHER' && (
+                <p className="mt-1.5 text-[11px] text-slate-400">{t('authModal.teacherSignupHint')}</p>
+              )}
+            </div>
             {mode === 'register' && (
               <>
                 <Field label={t('auth.name')} icon={User}>
                   <input type="text" required value={name} onChange={e => setName(e.target.value)} className="input" placeholder={t('authModal.yourName')} />
                 </Field>
-                <div>
+                {activeRole === 'STUDENT' && <div>
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">{t('authModal.grade')}</label>
                   <select value={grade} onChange={e => setGrade(e.target.value)} className="input">
                     {GRADES.map(g => <option key={g.id} value={g.id.slice(1)}>{t('common.grade', { grade: g.id.slice(1) })} ({t('authModal.ageYears', { age: g.age.replace(' yrs', '') })})</option>)}
                   </select>
-                </div>
+                </div>}
               </>
             )}
             <Field label={t('auth.email')} icon={Mail}>

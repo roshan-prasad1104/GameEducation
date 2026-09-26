@@ -6,15 +6,22 @@ import jakarta.validation.constraints.*;
 public final class AuthDtos {
     private AuthDtos() {}
 
+    /**
+     * {@code role} is the role picked on the sign-in screen. When present, a correct password for an
+     * account with a different role is rejected (ROLE_MISMATCH) and no token is issued. The stored
+     * role is always what the backend authorises with.
+     */
     public record LoginRequest(
             @NotBlank(message = "Email is required") @Email(message = "Enter a valid email") String email,
-            @NotBlank(message = "Password is required") String password) {}
+            @NotBlank(message = "Password is required") String password,
+            Role role) {}
 
     public record RegisterRequest(
             @NotBlank(message = "Name is required") @Size(max = 120) String name,
             @NotBlank(message = "Email is required") @Email(message = "Enter a valid email") @Size(max = 160) String email,
             @NotBlank(message = "Password is required") @Size(min = 8, max = 72, message = "Password must be 8–72 characters") String password,
-            @Min(value = 6, message = "Grade must be 6–12") @Max(value = 12, message = "Grade must be 6–12") Integer gradeLevel) {}
+            @Min(value = 6, message = "Grade must be 6–12") @Max(value = 12, message = "Grade must be 6–12") Integer gradeLevel,
+            Role role) {}
 
     public record OnboardingRequest(
             @NotNull(message = "Grade is required") @Min(6) @Max(12) Integer gradeLevel,

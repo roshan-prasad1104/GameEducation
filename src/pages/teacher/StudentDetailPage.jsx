@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Award, BookOpen, ClipboardList, Flame, Plus, TrendingUp, TriangleAlert } from 'lucide-react';
+import { Award, BookOpen, ClipboardList, Download, Flame, Plus, TrendingUp, TriangleAlert } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useApi } from '../../hooks/useApi';
 import { teacherApi } from '../../services/api';
@@ -11,9 +11,21 @@ import { AssignmentModal } from './AssignmentModal';
 
 export const StudentDetailPage = () => {
   const { studentId } = useParams();
-  const { t } = useApp();
+  const { t, showToast } = useApp();
   const { data, error, loading, reload } = useApi(() => teacherApi.student(studentId), [studentId]);
   const [assignFor, setAssignFor] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadReport = async () => {
+    setDownloading(true);
+    try {
+      await teacherApi.studentReport(studentId);
+    } catch {
+      showToast(t('teacherView.reportFailed'), 'error');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (loading && !data) return <LoadingState rows={3} />;
   if (error && !data) return <ErrorState error={error} onRetry={reload} />;
@@ -23,6 +35,7 @@ export const StudentDetailPage = () => {
     <div className="space-y-5">
       <PageHeader crumbs={[{ label: t('nav.students'), to: '/teacher/students' }]} title={s.name} subtitle={s.email}
         actions={<><SegmentBadge segment={s.segment} />
+          <Button size="sm" variant="ghost" leftIcon={Download} loading={downloading} onClick={downloadReport}>{t('teacherView.downloadPdf')}</Button>
           <Button size="sm" leftIcon={Plus} onClick={() => setAssignFor({ studentId: s.id })}>{t('assignments.assign')}</Button></>} />
       {s.segmentReason && <p className="text-sm text-slate-600 dark:text-slate-300 -mt-3">{s.segmentReason}</p>}
 

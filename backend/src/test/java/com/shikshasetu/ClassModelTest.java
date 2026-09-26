@@ -69,7 +69,8 @@ class ClassModelTest {
         send(get("/api/teacher/students/" + aarav), raviToken, null).andExpect(status().isNotFound());
         assertThat(body(send(get("/api/teacher/students"), sunita, null)).toString()).doesNotContain("\"id\":" + studentId + ",");
         send(get("/api/teacher/overview?classId=" + sunitaClass), raviToken, null).andExpect(status().isNotFound());
-        send(get("/api/teacher/reports/students.csv?classId=" + sunitaClass), raviToken, null).andExpect(status().isNotFound());
+        send(get("/api/teacher/reports/topics.csv?classId=" + sunitaClass), raviToken, null).andExpect(status().isNotFound());
+        send(get("/api/teacher/students/" + aarav + "/report.pdf"), raviToken, null).andExpect(status().isNotFound());
 
         // Assignments stay inside the class
         String lessonBody = "{\"title\":\"Class 7 homework\",\"lessonId\":1}";

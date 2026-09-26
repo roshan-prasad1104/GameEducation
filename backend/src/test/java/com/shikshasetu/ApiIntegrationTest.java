@@ -75,11 +75,16 @@ class ApiIntegrationTest {
     }
 
     @Test
-    void publicRegistrationAlwaysCreatesAStudent() throws Exception {
+    void publicRegistrationCreatesStudentsByDefaultAndNeverAdmins() throws Exception {
         String email = "new-" + UUID.randomUUID() + "@example.com";
-        String body = mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
+        // A forged role=ADMIN is rejected outright (AuthRoleAndReportTest covers the full matrix)
+        mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
                         .content(json.writeValueAsString(Map.of("name", "New Kid", "email", email,
                                 "password", "password123", "role", "ADMIN"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ROLE_NOT_ALLOWED"));
+        String body = mvc.perform(post("/api/auth/register").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("name", "New Kid", "email", email, "password", "password123"))))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         JsonNode user = json.readTree(body).get("user");
         assertThat(user.get("role").asText()).isEqualTo("STUDENT");
@@ -188,14 +193,17 @@ class ApiIntegrationTest {
 
         postJson("/api/teacher/assignments", teacher, Map.of("title", "Both set")).andExpect(status().isBadRequest());
 
-        // Power BI / Excel friendly CSV exports: header + one row per student, teacher-only
-        String csv = mvc.perform(get("/api/teacher/reports/students.csv").header("Authorization", "Bearer " + teacher))
+        // Power BI / Excel friendly topic CSV: header + one row per topic, teacher-only
+        String csv = mvc.perform(get("/api/teacher/reports/topics.csv").header("Authorization", "Bearer " + teacher))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("class-students.csv")))
+                .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("class-topics.csv")))
                 .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         String[] lines = csv.split("\r\n");
-        assertThat(lines[0]).startsWith("﻿student_id,name,email");
-        assertThat(lines.length - 1).isEqualTo(getJson("/api/teacher/students", teacher).size());
+        assertThat(lines[0]).startsWith("﻿subject,topic_code,topic");
+        assertThat(lines.length - 1).isEqualTo(getJson("/api/teacher/weak-topics", teacher).size());
+        // The per-student CSV was replaced by the per-student PDF report
+        mvc.perform(get("/api/teacher/reports/students.csv").header("Authorization", "Bearer " + teacher))
+                .andExpect(status().isNotFound());
         mvc.perform(get("/api/teacher/reports/topics.csv").header("Authorization", "Bearer " + login("aarav@shiksha.org", "Student@123")))
                 .andExpect(status().isForbidden());
 

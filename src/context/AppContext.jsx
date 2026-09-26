@@ -88,8 +88,8 @@ export const AppProvider = ({ children }) => {
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
   }, [logout, showToast, language]);
 
-  const login = useCallback(async (email, password) => {
-    const u = await authApi.login(email, password);
+  const login = useCallback(async (email, password, role) => {
+    const u = await authApi.login(email, password, role);
     setUser(u);
     setStatus('authed');
     if (u.preferredLanguage) applyLanguage(u.preferredLanguage);
