@@ -50,7 +50,11 @@ services:
 
   web:
     profiles: ["full"]
-    build: .
+    build:
+      context: .
+      args:
+        # Lists the demo accounts on the sign-in page; keep it in step with SEED_ENABLED.
+        VITE_DEMO_ACCOUNTS: ${DEMO_ACCOUNTS:-true}
     depends_on:
       - backend
     ports:

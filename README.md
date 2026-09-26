@@ -59,7 +59,13 @@ The Vite dev server proxies `/api` to the backend.
 
 Seven more students (`priya@`, `rohan@`, `kavya@`, `manish@`, `ananya@`, `imran@`, `deepa@shiksha.org`) share the password `Student@123`. They are all in the teacher's class **Class 8 – Section A** at *Govt. High School, Sundargarh*. The class code is random: the teacher dashboard and the admin **Classes** page show it, and a new student enters it during onboarding (or later in the profile) to join the class.
 
-The sign-in dialog shows one-click demo buttons in `npm run dev` only. Set `SEED_ENABLED=false` for any real deployment. To reset the demo data, stop the backend and delete `backend/data/`.
+All roles use the same sign-in form. After sign-in, each role goes to its own dashboard (`/admin`, `/teacher` or `/student`). Pages for other roles redirect back to the user's home, and the API returns 403.
+
+The sign-in dialog has a **Demo accounts** list (role + email; click to sign in, passwords are never displayed). It appears:
+- in `npm run dev`;
+- in production builds made with `VITE_DEMO_ACCOUNTS=true`, which is what the Docker `web` image does by default (`DEMO_ACCOUNTS` in compose).
+
+For any real deployment, set `DEMO_ACCOUNTS=false` and `SEED_ENABLED=false`. Without the flag, the demo list is compiled out of the bundle. To reset the demo data, stop the backend and delete `backend/data/`.
 
 ### Trying the offline mode
 

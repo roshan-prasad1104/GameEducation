@@ -6,11 +6,16 @@ import { X, Mail, KeyRound, Globe, ShieldCheck, ArrowRight, User, Sparkles } fro
 import { Button } from '../ui/Button';
 import { homeFor } from '../routing/roles';
 
-/** Seeded development accounts (documented in README). Shown only in `npm run dev`. */
+/**
+ * Seeded demo accounts (documented in README). Shown in `npm run dev` and in demo builds
+ * (VITE_DEMO_ACCOUNTS=true, the Docker default); a production build without the flag
+ * compiles this list out entirely. Passwords are never displayed, only used for one-click sign-in.
+ */
+const DEMO_ENABLED = import.meta.env.DEV || import.meta.env.VITE_DEMO_ACCOUNTS === 'true';
 const DEMO_ACCOUNTS = [
-  { email: 'aarav@shiksha.org', password: 'Student@123', labelKey: 'authModal.studentDemo' },
-  { email: 'teacher@shiksha.org', password: 'Teacher@123', labelKey: 'authModal.teacherDemo' },
-  { email: 'admin@shiksha.org', password: 'Admin@123', labelKey: 'authModal.adminDemo' },
+  { role: 'ADMIN', email: 'admin@shiksha.org', password: 'Admin@123' },
+  { role: 'TEACHER', email: 'teacher@shiksha.org', password: 'Teacher@123' },
+  { role: 'STUDENT', email: 'aarav@shiksha.org', password: 'Student@123' },
 ];
 
 /**
@@ -68,7 +73,7 @@ export const AuthModal = ({ mode }) => {
     }
   };
 
-  const demos = import.meta.env.DEV ? DEMO_ACCOUNTS : [];
+  const demos = DEMO_ENABLED ? DEMO_ACCOUNTS : [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -97,19 +102,21 @@ export const AuthModal = ({ mode }) => {
           {/* Demo accounts (login only) */}
           {mode === 'login' && demos.length > 0 && (
             <div className="mb-5 p-3 rounded-xl bg-slate-800/80 border border-slate-700">
-              <p className="text-xs font-semibold text-brand-200 mb-2 flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5" /> {t('authModal.demoOneClick')}
+              <p className="text-xs font-semibold text-brand-200 mb-1 flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5" /> {t('authModal.demoTitle')}
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <p className="text-[11px] text-slate-400 mb-2">{t('authModal.demoHint')}</p>
+              <div className="grid gap-2">
                 {demos.map(d => (
                   <button
                     key={d.email}
                     type="button"
                     onClick={() => signInDemo(d)}
                     disabled={submitting}
-                    className="text-xs font-medium px-2 py-1.5 rounded-lg bg-slate-900 border border-brand-500/60 text-slate-100 hover:border-brand-400 transition-colors disabled:opacity-50"
+                    className="flex items-center justify-between gap-3 text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 border border-brand-500/60 text-slate-100 hover:border-brand-400 transition-colors disabled:opacity-50"
                   >
-                    {t(d.labelKey)}
+                    <span className="font-semibold">{t(`roles.${d.role}`)}</span>
+                    <span className="text-slate-300 truncate">{d.email}</span>
                   </button>
                 ))}
               </div>
